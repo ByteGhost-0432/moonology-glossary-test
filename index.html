@@ -263,6 +263,48 @@
       to { opacity: 1; transform: scale(1); }
     }
 
+    .trophy-section {
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .trophy-input {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(212,175,55,0.35);
+      color: #e8e4d8;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .trophy-input::placeholder { color: rgba(232,228,216,0.4); }
+
+    .trophy-btn {
+      display: block;
+      width: 100%;
+      background: transparent;
+      color: #50c878;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 14px;
+      border: 1px solid #50c878;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(80,200,120,0.15);
+      transition: all 0.2s;
+    }
+
+    .trophy-btn:hover {
+      background: rgba(80,200,120,0.08);
+      box-shadow: 0 0 25px rgba(80,200,120,0.3);
+    }
+
     .missed-box {
       border: 1px solid rgba(212,175,55,0.25);
       padding: 20px 22px;
@@ -352,6 +394,10 @@
       <div class="moon-reveal" id="moon-reveal" style="display:none">
         <img src="thoth-moon-reveal.jpg" alt="The Moon" />
         <p class="moon-caption">Thoth, Lord of the Moon, acknowledges you.</p>
+      </div>
+      <div class="trophy-section" id="trophy-section" style="display:none">
+        <input type="text" id="trophy-name" class="trophy-input" placeholder="Enter your name for the trophy" maxlength="40" />
+        <button class="trophy-btn" onclick="generateTrophy()">[ Claim Your Trophy ]</button>
       </div>
       <div class="missed-box" id="missed-box" style="display:none">
         <h3>// Terms to revisit</h3>
@@ -528,6 +574,7 @@
     document.getElementById('results').style.display = 'block';
 
     document.getElementById('moon-reveal').style.display = score >= 30 ? 'block' : 'none';
+    document.getElementById('trophy-section').style.display = score >= 30 ? 'block' : 'none';
 
     let color, label, verdict;
     if (score >= 30) {
@@ -580,6 +627,106 @@
     document.getElementById('glossary-section').style.display = 'block';
     document.getElementById('progress-line').textContent = '33 questions — select one answer per question';
     window.scrollTo(0, 0);
+  }
+
+  async function generateTrophy() {
+    const nameInput = document.getElementById('trophy-name');
+    const name = (nameInput.value || 'Seeker of the Tablets').trim();
+
+    // Make sure the custom fonts are actually loaded before we draw text with them —
+    // otherwise canvas silently falls back to a default font on first use.
+    await Promise.all([
+      document.fonts.load('64px "UnifrakturMaguntia"'),
+      document.fonts.load('italic 26px "Cormorant Garamond"'),
+      document.fonts.load('700 42px "Cormorant Garamond"'),
+      document.fonts.load('700 20px "Cormorant Garamond"'),
+      document.fonts.load('28px "Cormorant Garamond"')
+    ]);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 800;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#07080a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const glow = ctx.createRadialGradient(600, 300, 50, 600, 300, 700);
+    glow.addColorStop(0, 'rgba(212,175,55,0.12)');
+    glow.addColorStop(1, 'rgba(212,175,55,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Borders
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+    ctx.strokeStyle = 'rgba(80,200,120,0.4)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(45, 45, canvas.width - 90, canvas.height - 90);
+
+    // Moon image, clipped to a circle, same asset as the in-page reveal
+    await new Promise((resolve) => {
+      const moonImg = new Image();
+      moonImg.onload = () => {
+        const cx = 600, cy = 220, r = 100;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(moonImg, cx - r, cy - r, r * 2, r * 2);
+        ctx.restore();
+        ctx.shadowColor = 'rgba(212,175,55,0.6)';
+        ctx.shadowBlur = 30;
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        resolve();
+      };
+      moonImg.onerror = resolve; // don't block the trophy if the image fails to load
+      moonImg.src = 'thoth-moon-reveal.jpg';
+    });
+
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = '#50c878';
+    ctx.font = '700 20px "Cormorant Garamond"';
+    ctx.fillText('M O O N O L O G Y   A R T   G A L L E R Y', 600, 375);
+
+    ctx.fillStyle = '#d4af37';
+    ctx.font = '64px "UnifrakturMaguntia"';
+    ctx.shadowColor = 'rgba(212,175,55,0.5)';
+    ctx.shadowBlur = 20;
+    ctx.fillText('Master of the Tablets', 600, 450);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = 'rgba(232,228,216,0.7)';
+    ctx.font = 'italic 26px "Cormorant Garamond"';
+    ctx.fillText('awarded to', 600, 520);
+
+    ctx.fillStyle = '#e8e4d8';
+    ctx.font = '700 42px "Cormorant Garamond"';
+    ctx.fillText(name, 600, 578);
+
+    const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    ctx.fillStyle = 'rgba(212,175,55,0.85)';
+    ctx.font = '28px "Cormorant Garamond"';
+    ctx.fillText('33 / 33 — ' + dateStr, 600, 635);
+
+    ctx.fillStyle = '#d4af37';
+    ctx.font = 'italic 24px "Cormorant Garamond"';
+    ctx.fillText('As above, so below.', 600, 725);
+
+    const safeName = name.replace(/[^a-z0-9]+/gi, '-').toLowerCase().replace(/^-+|-+$/g, '');
+    const link = document.createElement('a');
+    link.download = `moonology-trophy-${safeName || 'seeker'}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   }
 
   renderGlossary();
