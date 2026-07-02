@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Language of the Moon | Moonology Art Gallery</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cormorant+Garamond:wght@400;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Cormorant Garamond', serif;
+      background: #07080a;
+      color: #e8e4d8;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(212,175,55,0.06), transparent 60%);
+    }
+
+    .tablet-frame {
+      max-width: 760px;
+      width: 100%;
+      border: 1px solid #d4af37;
+      box-shadow: 0 0 40px rgba(212,175,55,0.12), inset 0 0 40px rgba(0,0,0,0.6);
+    }
+
+    .tablet-bar {
+      background: #0c0d10;
+      border-bottom: 1px solid #d4af37;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-gold { background: #d4af37; box-shadow: 0 0 4px #d4af37; }
+    .dot-emerald { background: #50c878; box-shadow: 0 0 4px #50c878; }
+    .dot-cream { background: #e8e4d8; box-shadow: 0 0 4px #e8e4d8; }
+
+    .tablet-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.72rem;
+      color: #50c878;
+      letter-spacing: 0.15em;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .tablet-body { padding: 32px 36px 50px; }
+
+    h1 {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 2.6rem;
+      color: #d4af37;
+      text-shadow: 0 0 20px rgba(212,175,55,0.4);
+      margin-bottom: 10px;
+      font-weight: 400;
+    }
+
+    .intro {
+      font-size: 1.05rem;
+      color: rgba(232,228,216,0.75);
+      line-height: 1.7;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(212,175,55,0.2);
+      margin: 24px 0;
+    }
+
+    .emerald-divider {
+      border: none;
+      border-top: 1px solid rgba(80,200,120,0.25);
+      margin: 24px 0;
+    }
+
+    /* Glossary */
+    .glossary-item {
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(212,175,55,0.1);
+    }
+
+    .glossary-item .term {
+      color: #d4af37;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .glossary-item .def {
+      color: rgba(232,228,216,0.85);
+      font-size: 1.02rem;
+      line-height: 1.55;
+      margin-top: 3px;
+    }
+
+    .begin-btn, .submit-btn, .restart-btn {
+      display: block;
+      width: 100%;
+      background: transparent;
+      color: #d4af37;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 14px;
+      border: 1px solid #d4af37;
+      cursor: pointer;
+      margin-top: 28px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(212,175,55,0.15);
+      transition: all 0.2s;
+    }
+
+    .begin-btn:hover, .submit-btn:hover:not(:disabled), .restart-btn:hover {
+      background: rgba(212,175,55,0.08);
+      box-shadow: 0 0 25px rgba(212,175,55,0.3);
+    }
+
+    .submit-btn:disabled {
+      border-color: rgba(80,200,120,0.25);
+      color: rgba(80,200,120,0.3);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Quiz */
+    #quiz-section, #results { display: none; }
+
+    .progress-line {
+      font-size: 0.8rem;
+      color: #50c878;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .question-block {
+      border: 1px solid rgba(80,200,120,0.25);
+      padding: 22px;
+      margin-bottom: 16px;
+      background: rgba(80,200,120,0.02);
+      position: relative;
+    }
+
+    .question-block::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: #d4af37;
+      box-shadow: 0 0 8px rgba(212,175,55,0.4);
+    }
+
+    .question-number {
+      font-size: 0.65rem;
+      color: #d4af37;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .question-text {
+      font-size: 1.1rem;
+      color: #e8e4d8;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 8px; }
+
+    .option {
+      background: transparent;
+      border: 1px solid rgba(232,228,216,0.18);
+      padding: 10px 14px;
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: rgba(232,228,216,0.7);
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+
+    .option:hover {
+      border-color: rgba(80,200,120,0.6);
+      color: #e8e4d8;
+      background: rgba(80,200,120,0.05);
+    }
+
+    .option.selected {
+      border-color: #d4af37;
+      color: #d4af37;
+      background: rgba(212,175,55,0.06);
+      box-shadow: inset 3px 0 0 #d4af37;
+    }
+
+    .option.selected::before { content: '> '; }
+
+    /* Results */
+    .result-header { text-align: center; margin-bottom: 24px; }
+
+    #score-display {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 6px;
+      text-shadow: 0 0 20px currentColor;
+    }
+
+    #score-label {
+      font-size: 0.95rem;
+      color: rgba(232,228,216,0.75);
+      letter-spacing: 0.08em;
+    }
+
+    #verdict-text {
+      font-size: 1.05rem;
+      color: rgba(232,228,216,0.9);
+      line-height: 1.7;
+      margin-bottom: 24px;
+      border-left: 2px solid rgba(212,175,55,0.4);
+      padding-left: 16px;
+      font-style: italic;
+    }
+
+    .missed-box {
+      border: 1px solid rgba(212,175,55,0.25);
+      padding: 20px 22px;
+      margin-bottom: 28px;
+      background: rgba(212,175,55,0.02);
+    }
+
+    .missed-box h3 {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #d4af37;
+      margin-bottom: 12px;
+    }
+
+    .missed-box ul { list-style: none; padding: 0; }
+
+    .missed-box ul li {
+      font-size: 1rem;
+      color: rgba(232,228,216,0.8);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(232,228,216,0.08);
+    }
+
+    .missed-box ul li:last-child { border-bottom: none; }
+    .missed-box ul li::before { content: '→ '; color: #50c878; }
+
+    .back-link {
+      display: block;
+      margin-top: 14px;
+      color: rgba(232,228,216,0.4);
+      font-size: 0.85rem;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      text-align: center;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: #d4af37; }
+
+    .footer-note {
+      margin-top: 36px;
+      font-size: 0.78rem;
+      color: rgba(212,175,55,0.35);
+      letter-spacing: 0.08em;
+      text-align: center;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<div class="tablet-frame">
+  <div class="tablet-bar">
+    <div class="dot dot-gold"></div>
+    <div class="dot dot-emerald"></div>
+    <div class="dot dot-cream"></div>
+    <div class="tablet-title">moonologyartgallery.com — the_language_of_the_moon</div>
+  </div>
+  <div class="tablet-body">
+
+    <!-- Glossary -->
+    <div id="glossary-section">
+      <h1>The Language of the Moon</h1>
+      <p class="intro">Core terms from the Emerald Tablets of Thoth the Atlantean (Doreal translation). Read through once, then test yourself. As above, so below.</p>
+      <hr class="divider" />
+      <div id="glossary-list"></div>
+      <button class="begin-btn" onclick="beginTest()">[ Begin the Test → ]</button>
+    </div>
+
+    <!-- Quiz -->
+    <div id="quiz-section">
+      <div class="progress-line" id="progress-line">33 questions — select one answer per question</div>
+      <hr class="divider" />
+      <div id="quiz-list"></div>
+      <button class="submit-btn" id="submitBtn" onclick="showResults()" disabled>[ Reveal Your Score ]</button>
+    </div>
+
+    <!-- Results -->
+    <div id="results">
+      <hr class="divider" />
+      <div class="result-header">
+        <span id="score-display"></span>
+        <span id="score-label"></span>
+      </div>
+      <hr class="emerald-divider" />
+      <p id="verdict-text"></p>
+      <div class="missed-box" id="missed-box" style="display:none">
+        <h3>// Terms to revisit</h3>
+        <ul id="missed-items"></ul>
+      </div>
+      <button class="restart-btn" onclick="restartQuiz()">[ Re-run the Test ]</button>
+      <a class="back-link" href="https://www.skool.com/still-learnin-3313">return to Moonology Art Gallery community</a>
+    </div>
+
+    <hr class="divider" />
+    <p class="footer-note">As above, so below. &mdash; Moonology Art Gallery</p>
+
+  </div>
+</div>
+
+<script>
+  // Data-driven glossary + quiz. Term, definition, and correct answer index
+  // all live in ONE object per entry, so the answer key can never drift out
+  // of sync with the options the way a hand-coded question block can.
+  const DATA = [
+    { term: "Thoth", def: "Atlantean priest-king and narrator; an immortal being who conquered death and later reincarnated as Hermes.",
+      q: "What did Thoth conquer?", opts: ["Time", "Death", "The Dark Brothers", "Atlantis"], correct: 1 },
+    { term: "Thotme", def: "Thoth's father; keeper of the great temple, a link between the Children of Light and the races of men.",
+      q: "Who is Thotme?", opts: ["Thoth's father", "Thoth's teacher", "The Dweller", "A Lord of the Cycles"], correct: 0 },
+    { term: "Hermes", def: "Described as a later incarnation of Thoth, called \"thrice-born.\"",
+      q: "How is Hermes described?", opts: ["Thoth's enemy", "A separate god", "A later incarnation of Thoth", "Thoth's father"], correct: 2 },
+    { term: "The Dweller", def: "A master being who rules from the Temple of Unal, directing cosmic and spiritual forces.",
+      q: "Where does the Dweller rule from?", opts: ["The Halls of Amenti", "The Temple of Unal", "Khem", "Arulu"], correct: 1 },
+    { term: "Horlet the Master", def: "Named as one who \"was never one with the children of men\" — a non-human advanced being.",
+      q: "What's unique about Horlet the Master?", opts: ["Never one with the children of men", "Built the Great Pyramid", "A Dark Brother", "Thoth's son"], correct: 0 },
+    { term: "Children of Light", def: "Thirty-two advanced beings who descended to guide humanity.",
+      q: "How many Children of Light descended to guide humanity?", opts: ["7", "9", "32", "15"], correct: 2 },
+    { term: "Dark Brothers", def: "Antagonist forces associated with forbidden or misused knowledge.",
+      q: "The Dark Brothers are associated with?", opts: ["Forbidden/misused knowledge", "The Flower of Life", "Space-Time", "Ether"], correct: 0 },
+    { term: "Brothers of Light", def: "The benevolent counterpart opposing the Dark Brothers.",
+      q: "What is the role of the Brothers of Light?", opts: ["Oppose the Dark Brothers", "Imprison Thoth", "Rule Arulu", "Built Yucatan's temples"], correct: 0 },
+    { term: "Lords of the Cycles", def: "Cosmic beings governing destiny, referred to by number (Three through Nine).",
+      q: "The Lords of the Cycles are referred to by?", opts: ["Color", "Number, Three through Nine", "Element", "Animal"], correct: 1 },
+    { term: "The Veiled Presence", def: "Called \"Lord of Lords, the infinite Nine,\" overseer above the Lords of the Cycles.",
+      q: "The Veiled Presence is also called?", opts: ["Lord of Lords, the infinite Nine", "The Dark Prince", "Master of Unal", "Keeper of the Flame"], correct: 0 },
+    { term: "Atlantis", def: "The lost civilization presented as the source of Thoth's wisdom, said to have sunk beneath the sea.",
+      q: "What ultimately happened to Atlantis?", opts: ["Ascended to the stars", "Sank beneath the sea", "Became Khem", "Merged with Yucatan"], correct: 1 },
+    { term: "Keor", def: "\"The great city on the island of Undal\" — Thoth's stated birthplace.",
+      q: "Keor is described as?", opts: ["A Lord of the Cycles", "A great city on the island of Undal", "A Dark Brother", "A summoning realm"], correct: 1 },
+    { term: "Undal", def: "The island on which the city of Keor stood.",
+      q: "Undal is the name of?", opts: ["A guardian being", "The island where Keor stood", "A cosmic void", "A trance state"], correct: 1 },
+    { term: "Unal", def: "A separate location named as the seat of the Dweller's Temple (\"the Master of Unal\").",
+      q: "Unal is named as the seat of?", opts: ["The Dweller's Temple", "The Great Pyramid", "The Halls of Amenti", "Arulu"], correct: 0 },
+    { term: "Khem", def: "The text's name for ancient Egypt, where Thoth led his people after Atlantis fell.",
+      q: "Khem refers to?", opts: ["Ancient Egypt", "Atlantis", "A cosmic realm", "A Lord of the Cycles"], correct: 0 },
+    { term: "Halls of Amenti", def: "Subterranean halls beneath the Earth, dwelling place of the Masters; called \"Halls of the Dead.\"",
+      q: "The Halls of Amenti are also called?", opts: ["Halls of the Dead", "Halls of Light", "Halls of Fire", "Halls of the Word"], correct: 0 },
+    { term: "Yucatan", def: "Named in the preface as where priests placed a set of tablets inside a Maya temple.",
+      q: "What's significant about Yucatan in the preface?", opts: ["Thoth was born there", "Priests placed tablets in a Maya temple there", "Location of Arulu", "Where Atlantis sank"], correct: 1 },
+    { term: "Great Pyramid of Giza", def: "Said to have been built by Thoth over the entrance to the Halls of Amenti.",
+      q: "The Great Pyramid was built over?", opts: ["The Temple of Unal", "The entrance to the Halls of Amenti", "Keor", "The Abyss"], correct: 1 },
+    { term: "The Temple", def: "The Dweller's dwelling, formed of ether, lost when Atlantis sank.",
+      q: "The Temple was made of?", opts: ["Stone", "Ether", "Gold", "Crystal"], correct: 1 },
+    { term: "Space-Time", def: "A dimension described as accessible through specific meditative techniques.",
+      q: "Space-Time is accessible through?", opts: ["Meditative/spiritual techniques", "Physical travel", "The Great Pyramid only", "Death"], correct: 0 },
+    { term: "The Abyss", def: "The primordial void from which Order and Light emerged.",
+      q: "What emerged from the Abyss?", opts: ["The Dark Brothers", "Order and Light", "Atlantis", "The Flame"], correct: 1 },
+    { term: "Arulu", def: "A \"dim, hidden land\" ruled by a \"dark prince,\" where a captive figure is imprisoned.",
+      q: "Arulu is described as?", opts: ["A dim, hidden land ruled by a dark prince", "A city of light", "The Dweller's seat", "A form of the Word"], correct: 0 },
+    { term: "Ekershegal", def: "A realm invoked by name in a summoning passage (\"from the realm of Ekershegal\").",
+      q: "Ekershegal is invoked as?", opts: ["A summoning realm", "A Lord of the Cycles", "A trance state", "A guardian being"], correct: 0 },
+    { term: "The Flower of Life", def: "A life-giving flame within the Halls of Amenti, radiating power.",
+      q: "The Flower of Life is described as?", opts: ["A book", "A life-giving flame in the Halls of Amenti", "A star", "A Dark Brother"], correct: 1 },
+    { term: "The Word", def: "The fundamental creative force behind all manifestation.",
+      q: "The Word is presented as?", opts: ["A written law", "The fundamental creative force behind all manifestation", "A place", "A Lord of the Cycles"], correct: 1 },
+    { term: "Ether", def: "The primordial substance from which matter is said to condense.",
+      q: "Ether is described as?", opts: ["The primordial substance matter condenses from", "A guardian being", "A cosmic void", "A written language"], correct: 0 },
+    { term: "Agwanti", def: "A trance-like state of detachment where the soul roams free while the body rests.",
+      q: "Agwanti describes?", opts: ["A weapon", "A trance-like state where the soul roams free", "A place in Atlantis", "A Lord of the Cycles"], correct: 1 },
+    { term: "Magic-Science", def: "The text's term for its own knowledge system, blending spiritual and technical principles.",
+      q: "Magic-Science refers to?", opts: ["A forbidden art", "The text's own system blending spiritual and technical principles", "A Dark Brother", "A location"], correct: 1 },
+    { term: "The Veil", def: "The barrier separating the material world from spiritual planes.",
+      q: "The Veil separates?", opts: ["Day and night", "The material world from spiritual planes", "Atlantis from Khem", "Thoth from Hermes"], correct: 1 },
+    { term: "Hounds of the Barrier", def: "Guardian beings blocking passage beyond the current cosmic cycle.",
+      q: "The Hounds of the Barrier do what?", opts: ["Guide lost souls", "Block passage beyond the current cosmic cycle", "Guard the Great Pyramid", "Serve the Dweller"], correct: 1 },
+    { term: "Logos", def: "The divine creative word or principle.",
+      q: "Logos refers to?", opts: ["A place", "The divine creative word or principle", "A Lord of the Cycles", "A guardian"], correct: 1 },
+    { term: "Soul-force", def: "The spiritual energy animating consciousness, described as needing to be freed from bondage.",
+      q: "Soul-force is described as needing to be?", opts: ["Hidden", "Freed from bondage", "Destroyed", "Worshipped"], correct: 1 },
+    { term: "The Flame", def: "A recurring symbol for the soul, consciousness, and connection to the divine.",
+      q: "The Flame is a recurring symbol for?", opts: ["War", "The soul, consciousness, and connection to the divine", "Atlantis", "The Dark Brothers"], correct: 1 }
+  ];
+
+  // ---- Self-check: run at load time so a broken entry fails loudly in console ----
+  (function selfCheck() {
+    DATA.forEach((d, i) => {
+      if (!d.term || !d.def || !d.q) console.error(`Entry ${i} missing a field`, d);
+      if (!Array.isArray(d.opts) || d.opts.length < 2) console.error(`Entry ${i} (${d.term}) has too few options`, d);
+      if (typeof d.correct !== 'number' || d.correct < 0 || d.correct >= d.opts.length) {
+        console.error(`Entry ${i} (${d.term}) has an out-of-range correct index`, d);
+      }
+    });
+    if (DATA.length !== 33) console.warn(`Expected 33 entries, found ${DATA.length}`);
+    console.log(`Self-check complete: ${DATA.length} glossary/quiz entries loaded.`);
+  })();
+
+  const answers = {}; // qIndex -> selected option index
+
+  function renderGlossary() {
+    const list = document.getElementById('glossary-list');
+    list.innerHTML = '';
+    DATA.forEach((d, i) => {
+      const div = document.createElement('div');
+      div.className = 'glossary-item';
+      div.innerHTML = `<div class="term">${i + 1}. ${d.term}</div><div class="def">${d.def}</div>`;
+      list.appendChild(div);
+    });
+  }
+
+  function renderQuiz() {
+    const list = document.getElementById('quiz-list');
+    list.innerHTML = '';
+    DATA.forEach((d, i) => {
+      const block = document.createElement('div');
+      block.className = 'question-block';
+
+      const num = document.createElement('div');
+      num.className = 'question-number';
+      num.textContent = `[ Query ${String(i + 1).padStart(2, '0')} / 33 ]`;
+      block.appendChild(num);
+
+      const qText = document.createElement('div');
+      qText.className = 'question-text';
+      qText.textContent = d.q;
+      block.appendChild(qText);
+
+      const optsDiv = document.createElement('div');
+      optsDiv.className = 'options';
+      d.opts.forEach((optText, optIndex) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.textContent = optText;
+        btn.dataset.q = i;
+        btn.dataset.opt = optIndex;
+        btn.onclick = () => selectOption(btn, i, optIndex);
+        optsDiv.appendChild(btn);
+      });
+      block.appendChild(optsDiv);
+
+      list.appendChild(block);
+    });
+  }
+
+  function selectOption(btn, qIndex, optIndex) {
+    document.querySelectorAll(`.option[data-q="${qIndex}"]`).forEach(o => o.classList.remove('selected'));
+    btn.classList.add('selected');
+    answers[qIndex] = optIndex;
+    document.getElementById('submitBtn').disabled = Object.keys(answers).length < DATA.length;
+    document.getElementById('progress-line').textContent =
+      `${Object.keys(answers).length} / 33 answered`;
+  }
+
+  function beginTest() {
+    document.getElementById('glossary-section').style.display = 'none';
+    document.getElementById('quiz-section').style.display = 'block';
+    renderQuiz();
+    window.scrollTo(0, 0);
+  }
+
+  function showResults() {
+    let score = 0;
+    const missed = [];
+    DATA.forEach((d, i) => {
+      if (answers[i] === d.correct) score++;
+      else missed.push(d.term);
+    });
+
+    document.getElementById('quiz-section').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+
+    let color, label, verdict;
+    if (score >= 30) {
+      color = '#d4af37';
+      label = 'MASTER OF THE TABLETS';
+      verdict = 'You know this text cold. The names, the places, the cosmology — it\'s all landed. As above, so below.';
+    } else if (score >= 22) {
+      color = '#50c878';
+      label = 'ADEPT';
+      verdict = 'Solid grasp of the material, with a few gaps worth closing. Revisit the terms below and run it again.';
+    } else if (score >= 12) {
+      color = '#e8e4d8';
+      label = 'INITIATE';
+      verdict = 'You\'ve got the core figures down — Thoth, Atlantis, the Halls of Amenti. The deeper cosmology needs another pass.';
+    } else {
+      color = '#c9a35a';
+      label = 'SEEKER';
+      verdict = 'You\'re just starting the descent. Read back through the glossary once more, slowly, then try again.';
+    }
+
+    const scoreEl = document.getElementById('score-display');
+    scoreEl.textContent = score + ' / 33';
+    scoreEl.style.color = color;
+
+    document.getElementById('score-label').textContent = label;
+    document.getElementById('score-label').style.color = color;
+    document.getElementById('verdict-text').textContent = verdict;
+
+    const missedBox = document.getElementById('missed-box');
+    const missedList = document.getElementById('missed-items');
+    missedList.innerHTML = '';
+    if (missed.length > 0) {
+      missedBox.style.display = 'block';
+      missed.forEach(term => {
+        const li = document.createElement('li');
+        li.textContent = term;
+        missedList.appendChild(li);
+      });
+    } else {
+      missedBox.style.display = 'none';
+    }
+
+    window.scrollTo(0, 0);
+  }
+
+  function restartQuiz() {
+    for (const k in answers) delete answers[k];
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('glossary-section').style.display = 'block';
+    document.getElementById('progress-line').textContent = '33 questions — select one answer per question';
+    window.scrollTo(0, 0);
+  }
+
+  renderGlossary();
+</script>
+</body>
+</html>
