@@ -235,6 +235,34 @@
       font-style: italic;
     }
 
+    .moon-reveal {
+      text-align: center;
+      margin-bottom: 28px;
+      animation: reveal-fade 1.2s ease;
+    }
+
+    .moon-reveal img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid #d4af37;
+      box-shadow: 0 0 40px rgba(212,175,55,0.5), 0 0 80px rgba(212,175,55,0.2);
+    }
+
+    .moon-caption {
+      margin-top: 14px;
+      font-style: italic;
+      color: #d4af37;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes reveal-fade {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     .missed-box {
       border: 1px solid rgba(212,175,55,0.25);
       padding: 20px 22px;
@@ -321,6 +349,10 @@
       </div>
       <hr class="emerald-divider" />
       <p id="verdict-text"></p>
+      <div class="moon-reveal" id="moon-reveal" style="display:none">
+        <img src="thoth-moon-reveal.jpg" alt="The Moon" />
+        <p class="moon-caption">Thoth, Lord of the Moon, acknowledges you.</p>
+      </div>
       <div class="missed-box" id="missed-box" style="display:none">
         <h3>// Terms to revisit</h3>
         <ul id="missed-items"></ul>
@@ -494,6 +526,8 @@
 
     document.getElementById('quiz-section').style.display = 'none';
     document.getElementById('results').style.display = 'block';
+
+    document.getElementById('moon-reveal').style.display = score >= 30 ? 'block' : 'none';
 
     let color, label, verdict;
     if (score >= 30) {
