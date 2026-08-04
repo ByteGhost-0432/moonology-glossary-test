@@ -562,6 +562,11 @@
     window.scrollTo(0, 0);
   }
 
+  // Exposed so generateTrophy() can print the REAL score. It used to hardcode
+  // "33 / 33", which meant anyone scoring 30, 31 or 32 downloaded a certificate
+  // claiming a perfect run. On a channel built on checking claims, that one hurt.
+  let lastScore = 0;
+
   function showResults() {
     let score = 0;
     const missed = [];
@@ -569,6 +574,8 @@
       if (answers[i] === d.correct) score++;
       else missed.push(d.term);
     });
+
+    lastScore = score;
 
     document.getElementById('quiz-section').style.display = 'none';
     document.getElementById('results').style.display = 'block';
@@ -716,17 +723,46 @@
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     ctx.fillStyle = 'rgba(212,175,55,0.85)';
     ctx.font = '28px "Cormorant Garamond"';
-    ctx.fillText('33 / 33 — ' + dateStr, 600, 635);
+    ctx.fillText(lastScore + ' / 33 — ' + dateStr, 600, 635);
 
     ctx.fillStyle = '#d4af37';
     ctx.font = 'italic 24px "Cormorant Garamond"';
     ctx.fillText('As above, so below.', 600, 725);
 
     const safeName = name.replace(/[^a-z0-9]+/gi, '-').toLowerCase().replace(/^-+|-+$/g, '');
-    const link = document.createElement('a');
-    link.download = `moonology-trophy-${safeName || 'seeker'}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const filename = `moonology-trophy-${safeName || 'seeker'}.png`;
+
+    // Blob rather than a data: URL — a 1200x800 PNG data URL runs to megabytes and
+    // some browsers refuse to navigate to one that large. The anchor is also attached
+    // to the document before clicking: a detached <a download> silently does nothing
+    // in Safari and Firefox, which is the likeliest reason this appeared to do nothing.
+    canvas.toBlob((blob) => {
+      if (!blob) { showTrophyStatus('Could not build the trophy image. Try again.', false); return; }
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      showTrophyStatus('Trophy saved as ' + filename, true);
+    }, 'image/png');
+  }
+
+  // Visible confirmation. Without it the button appeared to do nothing at all,
+  // because a browser download gives no on-page feedback.
+  function showTrophyStatus(msg, ok) {
+    let el = document.getElementById('trophy-status');
+    if (!el) {
+      el = document.createElement('p');
+      el.id = 'trophy-status';
+      el.style.cssText = 'margin-top:14px;font-family:\'Cormorant Garamond\',serif;font-size:18px;letter-spacing:.04em;';
+      document.getElementById('trophy-section').appendChild(el);
+    }
+    el.style.color = ok ? '#50c878' : '#c96a5a';
+    el.textContent = (ok ? '\u2713  ' : '\u2717  ') + msg;
   }
 
   renderGlossary();
