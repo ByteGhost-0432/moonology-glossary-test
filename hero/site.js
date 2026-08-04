@@ -55,6 +55,19 @@
       '{background-color:transparent !important;}',
     'header.elementor{border-bottom:1px solid rgba(212,175,55,.16);}',
 
+    // Bluehost WonderBlocks (nfd-*) and core block groups ship their own light theme —
+    // white panels and pure-blue headings — which sit on top of the sky. These are the
+    // actual source of the white band on About, not the theme.
+    '.wp-block-group,.wp-block-columns,.wp-block-column,.nfd-container,' +
+    '[class*="nfd-bg-white"],.has-white-background-color' +
+    '{background-color:transparent !important;}',
+    '.wp-block-group h1,.wp-block-group h2,.wp-block-group h3,.wp-block-group h4,' +
+    '[class*="nfd-"] h1,[class*="nfd-"] h2,[class*="nfd-"] h3,[class*="nfd-"] h4' +
+    '{color:' + GOLD_LT + ' !important;}',
+    '.wp-block-group p,.wp-block-group li,.wp-block-group span,' +
+    '[class*="nfd-"] p,[class*="nfd-"] li' +
+    '{color:' + CREAM + ' !important;}',
+
     // The hero owns itself.
     '.mng-hero,.mng-hero *{}',
 
