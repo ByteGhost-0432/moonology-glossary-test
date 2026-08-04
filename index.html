@@ -739,6 +739,15 @@
     canvas.toBlob((blob) => {
       if (!blob) { showTrophyStatus('Could not build the trophy image. Try again.', false); return; }
       const url = URL.createObjectURL(blob);
+
+      // ALWAYS show the trophy on the page. This is the part that actually works
+      // everywhere. On iOS Safari <a download> usually opens the image instead of
+      // saving it, and inside the Skool mobile app's in-app webview downloads often
+      // fail silently — the member taps Claim, sees a success message, and has no
+      // file. Rendering it inline means they can always press-and-hold to save.
+      showTrophyImage(url, filename);
+
+      // Still attempt a real download for desktop, where it works cleanly.
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
@@ -746,9 +755,28 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
-      showTrophyStatus('Trophy saved as ' + filename, true);
+
+      // Not revoked on a timer any more — the inline <img> needs the URL to stay
+      // alive for as long as the member is looking at it.
+      const touch = window.matchMedia('(pointer: coarse)').matches;
+      showTrophyStatus(
+        touch ? 'Press and hold the trophy above to save it to your photos.'
+              : 'Trophy saved as ' + filename,
+        true);
     }, 'image/png');
+  }
+
+  function showTrophyImage(url, filename) {
+    let img = document.getElementById('trophy-preview');
+    if (!img) {
+      img = document.createElement('img');
+      img.id = 'trophy-preview';
+      img.alt = 'Your Moonology trophy';
+      img.style.cssText = 'display:block;width:100%;max-width:640px;margin:20px auto 4px;border:1px solid #d4af37;border-radius:2px;';
+      const sec = document.getElementById('trophy-section');
+      sec.insertBefore(img, sec.firstChild);
+    }
+    img.src = url;
   }
 
   // Visible confirmation. Without it the button appeared to do nothing at all,
