@@ -345,6 +345,50 @@
 
     .back-link:hover { color: #d4af37; }
 
+    /* The conversion moment. The old grey "return to community" link meant nothing
+       to someone arriving from YouTube who had never heard of Skool — it was the
+       weakest element on the page and it was carrying the whole funnel.
+       "Post your score" also gives a free completion signal: GitHub Pages has no
+       analytics, so scores appearing as community posts is the only visibility
+       there is into whether anyone is finishing this. */
+    .join-panel {
+      margin-top: 30px;
+      padding: 26px 22px;
+      border: 1px solid #d4af37;
+      border-radius: 3px;
+      background: rgba(212,175,55,0.045);
+      text-align: center;
+    }
+    .join-lead {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: #d4af37;
+      margin: 0 0 10px;
+      letter-spacing: 0.02em;
+    }
+    .join-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.02rem;
+      line-height: 1.6;
+      color: rgba(232,228,216,0.78);
+      margin: 0 auto 20px;
+      max-width: 520px;
+    }
+    .join-btn {
+      display: inline-block;
+      padding: 13px 30px;
+      border: 1px solid #50c878;
+      border-radius: 2px;
+      color: #50c878;
+      background: rgba(80,200,120,0.06);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.12rem;
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .join-btn:hover { background: rgba(80,200,120,0.16); color: #7fe6a0; }
+
     .footer-note {
       margin-top: 36px;
       font-size: 0.78rem;
@@ -404,7 +448,15 @@
         <ul id="missed-items"></ul>
       </div>
       <button class="restart-btn" onclick="restartQuiz()">[ Re-run the Test ]</button>
-      <a class="back-link" href="https://www.skool.com/still-learnin-3313">return to Moonology Art Gallery community</a>
+      <div class="join-panel">
+        <p class="join-lead">Post your score in the community.</p>
+        <p class="join-sub">The Moonology Art Gallery is where the study notes, the moon series and the
+          rest of the Emerald Tablets work live. Free to join — tell us what you scored and which
+          term caught you out.</p>
+        <a class="join-btn" href="https://www.skool.com/still-learnin-3313" target="_blank" rel="noopener">
+          [ Post Your Score &rarr; ]
+        </a>
+      </div>
     </div>
 
     <hr class="divider" />
@@ -647,7 +699,8 @@
       document.fonts.load('italic 26px "Cormorant Garamond"'),
       document.fonts.load('700 42px "Cormorant Garamond"'),
       document.fonts.load('700 20px "Cormorant Garamond"'),
-      document.fonts.load('28px "Cormorant Garamond"')
+      document.fonts.load('28px "Cormorant Garamond"'),
+      document.fonts.load('18px "Cormorant Garamond"')
     ]);
 
     const canvas = document.createElement('canvas');
@@ -727,7 +780,13 @@
 
     ctx.fillStyle = '#d4af37';
     ctx.font = 'italic 24px "Cormorant Garamond"';
-    ctx.fillText('As above, so below.', 600, 725);
+    ctx.fillText('As above, so below.', 600, 712);
+
+    // The trophy is the one thing people screenshot and share, and it carried no
+    // address. This turns every share into a referral.
+    ctx.fillStyle = 'rgba(232,228,216,0.55)';
+    ctx.font = '18px "Cormorant Garamond"';
+    ctx.fillText('moonologyartgallery.com', 600, 748);
 
     const safeName = name.replace(/[^a-z0-9]+/gi, '-').toLowerCase().replace(/^-+|-+$/g, '');
     const filename = `moonology-trophy-${safeName || 'seeker'}.png`;
