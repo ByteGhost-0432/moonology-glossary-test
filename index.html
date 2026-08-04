@@ -747,18 +747,28 @@
       // file. Rendering it inline means they can always press-and-hold to save.
       showTrophyImage(url, filename);
 
-      // Still attempt a real download for desktop, where it works cleanly.
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Not revoked on a timer any more — the inline <img> needs the URL to stay
-      // alive for as long as the member is looking at it.
       const touch = window.matchMedia('(pointer: coarse)').matches;
+
+      // Attempt a real file download ONLY on desktop.
+      //
+      // On a phone this fired a system sheet asking whether to download from
+      // github.io or just view — and that sheet BLOCKS the page, so the member
+      // only saw their trophy if they declined it. Anyone who tapped the
+      // obvious-looking "Download" got a file they could not find and never saw
+      // the certificate at all. Nobody should have to make a technical choice
+      // to collect a trophy. On touch the inline image IS the delivery.
+      if (!touch) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // Not revoked on a timer — the inline <img> needs the URL to stay alive
+      // for as long as the member is looking at it.
       showTrophyStatus(
         touch ? 'Press and hold the trophy above to save it to your photos.'
               : 'Trophy saved as ' + filename,
@@ -777,6 +787,10 @@
       sec.insertBefore(img, sec.firstChild);
     }
     img.src = url;
+    // Bring it into view — on a phone the trophy renders below the fold.
+    if (window.matchMedia('(pointer: coarse)').matches) {
+      setTimeout(() => img.scrollIntoView({behavior:'smooth', block:'center'}), 250);
+    }
   }
 
   // Visible confirmation. Without it the button appeared to do nothing at all,
