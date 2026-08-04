@@ -95,6 +95,38 @@
   addEventListener('load', last);
   setTimeout(last, 400); setTimeout(last, 1600);
 
+  // ---------------------------------------------------------------- force the light panels
+  // Stylesheet overrides lost twice here: WonderBlocks' own rule is
+  // `.wp-block-group.is-style-nfd-theme-white` (specificity 0,2,0) and beat
+  // `body [class*="is-style-nfd-theme-"]` (0,1,1) even with !important on both sides.
+  // Rather than keep escalating selectors, set it inline with priority — an inline
+  // !important declaration cannot be outranked by any stylesheet.
+  var LIGHT = '.wp-block-group,.wp-block-columns,.wp-block-column,.nfd-container,' +
+              '[class*="is-style-nfd-theme-"],[class*="nfd-bg-white"],' +
+              '.has-white-background-color';
+
+  function deLight(root) {
+    (root || document).querySelectorAll(LIGHT).forEach(function (n) {
+      n.style.setProperty('background-color', 'transparent', 'important');
+      n.style.setProperty('background-image', 'none', 'important');
+    });
+    (root || document).querySelectorAll(
+      LIGHT.split(',').map(function (x) { return x + ' :is(h1,h2,h3,h4,h5,h6)'; }).join(',')
+    ).forEach(function (n) { n.style.setProperty('color', GOLD_LT, 'important'); });
+    (root || document).querySelectorAll(
+      LIGHT.split(',').map(function (x) { return x + ' :is(p,li,span,td,dd)'; }).join(',')
+    ).forEach(function (n) {
+      // leave anything that carries its own dark panel alone
+      if (n.closest('a')) return;
+      n.style.setProperty('color', CREAM, 'important');
+    });
+  }
+
+  deLight();
+  addEventListener('DOMContentLoaded', function () { deLight(); });
+  addEventListener('load', function () { deLight(); });
+  setTimeout(deLight, 500); setTimeout(deLight, 1800);
+
   // ---------------------------------------------------------------- starfield
   var cv = document.createElement('canvas');
   cv.id = 'mng-stars';
