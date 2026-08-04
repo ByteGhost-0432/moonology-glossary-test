@@ -58,14 +58,24 @@
     // Bluehost WonderBlocks (nfd-*) and core block groups ship their own light theme —
     // white panels and pure-blue headings — which sit on top of the sky. These are the
     // actual source of the white band on About, not the theme.
-    '.wp-block-group,.wp-block-columns,.wp-block-column,.nfd-container,' +
-    '[class*="nfd-bg-white"],.has-white-background-color' +
-    '{background-color:transparent !important;}',
-    '.wp-block-group h1,.wp-block-group h2,.wp-block-group h3,.wp-block-group h4,' +
-    '[class*="nfd-"] h1,[class*="nfd-"] h2,[class*="nfd-"] h3,[class*="nfd-"] h4' +
+    // `is-style-nfd-theme-white` is the actual culprit — a WonderBlocks *style variation*,
+    // not a plain background class. Found by reading the element's class list rather than
+    // guessing; a .wp-block-group override alone did not beat it.
+    'body .wp-block-group,body .wp-block-columns,body .wp-block-column,body .nfd-container,' +
+    'body [class*="nfd-bg-white"],body .has-white-background-color,' +
+    'body [class*="is-style-nfd-theme-"]' +
+    '{background-color:transparent !important;background-image:none !important;}',
+    'body [class*="is-style-nfd-theme-"]{--nfd-bg:transparent !important;' +
+      '--nfd-theme-bg:transparent !important;}',
+    'body .wp-block-group h1,body .wp-block-group h2,body .wp-block-group h3,' +
+    'body .wp-block-group h4,body [class*="nfd-"] h1,body [class*="nfd-"] h2,' +
+    'body [class*="nfd-"] h3,body [class*="nfd-"] h4,' +
+    'body [class*="is-style-nfd-theme-"] h1,body [class*="is-style-nfd-theme-"] h2,' +
+    'body [class*="is-style-nfd-theme-"] h3,body [class*="is-style-nfd-theme-"] h4' +
     '{color:' + GOLD_LT + ' !important;}',
-    '.wp-block-group p,.wp-block-group li,.wp-block-group span,' +
-    '[class*="nfd-"] p,[class*="nfd-"] li' +
+    'body .wp-block-group p,body .wp-block-group li,body .wp-block-group span,' +
+    'body [class*="nfd-"] p,body [class*="nfd-"] li,' +
+    'body [class*="is-style-nfd-theme-"] p,body [class*="is-style-nfd-theme-"] span' +
     '{color:' + CREAM + ' !important;}',
 
     // The hero owns itself.
@@ -76,6 +86,14 @@
       'pointer-events:none;display:block;}'
   ].join('\n');
   document.head.appendChild(css);
+
+  // Other plugins append stylesheets after ours, which cost us the cascade even with
+  // !important at equal specificity. Re-park ours at the end once the page settles.
+  function last(){ if (css.parentNode !== document.head ||
+                       document.head.lastElementChild !== css) document.head.appendChild(css); }
+  addEventListener('DOMContentLoaded', last);
+  addEventListener('load', last);
+  setTimeout(last, 400); setTimeout(last, 1600);
 
   // ---------------------------------------------------------------- starfield
   var cv = document.createElement('canvas');
