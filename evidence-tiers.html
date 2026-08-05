@@ -116,7 +116,11 @@
       color: #e8e4d8; font-family: 'Cormorant Garamond', serif; font-size: 1rem;
     }
     .trophy-btn { margin-top: 12px; }
-    #trophy-canvas { display: none; max-width: 100%; margin-top: 18px; border: 1px solid rgba(212,175,55,0.4); }
+    /* The canvas is only a drawing surface — it is never shown. iOS long-press
+       offers "Copy" on a canvas but "Save Image" only on a real <img>, so the
+       finished pixels are handed to #trophy-img and that is what the user sees. */
+    #trophy-canvas { display: none; }
+    #trophy-img { display: none; max-width: 100%; width: 100%; height: auto; margin-top: 18px; border: 1px solid rgba(212,175,55,0.4); }
     .trophy-hint { font-size: 0.85rem; color: rgba(232,228,216,0.5); text-align: center; margin-top: 8px; font-style: italic; }
 
     .missed-box { margin-top: 26px; border: 1px solid rgba(180,71,47,0.35); padding: 16px 18px; }
@@ -188,7 +192,8 @@
         <input type="text" id="trophy-name" class="trophy-input" placeholder="Enter your name for the trophy" maxlength="40" />
         <button class="trophy-btn" onclick="generateTrophy()">[ Claim Your Trophy ]</button>
         <canvas id="trophy-canvas" width="1080" height="1080"></canvas>
-        <p class="trophy-hint" id="trophy-hint" style="display:none">Press and hold the image to save it. 🌙</p>
+        <img id="trophy-img" alt="Your Three Tiers result" />
+        <p class="trophy-hint" id="trophy-hint" style="display:none">Press and hold the image, then Save Image. 🌙</p>
       </div>
 
       <div class="missed-box" id="missed-box" style="display:none">
@@ -388,7 +393,7 @@ function showResults(){
 function restart(){
   idx = 0; score = 0; missed = []; answered = false;
   document.getElementById('results').style.display = 'none';
-  document.getElementById('trophy-canvas').style.display = 'none';
+  document.getElementById('trophy-img').style.display = 'none';
   document.getElementById('trophy-hint').style.display = 'none';
   document.getElementById('intro-section').style.display = 'block';
   window.scrollTo({top:0, behavior:'smooth'});
@@ -450,12 +455,16 @@ function generateTrophy(){
   x.font = '600 24px Georgia, serif';
   x.fillText('test.moonologyartgallery.com', W/2, 990);
 
-  cv.style.display = 'block';
+  /* Hand the finished pixels to a real <img>. On iOS, long-pressing a canvas
+     offers only "Copy" — "Save Image" requires an actual image element.
+     Verified on a real phone 2026-08-05. */
+  const img = document.getElementById('trophy-img');
+  img.src = cv.toDataURL('image/png');
+  img.style.display = 'block';
 
-  /* Desktop (fine pointer, real hover) gets a silent auto-download.
+  /* Desktop (fine pointer, real hover) also gets a silent auto-download.
      Touch devices do NOT — an automatic download there throws up a save prompt
-     the user did not ask for. They get the canvas plus a long-press hint instead.
-     Verified on a real phone 2026-08-05: the auto-download was prompting. */
+     nobody asked for. They press and hold the image instead. */
   const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   document.getElementById('trophy-hint').style.display = isDesktop ? 'none' : 'block';
 
