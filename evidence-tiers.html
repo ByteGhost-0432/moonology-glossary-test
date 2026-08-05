@@ -188,7 +188,7 @@
         <input type="text" id="trophy-name" class="trophy-input" placeholder="Enter your name for the trophy" maxlength="40" />
         <button class="trophy-btn" onclick="generateTrophy()">[ Claim Your Trophy ]</button>
         <canvas id="trophy-canvas" width="1000" height="560"></canvas>
-        <p class="trophy-hint" id="trophy-hint" style="display:none">Long-press or right-click the image to save it.</p>
+        <p class="trophy-hint" id="trophy-hint" style="display:none">Press and hold the image to save it. 🌙</p>
       </div>
 
       <div class="missed-box" id="missed-box" style="display:none">
@@ -438,10 +438,16 @@ function generateTrophy(){
   x.fillText('As above, so below.', W/2, 482);
 
   cv.style.display = 'block';
-  document.getElementById('trophy-hint').style.display = 'block';
 
-  /* Desktop gets a real download; mobile browsers that block it still show the
-     canvas above, which can be long-pressed and saved. */
+  /* Desktop (fine pointer, real hover) gets a silent auto-download.
+     Touch devices do NOT — an automatic download there throws up a save prompt
+     the user did not ask for. They get the canvas plus a long-press hint instead.
+     Verified on a real phone 2026-08-05: the auto-download was prompting. */
+  const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  document.getElementById('trophy-hint').style.display = isDesktop ? 'none' : 'block';
+
+  if(!isDesktop) return;
+
   try {
     cv.toBlob(function(blob){
       if(!blob) return;
@@ -451,7 +457,7 @@ function generateTrophy(){
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
     });
-  } catch(e) { /* canvas shown above is the fallback */ }
+  } catch(e) { /* canvas is displayed above regardless */ }
 }
 </script>
 </body>
