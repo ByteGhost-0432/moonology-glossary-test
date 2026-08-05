@@ -187,7 +187,7 @@
       <div class="trophy-section" id="trophy-section" style="display:none">
         <input type="text" id="trophy-name" class="trophy-input" placeholder="Enter your name for the trophy" maxlength="40" />
         <button class="trophy-btn" onclick="generateTrophy()">[ Claim Your Trophy ]</button>
-        <canvas id="trophy-canvas" width="1000" height="560"></canvas>
+        <canvas id="trophy-canvas" width="1080" height="1080"></canvas>
         <p class="trophy-hint" id="trophy-hint" style="display:none">Press and hold the image to save it. 🌙</p>
       </div>
 
@@ -402,40 +402,53 @@ function generateTrophy(){
   const x = cv.getContext('2d');
   const W = cv.width, H = cv.height;
 
+  /* Square 1080 — reads large on a phone and is the right shape for sharing. */
   x.fillStyle = '#07080a'; x.fillRect(0,0,W,H);
-  const g = x.createRadialGradient(W/2, 0, 0, W/2, 0, H);
-  g.addColorStop(0,'rgba(212,175,55,0.13)'); g.addColorStop(1,'rgba(212,175,55,0)');
+  const g = x.createRadialGradient(W/2, H*0.30, 0, W/2, H*0.30, H*0.8);
+  g.addColorStop(0,'rgba(212,175,55,0.16)'); g.addColorStop(1,'rgba(212,175,55,0)');
   x.fillStyle = g; x.fillRect(0,0,W,H);
 
-  x.strokeStyle = '#d4af37'; x.lineWidth = 2; x.strokeRect(24,24,W-48,H-48);
+  x.strokeStyle = '#d4af37'; x.lineWidth = 3; x.strokeRect(38,38,W-76,H-76);
 
   x.textAlign = 'center';
-  x.fillStyle = '#d4af37';
-  x.font = '700 30px Georgia, serif';
-  x.fillText('MOONOLOGY ART GALLERY', W/2, 100);
-
-  x.font = '600 26px Georgia, serif';
-  x.fillStyle = 'rgba(232,228,216,0.65)';
-  x.fillText('T H R E E   T I E R S', W/2, 148);
-
-  x.fillStyle = '#e8e4d8';
-  x.font = '700 54px Georgia, serif';
-  x.fillText(name, W/2, 250);
 
   x.fillStyle = '#d4af37';
-  x.font = '700 84px Georgia, serif';
-  x.fillText(score + ' / ' + CARDS.length, W/2, 355);
+  x.font = '700 40px Georgia, serif';
+  x.fillText('MOONOLOGY ART GALLERY', W/2, 160);
 
   x.fillStyle = 'rgba(232,228,216,0.6)';
-  x.font = 'italic 24px Georgia, serif';
-  x.fillText('claims sorted by evidence, not by confidence', W/2, 400);
+  x.font = '600 30px Georgia, serif';
+  x.fillText('T H R E E   T I E R S', W/2, 218);
+
+  x.strokeStyle = 'rgba(212,175,55,0.35)'; x.lineWidth = 1;
+  x.beginPath(); x.moveTo(W/2-230, 268); x.lineTo(W/2+230, 268); x.stroke();
+
+  /* Name shrinks to fit rather than overflowing the frame. */
+  let fs = 82;
+  do { x.font = '700 ' + fs + 'px Georgia, serif'; fs -= 3; }
+  while (x.measureText(name).width > W - 180 && fs > 30);
+  x.fillStyle = '#e8e4d8';
+  x.fillText(name, W/2, 430);
+
+  x.fillStyle = '#d4af37';
+  x.font = '700 190px Georgia, serif';
+  x.fillText(score + ' / ' + CARDS.length, W/2, 650);
+
+  x.fillStyle = 'rgba(232,228,216,0.62)';
+  x.font = 'italic 32px Georgia, serif';
+  x.fillText('claims sorted by evidence,', W/2, 730);
+  x.fillText('not by confidence', W/2, 776);
 
   x.strokeStyle = 'rgba(80,200,120,0.5)'; x.lineWidth = 1;
-  x.beginPath(); x.moveTo(W/2-160, 440); x.lineTo(W/2+160, 440); x.stroke();
+  x.beginPath(); x.moveTo(W/2-200, 850); x.lineTo(W/2+200, 850); x.stroke();
 
-  x.fillStyle = 'rgba(232,228,216,0.5)';
-  x.font = 'italic 22px Georgia, serif';
-  x.fillText('As above, so below.', W/2, 482);
+  x.fillStyle = 'rgba(232,228,216,0.55)';
+  x.font = 'italic 34px Georgia, serif';
+  x.fillText('As above, so below.', W/2, 918);
+
+  x.fillStyle = 'rgba(212,175,55,0.55)';
+  x.font = '600 24px Georgia, serif';
+  x.fillText('test.moonologyartgallery.com', W/2, 990);
 
   cv.style.display = 'block';
 
