@@ -462,6 +462,12 @@ function generateTrophy(){
   img.src = cv.toDataURL('image/png');
   img.style.display = 'block';
 
+  /* On a phone the trophy renders below the fold — bring it into view.
+     Ported from the glossary test, which already solved this. */
+  if(window.matchMedia('(pointer: coarse)').matches){
+    setTimeout(()=>img.scrollIntoView({behavior:'smooth', block:'center'}), 250);
+  }
+
   /* Desktop (fine pointer, real hover) also gets a silent auto-download.
      Touch devices do NOT — an automatic download there throws up a save prompt
      nobody asked for. They press and hold the image instead. */
