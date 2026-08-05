@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Three Tiers | Moonology Art Gallery</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cormorant+Garamond:wght@400;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Cormorant Garamond', serif;
+      background: #07080a;
+      color: #e8e4d8;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px;
+      background-image: radial-gradient(circle at 50% 0%, rgba(212,175,55,0.06), transparent 60%);
+    }
+
+    .tablet-frame {
+      max-width: 760px; width: 100%;
+      border: 1px solid #d4af37;
+      box-shadow: 0 0 40px rgba(212,175,55,0.12), inset 0 0 40px rgba(0,0,0,0.6);
+    }
+
+    .tablet-bar {
+      background: #0c0d10; border-bottom: 1px solid #d4af37;
+      padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-gold { background: #d4af37; box-shadow: 0 0 4px #d4af37; }
+    .dot-emerald { background: #50c878; box-shadow: 0 0 4px #50c878; }
+    .dot-cream { background: #e8e4d8; box-shadow: 0 0 4px #e8e4d8; }
+    .tablet-title { flex: 1; text-align: center; font-size: 0.72rem; color: #50c878; letter-spacing: 0.15em; }
+
+    .tablet-body { padding: 32px 36px 50px; }
+
+    h1 {
+      font-family: 'UnifrakturMaguntia', cursive;
+      font-size: 2.6rem; color: #d4af37;
+      text-shadow: 0 0 20px rgba(212,175,55,0.4);
+      margin-bottom: 10px; font-weight: 400; line-height: 1.15;
+    }
+
+    .intro { font-size: 1.05rem; color: rgba(232,228,216,0.75); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+    .divider { border: none; border-top: 1px solid rgba(212,175,55,0.2); margin: 24px 0; }
+    .emerald-divider { border: none; border-top: 1px solid rgba(80,200,120,0.25); margin: 24px 0; }
+
+    .tier-key { margin: 18px 0 4px; }
+    .tier-key div { padding: 9px 12px; margin-bottom: 8px; border-left: 3px solid; font-size: 1rem; line-height: 1.5; }
+    .k-none { border-color: #b4472f; background: rgba(180,71,47,0.07); }
+    .k-real { border-color: #50c878; background: rgba(80,200,120,0.07); }
+    .k-cont { border-color: #d4af37; background: rgba(212,175,55,0.07); }
+    .tier-key strong { display: block; letter-spacing: 0.04em; }
+    .k-none strong { color: #e07a5f; }
+    .k-real strong { color: #50c878; }
+    .k-cont strong { color: #d4af37; }
+
+    .begin-btn, .submit-btn, .restart-btn, .next-btn, .trophy-btn {
+      display: block; width: 100%; background: transparent; color: #d4af37;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 700;
+      padding: 14px; border: 1px solid #d4af37; cursor: pointer; margin-top: 28px;
+      letter-spacing: 0.05em; transition: background .2s, color .2s;
+    }
+    .begin-btn:hover, .submit-btn:hover, .restart-btn:hover, .next-btn:hover, .trophy-btn:hover {
+      background: #d4af37; color: #07080a;
+    }
+
+    #card-section, #results { display: none; }
+
+    .progress-line { font-size: 0.85rem; color: rgba(232,228,216,0.5); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .claim-box {
+      border: 1px solid rgba(212,175,55,0.35);
+      background: rgba(212,175,55,0.04);
+      padding: 26px 22px; margin: 22px 0 6px; text-align: center;
+    }
+    .claim-box .label { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(232,228,216,0.45); display: block; margin-bottom: 12px; }
+    .claim-box .claim { font-size: 1.35rem; line-height: 1.5; color: #e8e4d8; }
+
+    .choices { display: grid; gap: 10px; margin-top: 18px; }
+    .choice {
+      width: 100%; text-align: left; padding: 13px 15px; cursor: pointer;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.02rem;
+      background: transparent; color: #e8e4d8; border: 1px solid rgba(232,228,216,0.25);
+      transition: border-color .2s, background .2s;
+    }
+    .choice:hover:not(:disabled) { border-color: #d4af37; background: rgba(212,175,55,0.07); }
+    .choice:disabled { cursor: default; opacity: 0.45; }
+    .choice.picked-right { border-color: #50c878; background: rgba(80,200,120,0.12); opacity: 1; }
+    .choice.picked-wrong { border-color: #b4472f; background: rgba(180,71,47,0.12); opacity: 1; }
+    .choice.was-answer { border-color: #d4af37; opacity: 1; }
+
+    .reveal { display: none; margin-top: 20px; border-top: 1px solid rgba(212,175,55,0.2); padding-top: 18px; }
+    .reveal .verdict { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+    .reveal .why { font-size: 1.02rem; line-height: 1.65; color: rgba(232,228,216,0.88); }
+    .reveal .cite {
+      margin-top: 12px; padding: 10px 12px; font-size: 0.9rem; line-height: 1.5;
+      color: rgba(232,228,216,0.6); border-left: 2px solid rgba(80,200,120,0.4);
+      background: rgba(80,200,120,0.04);
+    }
+
+    .result-header { text-align: center; margin: 8px 0 4px; }
+    #score-display { font-family: 'UnifrakturMaguntia', cursive; font-size: 3.2rem; color: #d4af37; display: block; }
+    #score-label { font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(232,228,216,0.5); }
+    #verdict-text { font-size: 1.1rem; line-height: 1.7; text-align: center; font-style: italic; }
+
+    .trophy-section { margin-top: 26px; }
+    .trophy-input {
+      width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.4);
+      color: #e8e4d8; font-family: 'Cormorant Garamond', serif; font-size: 1rem;
+    }
+    .trophy-btn { margin-top: 12px; }
+    #trophy-canvas { display: none; max-width: 100%; margin-top: 18px; border: 1px solid rgba(212,175,55,0.4); }
+    .trophy-hint { font-size: 0.85rem; color: rgba(232,228,216,0.5); text-align: center; margin-top: 8px; font-style: italic; }
+
+    .missed-box { margin-top: 26px; border: 1px solid rgba(180,71,47,0.35); padding: 16px 18px; }
+    .missed-box h3 { color: #e07a5f; font-size: 0.95rem; letter-spacing: 0.1em; margin-bottom: 10px; font-weight: 700; }
+    .missed-box li { margin-left: 18px; margin-bottom: 8px; font-size: 0.98rem; line-height: 1.5; color: rgba(232,228,216,0.8); }
+
+    .back-link { display: block; text-align: center; margin-top: 24px; color: #50c878; font-size: 0.95rem; letter-spacing: 0.05em; }
+    .footer-note { text-align: center; font-size: 0.85rem; color: rgba(232,228,216,0.4); font-style: italic; }
+
+    @media (max-width: 600px) {
+      body { padding: 16px 10px; }
+      .tablet-body { padding: 22px 18px 36px; }
+      h1 { font-size: 2rem; }
+      .claim-box { padding: 20px 14px; }
+      .claim-box .claim { font-size: 1.15rem; }
+      #score-display { font-size: 2.6rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="tablet-frame">
+  <div class="tablet-bar">
+    <div class="dot dot-gold"></div>
+    <div class="dot dot-emerald"></div>
+    <div class="dot dot-cream"></div>
+    <div class="tablet-title">moonologyartgallery.com — three_tiers</div>
+  </div>
+  <div class="tablet-body">
+
+    <div id="intro-section">
+      <h1>Three Tiers</h1>
+      <p class="intro">Twelve claims about frequency, sound and the Moon. No sources shown. Your job is to place each one on the right tier of evidence &mdash; then find out where it actually sits, and why.</p>
+      <p class="intro" style="font-style:normal;color:rgba(232,228,216,0.85)">This is not a memory test. It is a sorting skill. Once you have it, it works on any claim anybody ever hands you.</p>
+
+      <div class="tier-key">
+        <div class="k-none"><strong>&#128308;&nbsp;&nbsp;NO EVIDENCE</strong>The claim may be old, popular, or sincerely believed. There is no credible published support for it &mdash; or it is simply wrong.</div>
+        <div class="k-real"><strong>&#128994;&nbsp;&nbsp;REAL BUT LIMITED</strong>Published, peer-reviewed support exists. The effect is modest, the literature is imperfect, and nobody serious is promising miracles.</div>
+        <div class="k-cont"><strong>&#127769;&nbsp;&nbsp;REAL AND CONTESTED</strong>Good researchers in good journals measured something &mdash; and other good researchers could not reproduce it. The argument is still running.</div>
+      </div>
+
+      <button class="begin-btn" onclick="begin()">[ Begin Sorting &rarr; ]</button>
+    </div>
+
+    <div id="card-section">
+      <div class="progress-line" id="progress-line"></div>
+      <div class="claim-box">
+        <span class="label">The claim</span>
+        <div class="claim" id="claim-text"></div>
+      </div>
+      <div class="choices" id="choices"></div>
+      <div class="reveal" id="reveal">
+        <div class="verdict" id="reveal-verdict"></div>
+        <div class="why" id="reveal-why"></div>
+        <div class="cite" id="reveal-cite"></div>
+        <button class="next-btn" id="next-btn" onclick="next()"></button>
+      </div>
+    </div>
+
+    <div id="results">
+      <hr class="divider" />
+      <div class="result-header">
+        <span id="score-display"></span>
+        <span id="score-label"></span>
+      </div>
+      <hr class="emerald-divider" />
+      <p id="verdict-text"></p>
+
+      <div class="trophy-section" id="trophy-section" style="display:none">
+        <input type="text" id="trophy-name" class="trophy-input" placeholder="Enter your name for the trophy" maxlength="40" />
+        <button class="trophy-btn" onclick="generateTrophy()">[ Claim Your Trophy ]</button>
+        <canvas id="trophy-canvas" width="1000" height="560"></canvas>
+        <p class="trophy-hint" id="trophy-hint" style="display:none">Long-press or right-click the image to save it.</p>
+      </div>
+
+      <div class="missed-box" id="missed-box" style="display:none">
+        <h3>// Claims to revisit</h3>
+        <ul id="missed-items"></ul>
+      </div>
+
+      <button class="restart-btn" onclick="restart()">[ Sort Again ]</button>
+      <a class="back-link" href="https://www.skool.com/still-learnin-3313">return to Moonology Art Gallery community</a>
+    </div>
+
+    <hr class="divider" />
+    <p class="footer-note">As above, so below. &mdash; Moonology Art Gallery</p>
+
+  </div>
+</div>
+
+<script>
+/* Tier constants. Every card carries its tier, its explanation and its citation
+   in ONE object, so the answer key can never drift from the reveal text. */
+const NONE = 0, REAL = 1, CONT = 2;
+const TIERS = [
+  { key: "\u{1F534}&nbsp;&nbsp;No evidence",        cls: "none" },
+  { key: "\u{1F7E2}&nbsp;&nbsp;Real but limited",   cls: "real" },
+  { key: "\u{1F319}&nbsp;&nbsp;Real and contested", cls: "cont" }
+];
+
+const CARDS = [
+  {
+    claim: "The Solfeggio frequencies come down to us from the ancient world.",
+    tier: NONE,
+    why: "The six frequencies were proposed in the 1970s by Joseph Puleo, a naturopath, and published with Leonard Horowitz in 1999. The <em>syllables</em> &mdash; ut, re, mi &mdash; really are medieval, from Guido of Arezzo in the 11th century. But hertz did not exist as a unit until the 1800s. Modern numbers were layered onto old vocabulary.",
+    cite: "Puleo &amp; Horowitz, <em>Healing Codes for the Biological Apocalypse</em> (1999). Guido of Arezzo, 11th c., hymn <em>Ut queant laxis</em>."
+  },
+  {
+    claim: "639 Hz specifically improves relationships and human connection.",
+    tier: NONE,
+    why: "No peer-reviewed support was found for 639 Hz doing anything in particular. Of the six Solfeggio tones, only 528 Hz has meaningful published work, and that is mostly in vitro, tentative and unreplicated.",
+    cite: "Absence of evidence, honestly reported. If you find a study on 639 Hz specifically, bring it &mdash; it would be genuinely interesting."
+  },
+  {
+    claim: "528 Hz repairs damaged DNA.",
+    tier: NONE,
+    why: "There is no solid, replicated evidence for this. The claim traces back to the same 1999 book rather than to any laboratory finding, and it is the single most repeated sentence in the entire frequency space.",
+    cite: "No replicated peer-reviewed support."
+  },
+  {
+    claim: "You can hear a binaural beat through a phone speaker.",
+    tier: NONE,
+    why: "No &mdash; and this one is not merely unsupported, it is flatly wrong. Each ear must receive its own carrier. Through a speaker the two tones combine in the air before they reach you, and the beat is gone. You are hearing two notes and nothing else.",
+    cite: "Definitional. This is why every one of these recordings says headphones required."
+  },
+  {
+    claim: "Binaural beats can measurably affect cognition, anxiety and pain.",
+    tier: REAL,
+    why: "This one has real backing. A meta-analysis pooled 22 studies and 35 effect sizes and found an overall effect of g = 0.45 &mdash; medium, significant and consistent. Medium is worth something. Medium is not a miracle.",
+    cite: "Garc&iacute;a-Argibay, Santed &amp; Reales (2019). <em>Psychological Research</em> 83(2), 357&ndash;372. PMID 30073406."
+  },
+  {
+    claim: "It matters whether you listen before a task or during it.",
+    tier: REAL,
+    why: "Same meta-analysis. Longer exposure did better, and listening <em>before</em> a task &mdash; or before and during &mdash; outperformed listening only while working. If you use these for focus, front-load them.",
+    cite: "Garc&iacute;a-Argibay, Santed &amp; Reales (2019). <em>Psychological Research</em> 83(2), 357&ndash;372."
+  },
+  {
+    claim: "The beat is not in the recording. Your brain manufactures it.",
+    tier: REAL,
+    why: "Correct. Two carriers go in, one per ear, and the difference frequency is generated inside the auditory system. Nothing in the file is oscillating at 14 Hz. That is the whole trick, and it is why separation matters.",
+    cite: "Established auditory mechanism; the basis of the entire binaural-beat literature."
+  },
+  {
+    claim: "A seven-day listening log will tell you whether it works.",
+    tier: NONE,
+    why: "It will tell you what <em>you</em> noticed, which is worth having. It will not tell you whether it works. One person, no control group, no blinding, and you already know what you are hoping for. There is a reason the meta-analysis needed 22 studies.",
+    cite: "Methods, not mysticism. Run the log &mdash; just do not cite it."
+  },
+  {
+    claim: "Around the full moon, people take longer to fall asleep and sleep less.",
+    tier: CONT,
+    why: "Measured, in a proper lab: delta activity during NREM sleep fell 30%, time to fall asleep rose 5 minutes, total sleep dropped 20 minutes, and melatonin came out lower &mdash; in a circadian protocol with no time cues. But at least three other studies found no association at all.",
+    cite: "Cajochen et al. (2013). <em>Current Biology</em> 23(15), 1485&ndash;1488. PMID 23891110."
+  },
+  {
+    claim: "Sleep runs later on the nights before a full moon, when there is moonlight after dusk.",
+    tier: CONT,
+    why: "This is the sharper version of the claim, and it points at an ordinary mechanism: light. Sleep started later and ran shorter on the nights <em>before</em> the full moon &mdash; the evenings that actually have moonlight in them. Found in communities with electricity and without, and in urban students.",
+    cite: "Casiraghi et al. (2021). <em>Science Advances</em> 7(5), eabe0465. 69 Toba/Qom participants plus ~464 urban US students, wrist actimetry. PMID 33571126."
+  },
+  {
+    claim: "The Moon can affect sleep even when you cannot see it.",
+    tier: CONT,
+    why: "Here is where the two best studies disagree. Casiraghi points squarely at moonlight after dusk &mdash; a physical, boring, testable explanation. But Cajochen's participants were in a lab with no time cues, no view of the sky, and something still moved. Two good journals. Two mechanisms. Unresolved.",
+    cite: "Cajochen et al. (2013) vs Casiraghi et al. (2021). Both stand; they do not agree about why."
+  },
+  {
+    claim: "Studies finding no lunar effect might simply never get published.",
+    tier: CONT,
+    why: "That is the file-drawer problem, and there is a published paper raising exactly this worry about lunar sleep research. If null results quietly vanish, the surviving literature looks stronger than reality. It is a reason to hold this whole area loosely &mdash; including the findings you happen to like.",
+    cite: "Published critique of the lunar sleep literature specifically."
+  }
+];
+
+let idx = 0, score = 0, missed = [], answered = false;
+
+/* Self-check: every card must carry a valid tier, a why and a cite. */
+(function selfCheck(){
+  CARDS.forEach((c,i)=>{
+    if(![NONE,REAL,CONT].includes(c.tier)) console.error("Card "+i+" has an invalid tier");
+    if(!c.why || !c.cite) console.error("Card "+i+" is missing why/cite");
+  });
+})();
+
+function begin(){
+  document.getElementById('intro-section').style.display = 'none';
+  document.getElementById('card-section').style.display = 'block';
+  render();
+}
+
+function render(){
+  answered = false;
+  const c = CARDS[idx];
+  document.getElementById('progress-line').textContent = "Claim " + (idx+1) + " of " + CARDS.length;
+  document.getElementById('claim-text').innerHTML = c.claim;
+  document.getElementById('reveal').style.display = 'none';
+
+  const box = document.getElementById('choices');
+  box.innerHTML = '';
+  TIERS.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.className = 'choice';
+    b.innerHTML = t.key;
+    b.onclick = ()=>choose(i);
+    box.appendChild(b);
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function choose(pick){
+  if(answered) return;
+  answered = true;
+  const c = CARDS[idx];
+  const right = pick === c.tier;
+  if(right) score++; else missed.push({claim:c.claim, tier:c.tier});
+
+  const btns = document.querySelectorAll('#choices .choice');
+  btns.forEach((b,i)=>{
+    b.disabled = true;
+    if(i === pick) b.classList.add(right ? 'picked-right' : 'picked-wrong');
+    if(!right && i === c.tier) b.classList.add('was-answer');
+  });
+
+  const v = document.getElementById('reveal-verdict');
+  v.innerHTML = right ? "✓ Correct — " + TIERS[c.tier].key : "✗ Not quite — it sits on " + TIERS[c.tier].key;
+  v.style.color = right ? '#50c878' : '#e07a5f';
+  document.getElementById('reveal-why').innerHTML = c.why;
+  document.getElementById('reveal-cite').innerHTML = c.cite;
+  document.getElementById('next-btn').innerHTML = (idx === CARDS.length-1) ? "[ See Your Result &rarr; ]" : "[ Next Claim &rarr; ]";
+  document.getElementById('reveal').style.display = 'block';
+}
+
+function next(){
+  if(idx < CARDS.length-1){ idx++; render(); }
+  else showResults();
+}
+
+function showResults(){
+  document.getElementById('card-section').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('score-display').textContent = score + " / " + CARDS.length;
+  document.getElementById('score-label').textContent = "claims sorted correctly";
+
+  let verdict;
+  if(score === CARDS.length) verdict = "Every one. You are not sorting by what sounds true — you are sorting by what is actually behind it. That is the rarest thing in this whole subject.";
+  else if(score >= 10) verdict = "Strong. You can tell a real finding from a confident sentence, and you did not get talked into anything.";
+  else if(score >= 7) verdict = "Getting there. The tiers are separating for you — the hard part is holding the line on the ones you want to be true.";
+  else verdict = "Worth another pass. Almost nobody gets this cold the first time, because we are all trained to hear confidence as evidence.";
+  document.getElementById('verdict-text').textContent = verdict;
+
+  const trophy = document.getElementById('trophy-section');
+  trophy.style.display = (score >= 11) ? 'block' : 'none';
+
+  const box = document.getElementById('missed-box');
+  const list = document.getElementById('missed-items');
+  list.innerHTML = '';
+  if(missed.length){
+    missed.forEach(m=>{
+      const li = document.createElement('li');
+      li.innerHTML = m.claim + " &mdash; <strong>" + TIERS[m.tier].key + "</strong>";
+      list.appendChild(li);
+    });
+    box.style.display = 'block';
+  } else box.style.display = 'none';
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function restart(){
+  idx = 0; score = 0; missed = []; answered = false;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('trophy-canvas').style.display = 'none';
+  document.getElementById('trophy-hint').style.display = 'none';
+  document.getElementById('intro-section').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* Trophy renders the ACTUAL score, never a hard-coded perfect one.
+   (Fixing that bug in the glossary test on 2026-08-03 is why this is explicit.) */
+function generateTrophy(){
+  const name = (document.getElementById('trophy-name').value || 'Seeker').trim().slice(0,40);
+  const cv = document.getElementById('trophy-canvas');
+  const x = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+
+  x.fillStyle = '#07080a'; x.fillRect(0,0,W,H);
+  const g = x.createRadialGradient(W/2, 0, 0, W/2, 0, H);
+  g.addColorStop(0,'rgba(212,175,55,0.13)'); g.addColorStop(1,'rgba(212,175,55,0)');
+  x.fillStyle = g; x.fillRect(0,0,W,H);
+
+  x.strokeStyle = '#d4af37'; x.lineWidth = 2; x.strokeRect(24,24,W-48,H-48);
+
+  x.textAlign = 'center';
+  x.fillStyle = '#d4af37';
+  x.font = '700 30px Georgia, serif';
+  x.fillText('MOONOLOGY ART GALLERY', W/2, 100);
+
+  x.font = '600 26px Georgia, serif';
+  x.fillStyle = 'rgba(232,228,216,0.65)';
+  x.fillText('T H R E E   T I E R S', W/2, 148);
+
+  x.fillStyle = '#e8e4d8';
+  x.font = '700 54px Georgia, serif';
+  x.fillText(name, W/2, 250);
+
+  x.fillStyle = '#d4af37';
+  x.font = '700 84px Georgia, serif';
+  x.fillText(score + ' / ' + CARDS.length, W/2, 355);
+
+  x.fillStyle = 'rgba(232,228,216,0.6)';
+  x.font = 'italic 24px Georgia, serif';
+  x.fillText('claims sorted by evidence, not by confidence', W/2, 400);
+
+  x.strokeStyle = 'rgba(80,200,120,0.5)'; x.lineWidth = 1;
+  x.beginPath(); x.moveTo(W/2-160, 440); x.lineTo(W/2+160, 440); x.stroke();
+
+  x.fillStyle = 'rgba(232,228,216,0.5)';
+  x.font = 'italic 22px Georgia, serif';
+  x.fillText('As above, so below.', W/2, 482);
+
+  cv.style.display = 'block';
+  document.getElementById('trophy-hint').style.display = 'block';
+
+  /* Desktop gets a real download; mobile browsers that block it still show the
+     canvas above, which can be long-pressed and saved. */
+  try {
+    cv.toBlob(function(blob){
+      if(!blob) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'moonology-three-tiers-' + name.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+    });
+  } catch(e) { /* canvas shown above is the fallback */ }
+}
+</script>
+</body>
+</html>
