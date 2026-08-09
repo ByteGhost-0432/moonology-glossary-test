@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A five-round binaural listening test. Checks your headphones, then checks whether you can actually hear a binaural beat. Moonology Art Gallery.">
+<style>*{margin:0;padding:0}</style>
+<title>Can You Hear It? — A Binaural Listening Test 🌕</title>
+
+<style>
+  :root{
+    --gold:#F5E5A7; --blue:#9FD2FF; --bg:#06070B; --panel:#0D1017;
+    --edge:#1C2130; --text:#E6E9F0; --dim:#868DA1;
+    --good:#7BD88F; --bad:#E88B8B;
+    --geo:"Futura","Avenir Next","Century Gothic",ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--geo); line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    padding:clamp(16px,4vw,48px) clamp(14px,4vw,24px);
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, #fff5 50%, transparent 50%),
+      radial-gradient(1px 1px at 78% 12%, #fff4 50%, transparent 50%),
+      radial-gradient(1px 1px at 34% 76%, #fff3 50%, transparent 50%),
+      radial-gradient(1px 1px at 88% 62%, #fff4 50%, transparent 50%),
+      radial-gradient(1px 1px at 56% 40%, #fff3 50%, transparent 50%),
+      radial-gradient(1200px 700px at 50% -10%, #10192C 0%, transparent 70%);
+  }
+  .wrap{width:100%; max-width:640px; display:flex; flex-direction:column; gap:22px}
+
+  header{text-align:center; display:flex; flex-direction:column; gap:6px}
+  .eyebrow{
+    font-size:.74rem; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--blue); font-weight:600;
+  }
+  h1{
+    margin:0; font-size:clamp(1.9rem,6.5vw,2.9rem); font-weight:800;
+    color:var(--gold); text-wrap:balance; letter-spacing:-.01em;
+  }
+  .sub{color:var(--dim); font-size:.95rem}
+
+  .card{
+    background:linear-gradient(180deg,#0F131C,#0A0D14);
+    border:1px solid var(--edge); border-radius:18px;
+    padding:clamp(18px,4.5vw,30px);
+    box-shadow:0 20px 60px -30px #000;
+  }
+
+  .warn{
+    display:flex; gap:12px; align-items:flex-start;
+    background:#16110A; border:1px solid #3A2E14; border-radius:12px;
+    padding:14px 16px; font-size:.9rem; color:#E9D9AE;
+  }
+  .warn b{color:var(--gold)}
+
+  button{font-family:inherit}
+  .btn{
+    width:100%; padding:15px 18px; border-radius:12px; cursor:pointer;
+    border:1px solid var(--edge); background:#141926; color:var(--text);
+    font-size:1rem; font-weight:600; text-align:left;
+    transition:border-color .15s, background .15s, transform .06s;
+  }
+  .btn:hover:not(:disabled){border-color:var(--blue); background:#182034}
+  .btn:active:not(:disabled){transform:translateY(1px)}
+  .btn:focus-visible{outline:2px solid var(--blue); outline-offset:2px}
+  .btn:disabled{opacity:.5; cursor:default}
+  .btn.primary{
+    background:var(--gold); color:#0A0B10; border-color:var(--gold);
+    text-align:center; font-weight:800; font-size:1.05rem;
+  }
+  .btn.primary:hover:not(:disabled){background:#FFF0BC; border-color:#FFF0BC}
+  .btn.ghost{background:transparent; text-align:center; color:var(--dim); font-weight:600}
+  .btn.good{border-color:var(--good); background:#102014}
+  .btn.bad{border-color:var(--bad); background:#201012}
+
+  .choices{display:flex; flex-direction:column; gap:10px; margin-top:18px}
+
+  .dots{display:flex; gap:7px; justify-content:center; margin-bottom:4px}
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--edge)}
+  .dot.on{background:var(--blue)}
+  .dot.done{background:var(--gold)}
+
+  .qnum{
+    font-size:.74rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--blue); font-weight:700; margin-bottom:8px;
+  }
+  h2{margin:0 0 8px; font-size:clamp(1.15rem,4vw,1.45rem); color:var(--gold); text-wrap:balance}
+  .hint{color:var(--dim); font-size:.92rem; margin:0}
+
+  .player{
+    display:flex; gap:12px; align-items:center; margin-top:18px;
+    padding:14px; border:1px dashed var(--edge); border-radius:12px;
+  }
+  .play{
+    flex:0 0 auto; width:54px; height:54px; border-radius:50%;
+    border:1px solid var(--blue); background:#101827; color:var(--blue);
+    font-size:1.2rem; cursor:pointer; display:grid; place-items:center;
+  }
+  .play:hover{background:#162034}
+  .play[aria-pressed="true"]{background:var(--blue); color:#08101E}
+  .meter{flex:1; min-width:0}
+  .meter label{display:block; font-size:.76rem; color:var(--dim); margin-bottom:5px}
+  input[type=range]{width:100%; accent-color:var(--blue)}
+  .bars{display:flex; gap:3px; height:22px; align-items:flex-end; margin-top:8px}
+  .bars i{flex:1; background:var(--edge); border-radius:2px; height:20%}
+  .bars.live i{background:var(--blue); animation:b .9s ease-in-out infinite}
+  .bars.live i:nth-child(2){animation-delay:.1s}
+  .bars.live i:nth-child(3){animation-delay:.2s}
+  .bars.live i:nth-child(4){animation-delay:.3s}
+  .bars.live i:nth-child(5){animation-delay:.4s}
+  .bars.live i:nth-child(6){animation-delay:.5s}
+  .bars.live i:nth-child(7){animation-delay:.6s}
+  .bars.live i:nth-child(8){animation-delay:.7s}
+  @keyframes b{0%,100%{height:18%}50%{height:100%}}
+  @media (prefers-reduced-motion:reduce){.bars.live i{animation:none;height:60%}}
+
+  .verdict{margin-top:16px; padding:14px 16px; border-radius:12px; font-size:.94rem}
+  .verdict.ok{background:#0E1B12; border:1px solid #23482F; color:#BFE9CC}
+  .verdict.no{background:#1B0F11; border:1px solid #4A2429; color:#EEC6C6}
+  .verdict b{display:block; margin-bottom:4px; font-size:1rem}
+
+  /* result */
+  .trophy{text-align:center; padding:8px 0 4px}
+  .score{
+    font-size:clamp(3.4rem,16vw,5.2rem); font-weight:800; color:var(--gold);
+    line-height:1; font-variant-numeric:tabular-nums;
+  }
+  .score span{font-size:.4em; color:var(--dim)}
+  .medal{font-size:clamp(2.6rem,12vw,3.6rem); line-height:1.1}
+  .rank{
+    font-size:.78rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--blue); font-weight:700; margin-top:6px;
+  }
+  .breakdown{list-style:none; padding:0; margin:20px 0 0; display:flex; flex-direction:column; gap:8px}
+  .breakdown li{
+    display:flex; gap:10px; align-items:flex-start; font-size:.9rem;
+    padding:11px 13px; border:1px solid var(--edge); border-radius:10px; background:#0B0E15;
+  }
+  .breakdown .m{flex:0 0 auto; width:1.2em}
+  .breakdown .t{color:var(--dim)}
+  .breakdown .t b{color:var(--text); font-weight:600; display:block}
+
+  footer{
+    text-align:center; color:var(--dim); font-size:.82rem;
+    border-top:1px solid var(--edge); padding-top:18px; margin-top:4px;
+  }
+  footer a{color:var(--blue)}
+  .sig{color:var(--gold); font-style:italic; margin-top:6px}
+  .hidden{display:none !important}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Moonology Art Gallery · Listening Test</div>
+    <h1>Can You Hear It?</h1>
+    <p class="sub">Five rounds. Headphones required — that is not a suggestion. 🎧</p>
+  </header>
+
+  <!-- ============ INTRO ============ -->
+  <section class="card" id="intro">
+    <div class="warn">
+      <span>⚠️</span>
+      <div>
+        <b>Turn your volume DOWN before you start.</b>
+        These are pure tones. They are louder than they feel, and they do not warn you.
+        Start low. You can raise it in round one.
+      </div>
+    </div>
+
+    <p style="margin:18px 0 0">
+      A binaural beat only works when each ear gets its own tone. Your left ear hears one.
+      Your right ear hears a slightly different one. Your brain hears the <b>gap</b> between
+      them as a slow pulse. 🌀
+    </p>
+    <p style="margin:12px 0 0">
+      That pulse is not in the recording. Neither ear gets it. Your head builds it.
+      Take one earbud out and it disappears.
+    </p>
+    <p class="hint" style="margin:14px 0 0">
+      Most people have never checked whether they can actually hear this. Some hear it right
+      away. Some hear almost nothing. Both are normal — and if your headphones are wired
+      backwards, round one will catch it.
+    </p>
+
+    <div class="choices">
+      <button class="btn primary" id="start">Start the test 🎧</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="card hidden" id="quiz">
+    <div class="dots" id="dots"></div>
+    <div class="qnum" id="qnum"></div>
+    <h2 id="qtitle"></h2>
+    <p class="hint" id="qhint"></p>
+
+    <div class="player">
+      <button class="play" id="play" aria-pressed="false" aria-label="Play the sound">▶</button>
+      <div class="meter">
+        <label for="vol">Volume — keep it gentle</label>
+        <input type="range" id="vol" min="0" max="100" value="22">
+        <div class="bars" id="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+    <div id="verdict"></div>
+    <div class="choices hidden" id="nextwrap">
+      <button class="btn primary" id="next">Next round →</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section class="card hidden" id="result">
+    <div class="trophy">
+      <div class="medal" id="medal">🌕</div>
+      <div class="score"><span id="got">0</span><span> / 5</span></div>
+      <div class="rank" id="rank"></div>
+    </div>
+    <p id="blurb" style="text-align:center; margin:14px 0 0"></p>
+    <ul class="breakdown" id="breakdown"></ul>
+    <div class="choices">
+      <button class="btn primary" id="again">Take it again ↻</button>
+      <button class="btn ghost" id="copy">Copy my score to share 📋</button>
+    </div>
+  </section>
+
+  <footer>
+    Built with nothing but a browser. No files, no tracking, works offline. 🔧<br>
+    🌐 moonologyartgallery.com · 👥 skool.com/still-learnin-3313
+    <div class="sig">Still learning. Always will be.</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- audio engine ---------------- */
+  var ctx=null, live=null, vol=0.22;
+
+  function ac(){
+    if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)();
+    if(ctx.state==="suspended") ctx.resume();
+    return ctx;
+  }
+
+  // mode "binaural": fL to left ear only, fR to right ear only  -> beat built in the head
+  // mode "mono":     both tones into BOTH ears                  -> beat happens in the air
+  // mode "left"/"right": single tone, one ear only
+  function play(spec){
+    stop();
+    var c=ac(), t=c.currentTime;
+    var merge=c.createChannelMerger(2);
+    var master=c.createGain();
+    master.gain.setValueAtTime(0.0001,t);
+    master.gain.exponentialRampToValueAtTime(Math.max(vol,0.0002), t+0.25);
+    merge.connect(master); master.connect(c.destination);
+
+    var nodes=[];
+    function tone(freq, toL, toR){
+      var o=c.createOscillator(), g=c.createGain();
+      o.type="sine"; o.frequency.setValueAtTime(freq,t);
+      g.gain.value=0.5;
+      o.connect(g);
+      if(toL) g.connect(merge,0,0);
+      if(toR) g.connect(merge,0,1);
+      o.start(t); nodes.push(o);
+    }
+
+    if(spec.mode==="left")      tone(spec.f, true,  false);
+    else if(spec.mode==="right")tone(spec.f, false, true);
+    else if(spec.mode==="mono"){ tone(spec.fL,true,true); tone(spec.fR,true,true); }
+    else if(spec.mode==="same"){ tone(spec.f, true,false); tone(spec.f,false,true); }
+    else { tone(spec.fL,true,false); tone(spec.fR,false,true); }   // binaural
+
+    live={nodes:nodes, master:master, ctx:c};
+    bars.classList.add("live");
+    playBtn.textContent="■"; playBtn.setAttribute("aria-pressed","true");
+    return live;
+  }
+
+  function stop(){
+    if(!live) return;
+    var t=live.ctx.currentTime;
+    try{
+      live.master.gain.cancelScheduledValues(t);
+      live.master.gain.setValueAtTime(Math.max(live.master.gain.value,0.0002),t);
+      live.master.gain.exponentialRampToValueAtTime(0.0001,t+0.12);
+      live.nodes.forEach(function(o){ o.stop(t+0.16); });
+    }catch(e){}
+    live=null;
+    bars.classList.remove("live");
+    playBtn.textContent="▶"; playBtn.setAttribute("aria-pressed","false");
+  }
+
+  /* ---------------- the rounds ---------------- */
+  // one ear is chosen at random so the answer cannot be memorised
+  var earIsLeft = Math.random() < 0.5;
+
+  var ROUNDS=[
+    {
+      title:"Which ear is the sound in?",
+      hint:"One tone. One ear. If you hear it in the wrong side, your headphones are on backwards — which is worth knowing before you listen to an hour of anything. 🎧",
+      spec:function(){ return {mode: earIsLeft?"left":"right", f:432}; },
+      choices:function(){ return [
+        {t:"My left ear",  ok:earIsLeft},
+        {t:"My right ear", ok:!earIsLeft},
+        {t:"Both ears, evenly", ok:false}
+      ];},
+      why:function(ok){ return ok
+        ? "Correct — it was your <b>"+(earIsLeft?"left":"right")+"</b> ear. Your headphones are wired the right way round and both sides work."
+        : "It was actually your <b>"+(earIsLeft?"left":"right")+"</b> ear. If you heard the other side, your headphones are reversed. If you heard both, you are probably on speakers — and none of the rest of this will work."; },
+      label:"Headphone check"
+    },
+    {
+      title:"Does this one pulse, or is it steady?",
+      hint:"Both ears get a tone. The question is whether the two tones are the same.",
+      spec:function(){ return {mode:"binaural", fL:432, fR:436.32}; },
+      choices:function(){ return [
+        {t:"It pulses slowly", ok:true},
+        {t:"It is completely steady", ok:false},
+        {t:"I honestly cannot tell", ok:false}
+      ];},
+      why:function(ok){ return ok
+        ? "Right. Left ear 432.000 Hz, right ear 436.320 Hz. The gap is <b>4.32 Hz</b> — and that is exactly the track this test came from."
+        : "It was pulsing. Left ear 432.000 Hz, right ear 436.320 Hz — a gap of <b>4.32 Hz</b>. It is a soft effect, not a wobble. Some people need a few listens before it appears. That is normal."; },
+      label:"Can you detect a beat"
+    },
+    {
+      title:"Slow pulse, or fast pulse?",
+      hint:"Same idea, different gap. Trust your gut on this one.",
+      spec:function(){ return {mode:"binaural", fL:432, fR:446}; },
+      choices:function(){ return [
+        {t:"Fast — a flutter", ok:true},
+        {t:"Slow — a drift", ok:false},
+        {t:"Same as the last one", ok:false}
+      ];},
+      why:function(ok){ return ok
+        ? "Correct. That gap was <b>14 Hz</b> — over three times faster than the 4.32 Hz you just heard."
+        : "That one was <b>14 Hz</b>, more than three times faster than the previous 4.32 Hz. Fast beats read as a flutter or roughness. Slow beats read as a drift."; },
+      label:"Slow versus fast"
+    },
+    {
+      title:"Count the pulses. Five seconds. Roughly how many?",
+      hint:"You do not need to be exact. Pick the closest. Play it a couple of times.",
+      spec:function(){ return {mode:"binaural", fL:400, fR:403}; },
+      choices:function(){ return [
+        {t:"About 5", ok:false},
+        {t:"About 15", ok:true},
+        {t:"About 40", ok:false}
+      ];},
+      why:function(ok){ return ok
+        ? "Correct — <b>3 Hz</b> means three pulses a second, so about 15 in five seconds. You can literally count a frequency."
+        : "It was <b>3 Hz</b>. Three pulses per second, five seconds — about 15. That is the whole idea: the number is the beat."; },
+      label:"Counting the gap"
+    },
+    {
+      title:"Two sounds. Which one happened inside your head?",
+      hint:"Press play to hear A, then press it again for B. A is one tone in each ear. B puts both tones in both ears — that beat happens in the air, before it reaches you.",
+      spec:function(n){ return n%2===0
+        ? {mode:"binaural", fL:432, fR:438}
+        : {mode:"mono",     fL:432, fR:438}; },
+      alternates:true,
+      choices:function(){ return [
+        {t:"A — softer, harder to point at", ok:true},
+        {t:"B — louder and rougher", ok:false},
+        {t:"They sounded identical", ok:false}
+      ];},
+      why:function(ok){ return ok
+        ? "Right. <b>A</b> was the real binaural beat — your brain made it, so it sits oddly in the middle of your skull. <b>B</b> is a monaural beat: the two tones collided in the air and beat before they ever reached your ears. That one is louder and rougher, and it works fine on speakers."
+        : "<b>A</b> was the binaural one — built by your brain, soft, hard to locate. <b>B</b> was both tones in both ears, beating in the air. Louder and rougher. That difference is the entire reason I keep saying headphones required."; },
+      label:"Binaural versus in the air"
+    }
+  ];
+
+  /* ---------------- state + wiring ---------------- */
+  var i=0, score=0, results=[], answered=false, playCount=0;
+  var $=function(id){ return document.getElementById(id); };
+  var intro=$("intro"), quiz=$("quiz"), result=$("result");
+  var dots=$("dots"), qnum=$("qnum"), qtitle=$("qtitle"), qhint=$("qhint");
+  var choicesEl=$("choices"), verdict=$("verdict"), nextwrap=$("nextwrap");
+  var playBtn=$("play"), bars=$("bars"), volEl=$("vol");
+
+  volEl.addEventListener("input", function(){
+    vol = Math.pow(volEl.value/100, 2) * 0.6;
+    if(live){ try{ live.master.gain.setTargetAtTime(Math.max(vol,0.0002), live.ctx.currentTime, .05);}catch(e){} }
+  });
+  vol = Math.pow(volEl.value/100,2)*0.6;
+
+  playBtn.addEventListener("click", function(){
+    if(live){ stop(); return; }
+    var r=ROUNDS[i];
+    play(r.alternates ? r.spec(playCount++) : r.spec());
+  });
+
+  function render(){
+    stop(); answered=false; playCount=0;
+    var r=ROUNDS[i];
+    dots.innerHTML="";
+    for(var k=0;k<ROUNDS.length;k++){
+      var d=document.createElement("div");
+      d.className="dot"+(k<i?" done":(k===i?" on":""));
+      dots.appendChild(d);
+    }
+    qnum.textContent="Round "+(i+1)+" of "+ROUNDS.length+" · "+r.label;
+    qtitle.textContent=r.title;
+    qhint.innerHTML=r.hint;
+    verdict.innerHTML=""; nextwrap.classList.add("hidden");
+    choicesEl.innerHTML="";
+    r.choices().forEach(function(c){
+      var b=document.createElement("button");
+      b.className="btn"; b.textContent=c.t;
+      b.addEventListener("click", function(){ answer(c, b); });
+      choicesEl.appendChild(b);
+    });
+  }
+
+  function answer(choice, btn){
+    if(answered) return;
+    answered=true; stop();
+    var r=ROUNDS[i];
+    if(choice.ok){ score++; btn.classList.add("good"); }
+    else { btn.classList.add("bad"); }
+    results.push({label:r.label, ok:!!choice.ok});
+    Array.prototype.forEach.call(choicesEl.children,function(b){ b.disabled=true; });
+    verdict.innerHTML='<div class="verdict '+(choice.ok?"ok":"no")+'">'+
+      '<b>'+(choice.ok?"✅ Got it":"❌ Not quite")+'</b>'+r.why(!!choice.ok)+'</div>';
+    nextwrap.classList.remove("hidden");
+    $("next").focus();
+  }
+
+  $("next").addEventListener("click", function(){
+    i++;
+    if(i<ROUNDS.length) render(); else finish();
+  });
+
+  var RANKS=[
+    {min:5, medal:"🌕", rank:"Full Moon",      blurb:"Five out of five. Your ears, your headphones and your attention are all working. You heard a 3 Hz gap and counted it. That is a real skill and most people do not have it."},
+    {min:4, medal:"🌖", rank:"Waning Gibbous", blurb:"Four out of five. You can clearly hear binaural beats. Whatever you missed is the subtle one, and subtle is exactly what this is supposed to be."},
+    {min:3, medal:"🌗", rank:"Half Moon",      blurb:"Three out of five. You are hearing the effect but not locking onto it yet. Try again in a quiet room with the volume low — low actually helps, because loud tones mask the gap."},
+    {min:2, medal:"🌘", rank:"Waning Crescent",blurb:"Two out of five. Check your headphones first. If round one went wrong, everything after it was fighting uphill. Cheap earbuds and one dead channel are the usual culprits."},
+    {min:0, medal:"🌑", rank:"New Moon",       blurb:"Not this time. Honestly, the most common reason is speakers instead of headphones, or a phone playing in mono. Neither of those can produce a binaural beat at all. It is not your ears."}
+  ];
+
+  function finish(){
+    stop();
+    quiz.classList.add("hidden"); result.classList.remove("hidden");
+    // trophy reflects the ACTUAL score, never a fixed graphic
+    var band=RANKS.filter(function(r){ return score>=r.min; })[0];
+    $("got").textContent=score;
+    $("medal").textContent=band.medal;
+    $("rank").textContent=band.rank;
+    $("blurb").textContent=band.blurb;
+    var ul=$("breakdown"); ul.innerHTML="";
+    results.forEach(function(r,n){
+      var li=document.createElement("li");
+      li.innerHTML='<span class="m">'+(r.ok?"✅":"❌")+'</span>'+
+                   '<span class="t"><b>Round '+(n+1)+" — "+r.label+'</b>'+
+                   (r.ok?"Correct":"Missed")+'</span>';
+      ul.appendChild(li);
+    });
+    result.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  $("start").addEventListener("click", function(){
+    ac();                       // unlock audio on the user gesture
+    intro.classList.add("hidden");
+    quiz.classList.remove("hidden");
+    render();
+  });
+
+  $("again").addEventListener("click", function(){
+    i=0; score=0; results=[]; earIsLeft=Math.random()<0.5;
+    result.classList.add("hidden"); quiz.classList.remove("hidden");
+    render();
+    quiz.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+
+  $("copy").addEventListener("click", function(){
+    var band=RANKS.filter(function(r){ return score>=r.min; })[0];
+    var txt="🎧 Can You Hear It? — binaural listening test\n"+
+            band.medal+" "+score+"/5 — "+band.rank+"\n"+
+            "Moonology Art Gallery 🌕";
+    var btn=this;
+    function done(){ btn.textContent="Copied ✅"; setTimeout(function(){ btn.textContent="Copy my score to share 📋"; },1800); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done, fallback);
+    } else fallback();
+    function fallback(){
+      var ta=document.createElement("textarea");
+      ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); done(); }catch(e){ btn.textContent="Copy failed — select it by hand"; }
+      document.body.removeChild(ta);
+    }
+  });
+
+  window.addEventListener("pagehide", stop);
+})();
+</script>
+</body>
+</html>
