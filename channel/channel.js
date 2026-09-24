@@ -44,6 +44,7 @@
     '.mng-ch .hd{display:flex;align-items:center;gap:20px;flex-wrap:wrap}',
     '.mng-ch .mark{width:72px;height:72px;border-radius:50%;border:1px solid var(--rule);',
     'display:grid;place-items:center;font-size:34px;background:radial-gradient(circle at 35% 35%,#1b1a14,#05060a)}',
+    '.mng-ch .mark img{width:100%;height:100%;display:block;border-radius:50%;}',
     '.mng-ch .who{flex:1;min-width:220px}',
     '.mng-ch .nm{font-family:var(--display);font-weight:400;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(1.05rem,2vw,1.55rem);',
     'color:var(--gold-lt);margin:0;line-height:1.1}',
@@ -202,7 +203,9 @@
     root.appendChild(inn);
 
     var hd = el('div', 'hd');
-    hd.appendChild(el('div', 'mark', '🌙'));
+    var mk = el('div', 'mark'), mi = document.createElement('img');
+    mi.src = BASE + 'mark.png'; mi.alt = 'Moonology Art Gallery';   // circle mark, waxing crescent (9/24)
+    mk.appendChild(mi); hd.appendChild(mk);
     var who = el('div', 'who');
     who.appendChild(el('h2', 'nm', d.channel.name));
     // subline + store link are set in WordPress on the hero mount: data-subline, data-store.
