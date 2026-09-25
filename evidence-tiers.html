@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Three Tiers | Moonology Art Gallery</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cormorant+Garamond:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Metamorphous&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: Futura, "Avenir Next", "Gill Sans", system-ui, sans-serif;
       background: #07080a;
       color: #e8e4d8;
       min-height: 100vh;
@@ -41,7 +41,7 @@
     .tablet-body { padding: 32px 36px 50px; }
 
     h1 {
-      font-family: 'UnifrakturMaguntia', cursive;
+      font-family: Herculanum, Metamorphous, Georgia, serif;
       font-size: 2.6rem; color: #d4af37;
       text-shadow: 0 0 20px rgba(212,175,55,0.4);
       margin-bottom: 10px; font-weight: 400; line-height: 1.15;
@@ -63,7 +63,7 @@
 
     .begin-btn, .submit-btn, .restart-btn, .next-btn, .trophy-btn {
       display: block; width: 100%; background: transparent; color: #d4af37;
-      font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 700;
+      font-family: Futura, "Avenir Next", "Gill Sans", system-ui, sans-serif; font-size: 1.05rem; font-weight: 700;
       padding: 14px; border: 1px solid #d4af37; cursor: pointer; margin-top: 28px;
       letter-spacing: 0.05em; transition: background .2s, color .2s;
     }
@@ -86,7 +86,7 @@
     .choices { display: grid; gap: 10px; margin-top: 18px; }
     .choice {
       width: 100%; text-align: left; padding: 13px 15px; cursor: pointer;
-      font-family: 'Cormorant Garamond', serif; font-size: 1.02rem;
+      font-family: Futura, "Avenir Next", "Gill Sans", system-ui, sans-serif; font-size: 1.02rem;
       background: transparent; color: #e8e4d8; border: 1px solid rgba(232,228,216,0.25);
       transition: border-color .2s, background .2s;
     }
@@ -106,14 +106,14 @@
     }
 
     .result-header { text-align: center; margin: 8px 0 4px; }
-    #score-display { font-family: 'UnifrakturMaguntia', cursive; font-size: 3.2rem; color: #d4af37; display: block; }
+    #score-display { font-family: Herculanum, Metamorphous, Georgia, serif; font-size: 3.2rem; color: #d4af37; display: block; }
     #score-label { font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(232,228,216,0.5); }
     #verdict-text { font-size: 1.1rem; line-height: 1.7; text-align: center; font-style: italic; }
 
     .trophy-section { margin-top: 26px; }
     .trophy-input {
       width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(212,175,55,0.4);
-      color: #e8e4d8; font-family: 'Cormorant Garamond', serif; font-size: 1rem;
+      color: #e8e4d8; font-family: Futura, "Avenir Next", "Gill Sans", system-ui, sans-serif; font-size: 1rem;
     }
     .trophy-btn { margin-top: 12px; }
     /* The canvas is only a drawing surface — it is never shown. iOS long-press
@@ -138,6 +138,16 @@
       .claim-box .claim { font-size: 1.15rem; }
       #score-display { font-size: 2.6rem; }
     }
+
+    /* ── MOONOLOGY TYPE · 2026-09-24 — matches moonologyartgallery.com + the Shorts cards.
+       Herculanum (Mac/iOS) → Metamorphous (everyone else) for titles; Futura for text. ── */
+    h1, h2, h3, #score-display, .glossary-item .term {
+      font-family: Herculanum, Metamorphous, Georgia, serif !important;
+      font-weight: 400 !important;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .tablet-title { text-transform: uppercase; letter-spacing: 0.16em; }
   </style>
 </head>
 <body>
