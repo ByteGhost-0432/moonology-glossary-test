@@ -400,13 +400,14 @@
 
     /* ── MOONOLOGY TYPE · 2026-09-24 — matches moonologyartgallery.com + the Shorts cards.
        Herculanum (Mac/iOS) → Metamorphous (everyone else) for titles; Futura for text. ── */
-    h1, h2, h3, #score-display, .glossary-item .term, .question-text {
+    h1, h2, h3, #score-display, .glossary-item .term, .question-text, .join-lead {
       font-family: Herculanum, Metamorphous, Georgia, serif !important;
       font-weight: 400 !important;
       text-transform: uppercase;
       letter-spacing: 0.02em;
     }
     .tablet-title { text-transform: uppercase; letter-spacing: 0.16em; }
+    .join-btn { text-transform: uppercase; letter-spacing: 0.16em; }
   </style>
 </head>
 <body>
@@ -706,7 +707,7 @@
     // otherwise canvas silently falls back to a default font on first use.
     await Promise.all([
       document.fonts.load('64px Metamorphous'),
-      document.fonts.load('italic 26px Futura, "Avenir Next", "Gill Sans", sans-serif'),
+      document.fonts.load('22px Futura, "Avenir Next", "Gill Sans", sans-serif'),
       document.fonts.load('700 42px Futura, "Avenir Next", "Gill Sans", sans-serif'),
       document.fonts.load('700 20px Futura, "Avenir Next", "Gill Sans", sans-serif'),
       document.fonts.load('28px Futura, "Avenir Next", "Gill Sans", sans-serif'),
@@ -772,16 +773,18 @@
     ctx.font = '64px Herculanum, Metamorphous, Georgia, serif';
     ctx.shadowColor = 'rgba(212,175,55,0.5)';
     ctx.shadowBlur = 20;
-    ctx.fillText('Master of the Tablets', 600, 450);
+    ctx.fillText('MASTER OF THE TABLETS', 600, 450);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = 'rgba(232,228,216,0.7)';
-    ctx.font = 'italic 26px Futura, "Avenir Next", "Gill Sans", sans-serif';
-    ctx.fillText('awarded to', 600, 520);
+    ctx.font = '22px Futura, "Avenir Next", "Gill Sans", sans-serif';
+    if ('letterSpacing' in ctx) ctx.letterSpacing = '6px';
+    ctx.fillText('AWARDED TO', 600, 520);
+    if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
 
     ctx.fillStyle = '#e8e4d8';
-    ctx.font = '700 42px Futura, "Avenir Next", "Gill Sans", sans-serif';
-    ctx.fillText(name, 600, 578);
+    ctx.font = '46px Herculanum, Metamorphous, Georgia, serif';
+    ctx.fillText(name.toUpperCase(), 600, 580);
 
     const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     ctx.fillStyle = 'rgba(212,175,55,0.85)';
@@ -789,8 +792,8 @@
     ctx.fillText(lastScore + ' / 33 — ' + dateStr, 600, 635);
 
     ctx.fillStyle = '#d4af37';
-    ctx.font = 'italic 24px Futura, "Avenir Next", "Gill Sans", sans-serif';
-    ctx.fillText('As above, so below.', 600, 712);
+    ctx.font = '30px Herculanum, Metamorphous, Georgia, serif';
+    ctx.fillText('AS ABOVE, SO BELOW.', 600, 712);
 
     // The trophy is the one thing people screenshot and share, and it carried no
     // address. This turns every share into a referral.
