@@ -6,18 +6,11 @@
  },
  "latest": [
   {
-   "id": "isbz362Wais",
-   "title": "🌙 Where Did Those Dice Come From?",
-   "published": "2026-09-25T06:19:39+00:00",
-   "short": true,
-   "views": 20
-  },
-  {
    "id": "xBl4U4edsFk",
    "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
    "published": "2026-09-22T20:39:49+00:00",
    "short": true,
-   "views": 1196
+   "views": 1197
   },
   {
    "id": "lQ75e09ZQcc",
@@ -109,22 +102,22 @@
    "published": "2026-09-07T20:15:41+00:00",
    "short": true,
    "views": 954
+  },
+  {
+   "id": "MbJ0c2Aw0sk",
+   "title": "🪚 The Saw That Did Not Cut 🌙",
+   "published": "2026-09-04T14:49:25+00:00",
+   "short": true,
+   "views": 379
   }
  ],
  "shorts": [
-  {
-   "id": "isbz362Wais",
-   "title": "🌙 Where Did Those Dice Come From?",
-   "published": "2026-09-25T06:19:39+00:00",
-   "short": true,
-   "views": 20
-  },
   {
    "id": "xBl4U4edsFk",
    "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
    "published": "2026-09-22T20:39:49+00:00",
    "short": true,
-   "views": 1196
+   "views": 1197
   },
   {
    "id": "lQ75e09ZQcc",
@@ -216,6 +209,13 @@
    "published": "2026-08-30T03:57:22+00:00",
    "short": true,
    "views": 743
+  },
+  {
+   "id": "lybGh66IUI8",
+   "title": "These Are Monkeys. Carved 2,800 Years Ago as Small Bald Men. 🐒🌙",
+   "published": "2026-08-29T03:52:40+00:00",
+   "short": true,
+   "views": 783
   }
  ],
  "videos": [
@@ -310,18 +310,11 @@
    "title": "🏺 Ancient Egypt · Object by Object",
    "items": [
     {
-     "id": "isbz362Wais",
-     "title": "🌙 Where Did Those Dice Come From?",
-     "published": "2026-09-25T06:19:39+00:00",
-     "short": true,
-     "views": 20
-    },
-    {
      "id": "xBl4U4edsFk",
      "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
      "published": "2026-09-22T20:39:49+00:00",
      "short": true,
-     "views": 1196
+     "views": 1197
     },
     {
      "id": "lQ75e09ZQcc",
@@ -831,5 +824,5 @@
    ]
   }
  ],
- "updated": "2026-09-25T11:47Z"
+ "updated": "2026-09-25T17:08Z"
 }
