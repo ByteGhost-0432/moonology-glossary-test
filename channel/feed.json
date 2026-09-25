@@ -6,11 +6,18 @@
  },
  "latest": [
   {
+   "id": "isbz362Wais",
+   "title": "🌙 Where Did Those Dice Come From?",
+   "published": "2026-09-25T06:19:39+00:00",
+   "short": true,
+   "views": 20
+  },
+  {
    "id": "xBl4U4edsFk",
    "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
    "published": "2026-09-22T20:39:49+00:00",
    "short": true,
-   "views": 1192
+   "views": 1196
   },
   {
    "id": "lQ75e09ZQcc",
@@ -31,7 +38,7 @@
    "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🎧 | Jupiter's Ganymede 🌕 | 60 Minutes",
    "published": "2026-09-18T14:16:36+00:00",
    "short": false,
-   "views": 9
+   "views": 10
   },
   {
    "id": "-muodg53kHA",
@@ -45,21 +52,21 @@
    "title": "They Measured A Cat, Then Built A Box To Fit It 🐈🌙",
    "published": "2026-09-17T05:04:36+00:00",
    "short": false,
-   "views": 8
+   "views": 9
   },
   {
    "id": "YBR0zN7SYjQ",
    "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
    "published": "2026-09-15T23:24:40+00:00",
    "short": true,
-   "views": 1161
+   "views": 1162
   },
   {
    "id": "Wqar0Zmds-Y",
    "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
    "published": "2026-09-15T05:28:13+00:00",
    "short": true,
-   "views": 2701
+   "views": 2706
   },
   {
    "id": "r7Zq2wY_qOU",
@@ -102,22 +109,22 @@
    "published": "2026-09-07T20:15:41+00:00",
    "short": true,
    "views": 954
-  },
-  {
-   "id": "MbJ0c2Aw0sk",
-   "title": "🪚 The Saw That Did Not Cut 🌙",
-   "published": "2026-09-04T14:49:25+00:00",
-   "short": true,
-   "views": 378
   }
  ],
  "shorts": [
+  {
+   "id": "isbz362Wais",
+   "title": "🌙 Where Did Those Dice Come From?",
+   "published": "2026-09-25T06:19:39+00:00",
+   "short": true,
+   "views": 20
+  },
   {
    "id": "xBl4U4edsFk",
    "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
    "published": "2026-09-22T20:39:49+00:00",
    "short": true,
-   "views": 1192
+   "views": 1196
   },
   {
    "id": "lQ75e09ZQcc",
@@ -145,14 +152,14 @@
    "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
    "published": "2026-09-15T23:24:40+00:00",
    "short": true,
-   "views": 1161
+   "views": 1162
   },
   {
    "id": "Wqar0Zmds-Y",
    "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
    "published": "2026-09-15T05:28:13+00:00",
    "short": true,
-   "views": 2701
+   "views": 2706
   },
   {
    "id": "r7Zq2wY_qOU",
@@ -201,7 +208,7 @@
    "title": "🪚 The Saw That Did Not Cut 🌙",
    "published": "2026-09-04T14:49:25+00:00",
    "short": true,
-   "views": 378
+   "views": 379
   },
   {
    "id": "N4nMVQTNFBg",
@@ -209,13 +216,6 @@
    "published": "2026-08-30T03:57:22+00:00",
    "short": true,
    "views": 743
-  },
-  {
-   "id": "lybGh66IUI8",
-   "title": "These Are Monkeys. Carved 2,800 Years Ago as Small Bald Men. 🐒🌙",
-   "published": "2026-08-29T03:52:40+00:00",
-   "short": true,
-   "views": 783
   }
  ],
  "videos": [
@@ -224,14 +224,14 @@
    "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🎧 | Jupiter's Ganymede 🌕 | 60 Minutes",
    "published": "2026-09-18T14:16:36+00:00",
    "short": false,
-   "views": 9
+   "views": 10
   },
   {
    "id": "SRGovBbXqUg",
    "title": "They Measured A Cat, Then Built A Box To Fit It 🐈🌙",
    "published": "2026-09-17T05:04:36+00:00",
    "short": false,
-   "views": 8
+   "views": 9
   },
   {
    "id": "qCxIvhYSfjA",
@@ -310,11 +310,18 @@
    "title": "🏺 Ancient Egypt · Object by Object",
    "items": [
     {
+     "id": "isbz362Wais",
+     "title": "🌙 Where Did Those Dice Come From?",
+     "published": "2026-09-25T06:19:39+00:00",
+     "short": true,
+     "views": 20
+    },
+    {
      "id": "xBl4U4edsFk",
      "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
      "published": "2026-09-22T20:39:49+00:00",
      "short": true,
-     "views": 1192
+     "views": 1196
     },
     {
      "id": "lQ75e09ZQcc",
@@ -342,14 +349,14 @@
      "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
      "published": "2026-09-15T23:24:40+00:00",
      "short": true,
-     "views": 1161
+     "views": 1162
     },
     {
      "id": "Wqar0Zmds-Y",
      "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
      "published": "2026-09-15T05:28:13+00:00",
      "short": true,
-     "views": 2701
+     "views": 2706
     },
     {
      "id": "r7Zq2wY_qOU",
@@ -363,7 +370,7 @@
      "title": "🪚 The Saw That Did Not Cut 🌙",
      "published": "2026-09-04T14:49:25+00:00",
      "short": true,
-     "views": 378
+     "views": 379
     },
     {
      "id": "N4nMVQTNFBg",
@@ -397,7 +404,7 @@
      "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🎧 | Jupiter's Ganymede 🌕 | 60 Minutes",
      "published": "2026-09-18T14:16:36+00:00",
      "short": false,
-     "views": 9
+     "views": 10
     },
     {
      "id": "FaE99tK3a0w",
@@ -487,14 +494,14 @@
      "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
      "published": "2026-09-15T23:24:40+00:00",
      "short": true,
-     "views": 1161
+     "views": 1162
     },
     {
      "id": "SRGovBbXqUg",
      "title": "They Measured A Cat, Then Built A Box To Fit It 🐈🌙",
      "published": "2026-09-17T05:04:36+00:00",
      "short": false,
-     "views": 8
+     "views": 9
     }
    ]
   },
@@ -514,21 +521,21 @@
      "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
      "published": "2026-09-15T23:24:40+00:00",
      "short": true,
-     "views": 1161
+     "views": 1162
     },
     {
      "id": "Wqar0Zmds-Y",
      "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
      "published": "2026-09-15T05:28:13+00:00",
      "short": true,
-     "views": 2701
+     "views": 2706
     },
     {
      "id": "Wqar0Zmds-Y",
      "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
      "published": "2026-09-15T05:28:13+00:00",
      "short": true,
-     "views": 2701
+     "views": 2706
     },
     {
      "id": "r7Zq2wY_qOU",
@@ -549,7 +556,7 @@
      "title": "🪚 The Saw That Did Not Cut 🌙",
      "published": "2026-09-04T14:49:25+00:00",
      "short": true,
-     "views": 378
+     "views": 379
     },
     {
      "id": "N4nMVQTNFBg",
@@ -584,7 +591,7 @@
      "title": "The Museum Says Furniture. The Physicist Said Lens 🔍🌙",
      "published": "2026-08-10T07:43:43+00:00",
      "short": true,
-     "views": 853
+     "views": 854
     },
     {
      "id": "sVPqnW-qb-4",
@@ -687,7 +694,7 @@
      "title": "🪚 The Saw That Did Not Cut 🌙",
      "published": "2026-09-04T14:49:25+00:00",
      "short": true,
-     "views": 378
+     "views": 379
     },
     {
      "id": "N4nMVQTNFBg",
@@ -759,13 +766,6 @@
    "title": "Moonology Binaural 🌙",
    "items": [
     {
-     "id": "myJhz60jMOs",
-     "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🌙 | 42 Minutes",
-     "published": "2026-07-14T22:20:14+00:00",
-     "short": false,
-     "views": 130
-    },
-    {
      "id": "9bYF9Kkatig",
      "title": "As Above, So Below 🪐 Europa's Locked 🔒 Resonance | 528 Hz / 7.83 Hz Binaural 🎧 | 3 Hours",
      "published": "2026-07-28T00:26:56+00:00",
@@ -808,6 +808,13 @@
      "views": 35
     },
     {
+     "id": "myJhz60jMOs",
+     "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🌙 | 42 Minutes",
+     "published": "2026-07-14T22:20:14+00:00",
+     "short": false,
+     "views": 130
+    },
+    {
      "id": "C4lz2Zu3qH0",
      "title": "7.83 Hz Is NOT a Sleep Frequency 🌙 What Earth's Resonance Actually Does 🎧 528 Hz Binaural",
      "published": "2026-07-18T08:23:15+00:00",
@@ -819,10 +826,10 @@
      "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🎧 | Jupiter's Ganymede 🌕 | 60 Minutes",
      "published": "2026-09-18T14:16:36+00:00",
      "short": false,
-     "views": 9
+     "views": 10
     }
    ]
   }
  ],
- "updated": "2026-09-24T21:50Z"
+ "updated": "2026-09-25T11:47Z"
 }
