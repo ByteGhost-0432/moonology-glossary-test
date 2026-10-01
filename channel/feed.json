@@ -6,6 +6,13 @@
  },
  "latest": [
   {
+   "id": "lW0peOauYM4",
+   "title": "🎲 A Twenty-Sided Die From Egypt. Where Was It Found? 🌙",
+   "published": "2026-09-30T23:18:46+00:00",
+   "short": true,
+   "views": 39
+  },
+  {
    "id": "xBl4U4edsFk",
    "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
    "published": "2026-09-22T20:39:49+00:00",
@@ -17,7 +24,7 @@
    "title": "They Buried A Brick And Waited For It To Grow 🌙",
    "published": "2026-09-20T07:36:32+00:00",
    "short": true,
-   "views": 1603
+   "views": 1604
   },
   {
    "id": "UtJqjmo_y2A",
@@ -59,7 +66,7 @@
    "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
    "published": "2026-09-15T05:28:13+00:00",
    "short": true,
-   "views": 2735
+   "views": 2736
   },
   {
    "id": "r7Zq2wY_qOU",
@@ -102,16 +109,16 @@
    "published": "2026-09-07T20:15:41+00:00",
    "short": true,
    "views": 955
-  },
-  {
-   "id": "MbJ0c2Aw0sk",
-   "title": "🪚 The Saw That Did Not Cut 🌙",
-   "published": "2026-09-04T14:49:25+00:00",
-   "short": true,
-   "views": 379
   }
  ],
  "shorts": [
+  {
+   "id": "lW0peOauYM4",
+   "title": "🎲 A Twenty-Sided Die From Egypt. Where Was It Found? 🌙",
+   "published": "2026-09-30T23:18:46+00:00",
+   "short": true,
+   "views": 39
+  },
   {
    "id": "xBl4U4edsFk",
    "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
@@ -124,7 +131,7 @@
    "title": "They Buried A Brick And Waited For It To Grow 🌙",
    "published": "2026-09-20T07:36:32+00:00",
    "short": true,
-   "views": 1603
+   "views": 1604
   },
   {
    "id": "UtJqjmo_y2A",
@@ -152,7 +159,7 @@
    "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
    "published": "2026-09-15T05:28:13+00:00",
    "short": true,
-   "views": 2735
+   "views": 2736
   },
   {
    "id": "r7Zq2wY_qOU",
@@ -209,13 +216,6 @@
    "published": "2026-08-30T03:57:22+00:00",
    "short": true,
    "views": 743
-  },
-  {
-   "id": "lybGh66IUI8",
-   "title": "These Are Monkeys. Carved 2,800 Years Ago as Small Bald Men. 🐒🌙",
-   "published": "2026-08-29T03:52:40+00:00",
-   "short": true,
-   "views": 785
   }
  ],
  "videos": [
@@ -310,6 +310,13 @@
    "title": "🏺 Ancient Egypt · Object by Object",
    "items": [
     {
+     "id": "lW0peOauYM4",
+     "title": "🎲 A Twenty-Sided Die From Egypt. Where Was It Found? 🌙",
+     "published": "2026-09-30T23:18:46+00:00",
+     "short": true,
+     "views": 39
+    },
+    {
      "id": "xBl4U4edsFk",
      "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
      "published": "2026-09-22T20:39:49+00:00",
@@ -321,7 +328,7 @@
      "title": "They Buried A Brick And Waited For It To Grow 🌙",
      "published": "2026-09-20T07:36:32+00:00",
      "short": true,
-     "views": 1603
+     "views": 1604
     },
     {
      "id": "UtJqjmo_y2A",
@@ -521,14 +528,14 @@
      "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
      "published": "2026-09-15T05:28:13+00:00",
      "short": true,
-     "views": 2735
+     "views": 2736
     },
     {
      "id": "Wqar0Zmds-Y",
      "title": "They Crossed An Ocean To Hear A Broken Statue 🌙",
      "published": "2026-09-15T05:28:13+00:00",
      "short": true,
-     "views": 2735
+     "views": 2736
     },
     {
      "id": "r7Zq2wY_qOU",
@@ -824,5 +831,5 @@
    ]
   }
  ],
- "updated": "2026-09-30T20:00Z"
+ "updated": "2026-10-01T00:32Z"
 }
