@@ -6,6 +6,20 @@
  },
  "latest": [
   {
+   "id": "2Vuu19CLU0Q",
+   "title": "👑 Is Nefertiti Beyond King Tut's Tomb? · Akhenaten Part 2 🌙",
+   "published": "2026-10-07T00:45:48+00:00",
+   "short": true,
+   "views": 24
+  },
+  {
+   "id": "BQvyBtSjDHY",
+   "title": "👑 Nefertiti On A Block One Man Could Carry · Akhenaten Part 1 🌙",
+   "published": "2026-10-07T00:11:24+00:00",
+   "short": true,
+   "views": 202
+  },
+  {
    "id": "lW0peOauYM4",
    "title": "🎲 A Twenty-Sided Die From Egypt. Where Was It Found? 🌙",
    "published": "2026-09-30T23:18:46+00:00",
@@ -17,7 +31,7 @@
    "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
    "published": "2026-09-22T20:39:49+00:00",
    "short": true,
-   "views": 1200
+   "views": 1202
   },
   {
    "id": "lQ75e09ZQcc",
@@ -52,14 +66,14 @@
    "title": "They Measured A Cat, Then Built A Box To Fit It 🐈🌙",
    "published": "2026-09-17T05:04:36+00:00",
    "short": false,
-   "views": 10
+   "views": 11
   },
   {
    "id": "YBR0zN7SYjQ",
    "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
    "published": "2026-09-15T23:24:40+00:00",
    "short": true,
-   "views": 1165
+   "views": 1168
   },
   {
    "id": "Wqar0Zmds-Y",
@@ -73,7 +87,7 @@
    "title": "The Face On The Handle Is Looking At You 👁",
    "published": "2026-09-13T03:14:18+00:00",
    "short": true,
-   "views": 1581
+   "views": 1582
   },
   {
    "id": "OIonprYisbA",
@@ -95,23 +109,23 @@
    "published": "2026-09-12T07:05:10+00:00",
    "short": true,
    "views": 1181
-  },
-  {
-   "id": "1jcfK_UF6hs",
-   "title": "🌙 Thoth Was a Bird. He Was Also a Baboon. 🐒 | Music-Only Version",
-   "published": "2026-09-10T08:08:48+00:00",
-   "short": true,
-   "views": 62
-  },
-  {
-   "id": "FaE99tK3a0w",
-   "title": "Nobody Has Ever Seen This Ocean 🌊🌕 Ganymede Under The Ice",
-   "published": "2026-09-07T20:15:41+00:00",
-   "short": true,
-   "views": 957
   }
  ],
  "shorts": [
+  {
+   "id": "2Vuu19CLU0Q",
+   "title": "👑 Is Nefertiti Beyond King Tut's Tomb? · Akhenaten Part 2 🌙",
+   "published": "2026-10-07T00:45:48+00:00",
+   "short": true,
+   "views": 24
+  },
+  {
+   "id": "BQvyBtSjDHY",
+   "title": "👑 Nefertiti On A Block One Man Could Carry · Akhenaten Part 1 🌙",
+   "published": "2026-10-07T00:11:24+00:00",
+   "short": true,
+   "views": 202
+  },
   {
    "id": "lW0peOauYM4",
    "title": "🎲 A Twenty-Sided Die From Egypt. Where Was It Found? 🌙",
@@ -124,7 +138,7 @@
    "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
    "published": "2026-09-22T20:39:49+00:00",
    "short": true,
-   "views": 1200
+   "views": 1202
   },
   {
    "id": "lQ75e09ZQcc",
@@ -152,7 +166,7 @@
    "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
    "published": "2026-09-15T23:24:40+00:00",
    "short": true,
-   "views": 1165
+   "views": 1168
   },
   {
    "id": "Wqar0Zmds-Y",
@@ -166,7 +180,7 @@
    "title": "The Face On The Handle Is Looking At You 👁",
    "published": "2026-09-13T03:14:18+00:00",
    "short": true,
-   "views": 1581
+   "views": 1582
   },
   {
    "id": "OIonprYisbA",
@@ -202,20 +216,6 @@
    "published": "2026-09-07T20:15:41+00:00",
    "short": true,
    "views": 957
-  },
-  {
-   "id": "MbJ0c2Aw0sk",
-   "title": "🪚 The Saw That Did Not Cut 🌙",
-   "published": "2026-09-04T14:49:25+00:00",
-   "short": true,
-   "views": 380
-  },
-  {
-   "id": "N4nMVQTNFBg",
-   "title": "A Tool In Your Garage Is 4,000 Years Old 🧱",
-   "published": "2026-08-30T03:57:22+00:00",
-   "short": true,
-   "views": 743
   }
  ],
  "videos": [
@@ -231,7 +231,7 @@
    "title": "They Measured A Cat, Then Built A Box To Fit It 🐈🌙",
    "published": "2026-09-17T05:04:36+00:00",
    "short": false,
-   "views": 10
+   "views": 11
   },
   {
    "id": "qCxIvhYSfjA",
@@ -245,14 +245,14 @@
    "title": "It Rains Methane 🌧️ | Titan · 432 Hz / 6 Hz Theta Binaural 🎧 | 60 Minutes",
    "published": "2026-08-16T20:22:54+00:00",
    "short": false,
-   "views": 51
+   "views": 52
   },
   {
    "id": "W5RrGiDELEY",
    "title": "Only 12 People Have Ever Walked on the Moon 🌕 | Luna 🌕 432 Hz / 4.32 Hz Binaural 🎧 | 1 Hour",
    "published": "2026-08-09T09:20:27+00:00",
    "short": false,
-   "views": 39
+   "views": 40
   },
   {
    "id": "uCvlbYvNe9Q",
@@ -294,7 +294,7 @@
    "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🌙 | 42 Minutes",
    "published": "2026-07-14T22:20:14+00:00",
    "short": false,
-   "views": 132
+   "views": 133
   },
   {
    "id": "1CRkkqUNJ5M",
@@ -310,6 +310,20 @@
    "title": "🏺 Ancient Egypt · Object by Object",
    "items": [
     {
+     "id": "2Vuu19CLU0Q",
+     "title": "👑 Is Nefertiti Beyond King Tut's Tomb? · Akhenaten Part 2 🌙",
+     "published": "2026-10-07T00:45:48+00:00",
+     "short": true,
+     "views": 29
+    },
+    {
+     "id": "BQvyBtSjDHY",
+     "title": "👑 Nefertiti On A Block One Man Could Carry · Akhenaten Part 1 🌙",
+     "published": "2026-10-07T00:11:24+00:00",
+     "short": true,
+     "views": 202
+    },
+    {
      "id": "lW0peOauYM4",
      "title": "🎲 A Twenty-Sided Die From Egypt. Where Was It Found? 🌙",
      "published": "2026-09-30T23:18:46+00:00",
@@ -321,7 +335,7 @@
      "title": "Nobody Knows The Rules Of This 4,000-Year-Old Game 🎲🌙",
      "published": "2026-09-22T20:39:49+00:00",
      "short": true,
-     "views": 1200
+     "views": 1202
     },
     {
      "id": "lQ75e09ZQcc",
@@ -349,7 +363,7 @@
      "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
      "published": "2026-09-15T23:24:40+00:00",
      "short": true,
-     "views": 1165
+     "views": 1168
     },
     {
      "id": "Wqar0Zmds-Y",
@@ -363,7 +377,7 @@
      "title": "The Face On The Handle Is Looking At You 👁",
      "published": "2026-09-13T03:14:18+00:00",
      "short": true,
-     "views": 1581
+     "views": 1582
     },
     {
      "id": "MbJ0c2Aw0sk",
@@ -439,7 +453,7 @@
      "title": "It Rains Methane 🌧️ | Titan · 432 Hz / 6 Hz Theta Binaural 🎧 | 60 Minutes",
      "published": "2026-08-16T20:22:54+00:00",
      "short": false,
-     "views": 51
+     "views": 52
     },
     {
      "id": "qA31LmnfKjw",
@@ -453,7 +467,7 @@
      "title": "Only 12 People Have Ever Walked on the Moon 🌕 | Luna 🌕 432 Hz / 4.32 Hz Binaural 🎧 | 1 Hour",
      "published": "2026-08-09T09:20:27+00:00",
      "short": false,
-     "views": 39
+     "views": 40
     },
     {
      "id": "d1HcUwhr1Zk",
@@ -494,14 +508,14 @@
      "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
      "published": "2026-09-15T23:24:40+00:00",
      "short": true,
-     "views": 1165
+     "views": 1168
     },
     {
      "id": "SRGovBbXqUg",
      "title": "They Measured A Cat, Then Built A Box To Fit It 🐈🌙",
      "published": "2026-09-17T05:04:36+00:00",
      "short": false,
-     "views": 10
+     "views": 11
     }
    ]
   },
@@ -521,7 +535,7 @@
      "title": "They Were Making Boxes The Exact Length Of A Cat 🐈🌙",
      "published": "2026-09-15T23:24:40+00:00",
      "short": true,
-     "views": 1165
+     "views": 1168
     },
     {
      "id": "Wqar0Zmds-Y",
@@ -542,7 +556,7 @@
      "title": "The Face On The Handle Is Looking At You 👁",
      "published": "2026-09-13T03:14:18+00:00",
      "short": true,
-     "views": 1581
+     "views": 1582
     },
     {
      "id": "OWFi7IQ0YKg",
@@ -570,7 +584,7 @@
      "title": "These Are Monkeys. Carved 2,800 Years Ago as Small Bald Men. 🐒🌙",
      "published": "2026-08-29T03:52:40+00:00",
      "short": true,
-     "views": 787
+     "views": 788
     },
     {
      "id": "UOgwtUxbB1A",
@@ -605,7 +619,7 @@
      "title": "A 7,000-Year-Old Calendar in the Sahara — Older Than Stonehenge? 🌙",
      "published": "2026-08-03T06:57:25+00:00",
      "short": true,
-     "views": 922
+     "views": 923
     },
     {
      "id": "iEU1aHp9aqo",
@@ -791,14 +805,14 @@
      "title": "Only 12 People Have Ever Walked on the Moon 🌕 | Luna 🌕 432 Hz / 4.32 Hz Binaural 🎧 | 1 Hour",
      "published": "2026-08-09T09:20:27+00:00",
      "short": false,
-     "views": 39
+     "views": 40
     },
     {
      "id": "MQOtcrTWp9U",
      "title": "It Rains Methane 🌧️ | Titan · 432 Hz / 6 Hz Theta Binaural 🎧 | 60 Minutes",
      "published": "2026-08-16T20:22:54+00:00",
      "short": false,
-     "views": 51
+     "views": 52
     },
     {
      "id": "qCxIvhYSfjA",
@@ -812,7 +826,7 @@
      "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🌙 | 42 Minutes",
      "published": "2026-07-14T22:20:14+00:00",
      "short": false,
-     "views": 132
+     "views": 133
     },
     {
      "id": "C4lz2Zu3qH0",
@@ -831,5 +845,5 @@
    ]
   }
  ],
- "updated": "2026-10-06T20:17Z"
+ "updated": "2026-10-07T10:12Z"
 }
