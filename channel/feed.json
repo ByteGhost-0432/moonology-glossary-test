@@ -6,11 +6,18 @@
  },
  "latest": [
   {
+   "id": "5N4xAnQBKoQ",
+   "title": "Can You Count Faster Than a God? 🎲🌙",
+   "published": "2026-10-09T21:29:27+00:00",
+   "short": true,
+   "views": 84
+  },
+  {
    "id": "2Vuu19CLU0Q",
    "title": "👑 Is Nefertiti Beyond King Tut's Tomb? · Akhenaten Part 2 🌙",
    "published": "2026-10-07T00:45:48+00:00",
    "short": true,
-   "views": 103
+   "views": 105
   },
   {
    "id": "BQvyBtSjDHY",
@@ -102,22 +109,22 @@
    "published": "2026-09-12T07:52:09+00:00",
    "short": true,
    "views": 525
-  },
-  {
-   "id": "OWFi7IQ0YKg",
-   "title": "People See A Helicopter 🚁 Egyptologists See His Father's Name",
-   "published": "2026-09-12T07:05:10+00:00",
-   "short": true,
-   "views": 1181
   }
  ],
  "shorts": [
+  {
+   "id": "5N4xAnQBKoQ",
+   "title": "Can You Count Faster Than a God? 🎲🌙",
+   "published": "2026-10-09T21:29:27+00:00",
+   "short": true,
+   "views": 84
+  },
   {
    "id": "2Vuu19CLU0Q",
    "title": "👑 Is Nefertiti Beyond King Tut's Tomb? · Akhenaten Part 2 🌙",
    "published": "2026-10-07T00:45:48+00:00",
    "short": true,
-   "views": 103
+   "views": 105
   },
   {
    "id": "BQvyBtSjDHY",
@@ -209,13 +216,6 @@
    "published": "2026-09-10T08:08:48+00:00",
    "short": true,
    "views": 62
-  },
-  {
-   "id": "FaE99tK3a0w",
-   "title": "Nobody Has Ever Seen This Ocean 🌊🌕 Ganymede Under The Ice",
-   "published": "2026-09-07T20:15:41+00:00",
-   "short": true,
-   "views": 957
   }
  ],
  "videos": [
@@ -294,7 +294,7 @@
    "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🌙 | 42 Minutes",
    "published": "2026-07-14T22:20:14+00:00",
    "short": false,
-   "views": 133
+   "views": 134
   },
   {
    "id": "1CRkkqUNJ5M",
@@ -314,7 +314,7 @@
      "title": "👑 Is Nefertiti Beyond King Tut's Tomb? · Akhenaten Part 2 🌙",
      "published": "2026-10-07T00:45:48+00:00",
      "short": true,
-     "views": 103
+     "views": 105
     },
     {
      "id": "BQvyBtSjDHY",
@@ -826,7 +826,7 @@
      "title": "639 Hz Binaural — 14 Hz Beta for Focus & Wakefulness 🌙 | 42 Minutes",
      "published": "2026-07-14T22:20:14+00:00",
      "short": false,
-     "views": 133
+     "views": 134
     },
     {
      "id": "C4lz2Zu3qH0",
@@ -845,5 +845,5 @@
    ]
   }
  ],
- "updated": "2026-10-09T10:29Z"
+ "updated": "2026-10-10T00:47Z"
 }
