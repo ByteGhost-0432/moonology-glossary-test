@@ -19,6 +19,8 @@
     font-size:13px; line-height:1.6; color:#cfc7b8; opacity:0; transform:translateY(-6px); transition:.35s; pointer-events:none; }
   #label.show { opacity:1; transform:none; }
   #label .k { color:#33ff66; letter-spacing:.22em; font-size:11px; text-transform:uppercase; }
+  #label .watch { display:inline-block; margin-top:10px; padding:8px 14px; border:1px solid #33ff66; color:#33ff66;
+    text-decoration:none; letter-spacing:.14em; font-size:12px; text-transform:uppercase; box-shadow:0 0 10px rgba(51,255,102,.3); }
   #label .t { color:#f2ede3; font-size:18px; margin:4px 0 6px; }
   #walk { position:fixed; right:16px; bottom:64px; display:none; flex-direction:column; gap:10px; }
   #walk button { width:56px; height:56px; border-radius:50%; border:1px solid #c9a45c; background:rgba(8,8,7,.7);
@@ -58,6 +60,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { Reflector } from 'three/addons/objects/Reflector.js';
 
 // Palette, 60-30-10: black (walls/floor) · warm gold (architecture) · terminal green (accent only)
 const GREEN = 0x33ff66;
@@ -65,13 +68,16 @@ const neon = new THREE.MeshBasicMaterial({ color: GREEN, toneMapped: false });
 const neonLine = new THREE.LineBasicMaterial({ color: GREEN, toneMapped: false });
 
 // ---------- renderer / scene ----------
-const renderer = new THREE.WebGLRenderer({ antialias:true });
+const QS = new URLSearchParams(location.search);
+const TOUR = QS.has('tour'), FPS = 25, TW = 1080, TH = 1920;
+const renderer = new THREE.WebGLRenderer({ antialias:true, preserveDrawingBuffer: TOUR });
 const IS_TOUCH = matchMedia('(pointer: coarse)').matches;
 renderer.setPixelRatio(Math.min(devicePixelRatio, IS_TOUCH ? 1.5 : 2));
-renderer.setSize(innerWidth, innerHeight);
+if (TOUR) { renderer.setPixelRatio(1); renderer.setSize(TW, TH, false); renderer.domElement.style.cssText = 'height:100vh;width:auto;margin:0 auto'; }
+else renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = TOUR ? 1.3 : 1.05;   // phones in daylight: the film runs a little brighter
 renderer.shadowMap.enabled = !IS_TOUCH;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
@@ -80,7 +86,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020203);
 scene.fog = new THREE.Fog(0x020203, 14, 34);
 
-const camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.05, 200);
+const camera = new THREE.PerspectiveCamera(TOUR ? 58 : 62, TOUR ? TW/TH : innerWidth/innerHeight, 0.05, 200);
 camera.position.set(0, 1.62, 0.2);
 
 const tex = new THREE.TextureLoader();
@@ -116,6 +122,9 @@ function wall(w, h, x, y, z, ry) {
 }
 wall(W, H, 0, H/2, -D/2, 0);            // back wall (the piece)
 const DOOR_W = 1.8, DOOR_H = 3.0, HALL_W = 3.0, HALL_L = 14, HALL_H = 3.6;
+const R2_DOOR_W = 1.6, R2_DOOR_H = 2.5, R2W = 9, R2D = 11;
+// side halls for future rooms: openings in the main hall at BZ, corridors BL long
+const BW = 1.8, BH = 2.6, BCW = 2.4, BL = 6, BCH = 3.0;
 // entrance wall, built in three pieces around a doorway
 wall((W - DOOR_W)/2, H, -(W + DOOR_W)/4, H/2, D/2, Math.PI);
 wall((W - DOOR_W)/2, H,  (W + DOOR_W)/4, H/2, D/2, Math.PI);
@@ -346,22 +355,33 @@ scene.add(dust);
 
 // ---------- the hallway beyond the door ----------
 const hallZ0 = D/2, hallZ1 = D/2 + HALL_L, hallMid = (hallZ0 + hallZ1)/2;
+const BZ = hallZ0 + 5.5;   // where the side halls branch off
 {
   const hf = decoFloorTexture(); hf.repeat.set(HALL_W/4, HALL_L/4);
   const hfloor = new THREE.Mesh(new THREE.PlaneGeometry(HALL_W, HALL_L), new THREE.MeshStandardMaterial({ map:hf, roughness:0.3 }));
   hfloor.rotation.x = -Math.PI/2; hfloor.position.set(0, 0.001, hallMid); hfloor.receiveShadow = true; scene.add(hfloor);
   const hceil = new THREE.Mesh(new THREE.PlaneGeometry(HALL_W, HALL_L), cMat);
   hceil.rotation.x = Math.PI/2; hceil.position.set(0, HALL_H, hallMid); scene.add(hceil);
-  wall(HALL_L, HALL_H, -HALL_W/2, HALL_H/2, hallMid,  Math.PI/2);
-  wall(HALL_L, HALL_H,  HALL_W/2, HALL_H/2, hallMid, -Math.PI/2);
-  wall(HALL_W, HALL_H, 0, HALL_H/2, hallZ1, Math.PI);
+  const segA = BZ - BW/2 - hallZ0, segB = hallZ1 - (BZ + BW/2);
+  for (const side of [-1, 1]) {
+    const ry = -side*Math.PI/2, x = side*HALL_W/2;
+    wall(segA, HALL_H, x, HALL_H/2, hallZ0 + segA/2, ry);
+    wall(segB, HALL_H, x, HALL_H/2, hallZ1 - segB/2, ry);
+    wall(BW, HALL_H - BH, x, BH + (HALL_H - BH)/2, BZ, ry);
+  }
+  // hall end wall, built around the doorway into Room 02
+  wall((HALL_W - R2_DOOR_W)/2, HALL_H, -(HALL_W + R2_DOOR_W)/4, HALL_H/2, hallZ1, Math.PI);
+  wall((HALL_W - R2_DOOR_W)/2, HALL_H,  (HALL_W + R2_DOOR_W)/4, HALL_H/2, hallZ1, Math.PI);
+  wall(R2_DOOR_W, HALL_H - R2_DOOR_H, 0, R2_DOOR_H + (HALL_H - R2_DOOR_H)/2, hallZ1, Math.PI);
   // fill the gap between the hall height and the room's taller entrance wall (seen from the hall side)
   const cap = new THREE.Mesh(new THREE.PlaneGeometry(HALL_W, H - HALL_H), wallMat);
   cap.position.set(0, HALL_H + (H - HALL_H)/2, D/2 + 0.001); scene.add(cap);
   // green cove lines + gold rail down both sides
   for (const side of [-1, 1]) {
-    const cove = new THREE.Mesh(new THREE.PlaneGeometry(HALL_L, 0.012), neon);
-    cove.position.set(side*(HALL_W/2 - 0.02), 0.06, hallMid); cove.rotation.y = -side*Math.PI/2; scene.add(cove);
+    for (const [len, zc] of [[segA, hallZ0 + segA/2], [segB, hallZ1 - segB/2]]) {
+      const cove = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.012), neon);
+      cove.position.set(side*(HALL_W/2 - 0.02), 0.06, zc); cove.rotation.y = -side*Math.PI/2; scene.add(cove);
+    }
     const rail = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.025, HALL_L), goldMat);
     rail.position.set(side*(HALL_W/2 - 0.012), 3.0, hallMid); scene.add(rail);
   }
@@ -375,13 +395,13 @@ const hallZ0 = D/2, hallZ1 = D/2 + HALL_L, hallMid = (hallZ0 + hallZ1)/2;
   g.strokeStyle = '#c9a45c'; g.lineWidth = 4; g.strokeRect(24, 24, 976, 464);
   g.textAlign = 'center';
   g.fillStyle = '#33ff66'; g.font = '400 30px Futura, "Century Gothic", sans-serif'; g.fillText('R O O M   0 2', 512, 170);
-  g.fillStyle = '#f2ede3'; g.font = '500 72px Futura, "Century Gothic", sans-serif'; g.fillText('Coming Soon', 512, 270);
+  g.fillStyle = '#f2ede3'; g.font = '500 72px Futura, "Century Gothic", sans-serif'; g.fillText('The Moons', 512, 270);
   g.fillStyle = '#8c8476'; g.font = '400 28px Futura, "Century Gothic", sans-serif'; g.fillText('The Moon Museum  ·  As above, so below.', 512, 370);
   const st = new THREE.CanvasTexture(c); st.colorSpace = THREE.SRGBColorSpace;
-  const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), new THREE.MeshStandardMaterial({ map:st, roughness:0.6 }));
-  sign.position.set(0, 1.75, hallZ1 - 0.02); sign.rotation.y = Math.PI; scene.add(sign);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.5), new THREE.MeshStandardMaterial({ map:st, roughness:0.6 }));
+  sign.position.set(0, R2_DOOR_H + 0.55, hallZ1 - 0.02); sign.rotation.y = Math.PI; scene.add(sign);
   const signLight = new THREE.SpotLight(0xffe2b0, 10, 4, Math.PI/10, 0.6, 1.5);
-  signLight.position.set(0, HALL_H - 0.2, hallZ1 - 2); signLight.target = sign; scene.add(signLight);
+  signLight.position.set(0, HALL_H - 0.1, hallZ1 - 1.6); signLight.target = sign; scene.add(signLight);
 }
 
 // ---------- torches: Deco brackets with flickering flames (light + glow) ----------
@@ -411,8 +431,8 @@ for (const zz of [hallZ0 + 3, hallZ0 + 8]) {  // hallway, both sides
 
 // ---------- side-wall art from the library (all re-verified public domain at the Met collection API, 2026-10-12) ----------
 const exhibits = [];
-function hang(file, ar, x, z, ry, info) {
-  const h = Math.min(1.4, (1.55 - 0.34) / ar), w = h * ar;   // keep each frame inside its bay between the pilasters
+function hang(file, ar, x, z, ry, info, maxH = 1.4, maxW = 1.55, y = 1.65) {
+  const h = Math.min(maxH, (maxW - 0.34) / ar), w = h * ar;   // keep each frame inside its bay between the pilasters
   const g = new THREE.Group();
   for (const [m, col] of [[0.34, 0x0f0e0c], [0.16, 0x1a1712]]) {
     const pw = w + m, ph = h + m;
@@ -424,7 +444,7 @@ function hang(file, ar, x, z, ry, info) {
   const face = new THREE.MeshStandardMaterial({ map: load('assets/' + file), roughness:0.85 });
   const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.04), [edge, edge, edge, edge, face, edge]);
   box.position.z = 0.04; g.add(box);
-  g.position.set(x, 1.65, z); g.rotation.y = ry; scene.add(g);
+  g.position.set(x, y, z); g.rotation.y = ry; scene.add(g);
   // small brass label under the piece
   const c = document.createElement('canvas'); c.width = 512; c.height = 128;
   const q = c.getContext('2d'); q.fillStyle = '#0e0d0b'; q.fillRect(0, 0, 512, 128);
@@ -450,22 +470,320 @@ hang('ibis_feather.jpg', 1800/1350, R, -2.125, -Math.PI/2, { k:'Room 01 · No. 0
 hang('ostracon_ramesses.jpg', 1, R, 2.125, -Math.PI/2, { k:'Room 01 · No. 05', t:'Ostracon depicting Ramesses IX offering Maat, attributed to the chief draftsman Amenhotep',
   lines:['Limestone, ink','New Kingdom, Ramesside Period, Dynasty 20, ca. 1137–1118 BCE','The Metropolitan Museum of Art, Gift of Theodore M. Davis, 1914','Accession 14.6.215 · Public domain (Met Open Access)'] });
 
+
+// ---------- ROOM 02 · THE MOONS: every published moon hour, one framed piece each ----------
+const R2Z0 = hallZ1, R2Z1 = hallZ1 + R2D, R2C = (R2Z0 + R2Z1)/2;
+{
+  const f2 = decoFloorTexture(); f2.repeat.set(R2W/4, R2D/4);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(R2W, R2D), new THREE.MeshStandardMaterial({ map:f2, roughness:0.3, metalness:0.1 }));
+  fl.rotation.x = -Math.PI/2; fl.position.set(0, 0.002, R2C); fl.receiveShadow = true; scene.add(fl);
+  // walls: entrance (two pieces + lintel round the doorway), sides, back
+  wall((R2W - R2_DOOR_W)/2, H, -(R2W + R2_DOOR_W)/4, H/2, R2Z0 + 0.001, 0);
+  wall((R2W - R2_DOOR_W)/2, H,  (R2W + R2_DOOR_W)/4, H/2, R2Z0 + 0.001, 0);
+  wall(R2_DOOR_W, H - R2_DOOR_H, 0, R2_DOOR_H + (H - R2_DOOR_H)/2, R2Z0 + 0.001, 0);
+  wall(R2D, H, -R2W/2, H/2, R2C,  Math.PI/2);
+  wall(R2D, H,  R2W/2, H/2, R2C, -Math.PI/2);
+  wall(R2W, H, 0, H/2, R2Z1, Math.PI);
+  // ceiling with an open sky in the middle
+  const op = 4.2;
+  [[R2W, (R2D-op)/2, 0, R2Z0 + (R2D-op)/4], [R2W, (R2D-op)/2, 0, R2Z1 - (R2D-op)/4],
+   [(R2W-op)/2, op, -(R2W+op)/4, R2C], [(R2W-op)/2, op, (R2W+op)/4, R2C]].forEach(([w, d, x, z]) => {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(w, d), cMat); p.rotation.x = Math.PI/2; p.position.set(x, H, z); scene.add(p);
+  });
+  for (let i = 0; i < 3; i++) {
+    const s2 = op + 0.5 + i*0.55;
+    const ring = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(s2, s2)), new THREE.LineBasicMaterial({ color:0xc9a45c }));
+    ring.rotation.x = Math.PI/2; ring.position.set(0, H - 0.02 - i*0.09, R2C); scene.add(ring);
+  }
+  // gold rail + green coves
+  for (const [len, x, z, ry] of [[R2W, 0, R2Z1 - 0.01, Math.PI], [R2D, -R2W/2 + 0.01, R2C, Math.PI/2], [R2D, R2W/2 - 0.01, R2C, -Math.PI/2]]) {
+    const r = new THREE.Mesh(new THREE.BoxGeometry(len, 0.025, 0.02), goldMat); r.position.set(x, railY, z); r.rotation.y = ry; scene.add(r);
+    const cove = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.012), neon); cove.position.set(x, 0.06, z); cove.rotation.y = ry; scene.add(cove);
+  }
+  // green neon round the doorway, seen from inside the Moon Room
+  for (const [w, h, x, y] of [[R2_DOOR_W, 0.012, 0, R2_DOOR_H], [0.012, R2_DOOR_H, -R2_DOOR_W/2, R2_DOOR_H/2], [0.012, R2_DOOR_H, R2_DOOR_W/2, R2_DOOR_H/2]]) {
+    const bar = new THREE.Mesh(new THREE.PlaneGeometry(w, h), neon); bar.position.set(x, y, R2Z0 + 0.012); scene.add(bar);
+  }
+  // soft fill so the room is never black between the torches
+  for (const z of [R2Z0 + 1.2, R2C, R2Z1 - 2.5]) { const l = new THREE.PointLight(0xffd59a, 7, 6.5, 1.5); l.position.set(0, 3.8, z); scene.add(l); }
+}
+torch(-R2W/2 + 0.02, 2.6, R2Z0 + 4.0,  Math.PI/2, 4);
+torch(-R2W/2 + 0.02, 2.6, R2Z0 + 7.0,  Math.PI/2, 4);
+torch( R2W/2 - 0.02, 2.6, R2Z0 + 4.0, -Math.PI/2, 4);
+torch( R2W/2 - 0.02, 2.6, R2Z0 + 7.0, -Math.PI/2, 4);
+torch(-2.2, 2.6, R2Z0 + 0.02, 0, 4);          // flanking the doorway, inside the Moon Room
+torch( 2.2, 2.6, R2Z0 + 0.02, 0, 4);
+torch(-1.9, 2.8, R2Z1 - 0.02, Math.PI, 4);
+torch( 1.9, 2.8, R2Z1 - 0.02, Math.PI, 4);
+
+// image credits verified at the NASA image API on 2026-10-12; video IDs read live in YouTube Studio the same day
+const NASA_NOTE = 'Public domain · NASA does not endorse this gallery';
+const L2 = -R2W/2 + 0.02, R2 = R2W/2 - 0.02;
+hang('moon_luna.jpg', 1, 0, R2Z1 - 0.02, Math.PI, { k:'Room 02 · No. 01 · Earth', t:'Luna',
+  lines:['Episode 01 · published Aug 9, 2026 · 59:58', 'Globe rendered by Moonology from the NASA SVS CGI Moon Kit (SVS 4720)', "Image: NASA's Scientific Visualization Studio", NASA_NOTE],
+  watch:'https://youtu.be/W5RrGiDELEY' }, 2.1, 2.5, 1.85);
+hang('moon_europa.jpg', 1800/1330, L2, R2Z0 + 2.5, Math.PI/2, { k:'Room 02 · No. 02 · Jupiter', t:'Europa',
+  lines:['Episode 02 · published Jul 27, 2026 · 3:00:32', 'Galileo spacecraft, late 1990s, reprocessed colour (PIA19048)', 'Image: NASA/JPL-Caltech/SETI Institute', NASA_NOTE],
+  watch:'https://youtu.be/9bYF9Kkatig' }, 1.6, 2.1);
+hang('moon_mimas.jpg', 1, L2, R2Z0 + 5.5, Math.PI/2, { k:'Room 02 · No. 03 · Saturn', t:'Mimas',
+  lines:['Episode 03 · published Jul 31, 2026 · 33:34', "Cassini's closest flyby, Herschel Crater (PIA12570)", 'Image: NASA/JPL-Caltech/Space Science Institute', NASA_NOTE],
+  watch:'https://youtu.be/gKhMjVnv04Q' }, 1.6, 2.1);
+hang('moon_enceladus.jpg', 1, L2, R2Z0 + 8.5, Math.PI/2, { k:'Room 02 · No. 04 · Saturn', t:'Enceladus',
+  lines:['Episode 04 · published Aug 3, 2026 · 1:00:01', 'Globe rendered by Moonology from the Cassini enhanced-colour map (PIA18435)', 'Image: NASA/JPL-Caltech/Space Science Institute/Lunar and Planetary Institute', NASA_NOTE],
+  watch:'https://youtu.be/uCvlbYvNe9Q' }, 1.6, 2.1);
+hang('moon_titan.jpg', 1, R2, R2Z0 + 2.5, -Math.PI/2, { k:'Room 02 · No. 05 · Saturn', t:'Titan',
+  lines:['Episode 05 · published Aug 16, 2026 · 1:00:01', 'Globe rendered by Moonology from the Cassini near-infrared surface mosaic (PIA22770)', 'Image: NASA/JPL-Caltech/Univ. Arizona', NASA_NOTE],
+  watch:'https://youtu.be/MQOtcrTWp9U' }, 1.6, 2.1);
+hang('moon_io.jpg', 1, R2, R2Z0 + 5.5, -Math.PI/2, { k:'Room 02 · No. 06 · Jupiter', t:'Io',
+  lines:['Episode 06 · published Aug 28, 2026 · 1:00:01', 'Global image of Io, true colour (PIA02308)', 'Image: NASA/JPL/University of Arizona', NASA_NOTE],
+  watch:'https://youtu.be/qCxIvhYSfjA' }, 1.6, 2.1);
+hang('moon_ganymede.jpg', 1, R2, R2Z0 + 8.5, -Math.PI/2, { k:'Room 02 · No. 07 · Jupiter', t:'Ganymede',
+  lines:['Episode 07 · published Sep 18, 2026 · 1:01:04', 'Globe rendered by Moonology from the USGS global colour mosaic (Voyager + Galileo)', 'Image: USGS Astrogeology / NASA', NASA_NOTE],
+  watch:'https://youtu.be/Rv-QCFxjuEw' }, 1.6, 2.1);
+
+// =====================================================================================
+// EGYPTIAN ART DECO LAYER: papyrus columns, winged sun disks, lotus frieze, bonsai,
+// wayfinding signs, side halls for future rooms, and the reflecting pool.
+// =====================================================================================
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const obstacles = [];   // circles and boxes the visitor cannot walk through
+const ebony = new THREE.MeshStandardMaterial({ color:0x15120e, roughness:0.45, metalness:0.2 });
+const lapis = new THREE.MeshStandardMaterial({ color:0x1d3f6e, roughness:0.4, metalness:0.3 });
+
+// papyrus column: square plinth, tapered black shaft bound with gold, open bell capital, abacus
+function papyrusColumn(x, z, h = 4.2) {
+  const g = new THREE.Group();
+  const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.5), ebony); plinth.position.y = 0.09; g.add(plinth);
+  const ph = h - 0.18 - 0.62 - 0.08;
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.19, ph, 24), ebony); shaft.position.y = 0.18 + ph/2; g.add(shaft);
+  for (let i = 0; i < 8; i++) {   // the bundled papyrus stems, picked out in gold
+    const a = i/8 * Math.PI*2;
+    const stem = new THREE.Mesh(new THREE.BoxGeometry(0.012, ph*0.92, 0.012), goldMat);
+    stem.position.set(Math.cos(a)*0.17, 0.18 + ph/2, Math.sin(a)*0.17); g.add(stem);
+  }
+  for (const yy of [0.18 + ph*0.82, 0.18 + ph*0.86, 0.18 + ph*0.9]) {   // binding bands
+    const band = new THREE.Mesh(new THREE.TorusGeometry(0.155, 0.012, 8, 32), goldMat); band.rotation.x = Math.PI/2; band.position.y = yy; g.add(band);
+  }
+  const prof = [[0.15, 0], [0.18, 0.12], [0.26, 0.34], [0.33, 0.52], [0.35, 0.6], [0.0, 0.62]].map(([r, y]) => new THREE.Vector2(r, y));
+  const cap = new THREE.Mesh(new THREE.LatheGeometry(prof, 32), goldMat); cap.position.y = 0.18 + ph; g.add(cap);
+  const abacus = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.08, 0.42), ebony); abacus.position.y = h - 0.04; g.add(abacus);
+  g.position.set(x, 0, z); scene.add(g);
+  obstacles.push({ x, z, r: 0.45 });
+}
+
+// winged sun disk: gold disk, lapis wings in stepped Deco feather bands, a thin green line beneath
+function wingedSun(x, y, z, ry, sc = 1) {
+  const g = new THREE.Group();
+  const disk = new THREE.Mesh(new THREE.CircleGeometry(0.16, 48), goldMat); disk.position.z = 0.02; g.add(disk);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.17, 0.185, 48), neon); ring.position.z = 0.021; g.add(ring);
+  for (const side of [-1, 1]) for (let i = 0; i < 4; i++) {
+    const len = 0.95 - i*0.17, hgt = 0.05;
+    const band = new THREE.Mesh(new THREE.BoxGeometry(len, hgt, 0.02), i % 2 ? goldMat : lapis);
+    band.position.set(side*(0.2 + len/2), 0.06 - i*0.055, 0.01);
+    band.rotation.z = side * -0.06; g.add(band);
+  }
+  g.position.set(x, y, z); g.rotation.y = ry; g.scale.setScalar(sc); scene.add(g);
+}
+
+// lotus frieze: a gold band of alternating lotus flowers and buds, drawn once and repeated
+function lotusTexture(repeat) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 64;
+  const q = c.getContext('2d'); q.fillStyle = '#0d0b09'; q.fillRect(0, 0, 512, 64);
+  q.strokeStyle = '#c9a45c'; q.fillStyle = '#c9a45c'; q.lineWidth = 2;
+  q.fillRect(0, 2, 512, 2); q.fillRect(0, 60, 512, 2);
+  for (let i = 0; i < 4; i++) {
+    const cx = 64 + i*128;
+    for (const [a, l] of [[-0.55, 34], [-0.25, 40], [0, 44], [0.25, 40], [0.55, 34]]) {   // open lotus
+      q.save(); q.translate(cx, 54); q.rotate(a); q.beginPath(); q.ellipse(0, -l/2, 5, l/2, 0, 0, Math.PI*2); q.stroke(); q.restore();
+    }
+    q.beginPath(); q.ellipse(cx + 64, 38, 6, 16, 0, 0, Math.PI*2); q.stroke();             // bud
+    q.beginPath(); q.moveTo(cx + 64, 54); q.lineTo(cx + 64, 58); q.stroke();
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.repeat.set(repeat, 1); return t;
+}
+function frieze(len, x, y, z, ry) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.22), new THREE.MeshStandardMaterial({ map: lotusTexture(len/1.6), roughness:0.5, metalness:0.3 }));
+  m.position.set(x, y, z); m.rotation.y = ry; scene.add(m);
+}
+
+// bonsai in a stepped Deco planter
+function bonsai(x, z, sc = 1, seed = 1) {
+  const rnd = (() => { let a = seed * 9301 + 49297; return () => ((a = (a * 9301 + 49297) % 233280) / 233280); })();
+  const g = new THREE.Group();
+  const potMat = ebony;
+  const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.22, 0.42), potMat); p1.position.y = 0.11; g.add(p1);
+  const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.05, 0.5), goldMat); p2.position.y = 0.245; g.add(p2);
+  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.36), potMat); stand.position.y = -0.25; g.add(stand);
+  const soil = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.02, 0.4), new THREE.MeshStandardMaterial({ color:0x2a1f15, roughness:1 })); soil.position.y = 0.27; g.add(soil);
+  const bark = new THREE.MeshStandardMaterial({ color:0x4a3626, roughness:0.95 });
+  const leaf = new THREE.MeshStandardMaterial({ color:0x2f4f2a, roughness:0.9, flatShading:true });
+  const trunk = new THREE.CatmullRomCurve3([V3(0, 0.27, 0), V3(0.08, 0.5, 0.02), V3(-0.06, 0.75, 0), V3(0.05, 0.98, -0.02), V3(-0.02, 1.15, 0)]);
+  g.add(new THREE.Mesh(new THREE.TubeGeometry(trunk, 24, 0.045, 8), bark));
+  const tips = [V3(0.38, 0.86, 0.05), V3(-0.36, 1.0, -0.04), V3(0.12, 1.28, 0.02), V3(-0.2, 0.7, 0.08)];
+  const roots = [V3(0.06, 0.6, 0.02), V3(-0.04, 0.85, 0), V3(0.02, 1.05, -0.01), V3(0.0, 0.55, 0.0)];
+  tips.forEach((tp, i) => {
+    const br = new THREE.CatmullRomCurve3([roots[i], roots[i].clone().lerp(tp, 0.5).add(V3(0, 0.06, 0)), tp]);
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(br, 12, 0.022, 6), bark));
+    for (let k = 0; k < 6; k++) {   // a flat foliage pad, the classic cloud shape
+      const pad = new THREE.Mesh(new THREE.IcosahedronGeometry(0.1 + rnd()*0.06, 0), leaf);
+      pad.position.set(tp.x + (rnd()-0.5)*0.28, tp.y + (rnd()-0.3)*0.08, tp.z + (rnd()-0.5)*0.22);
+      pad.scale.y = 0.55; g.add(pad);
+    }
+  });
+  g.position.set(x, 0.5*sc, z); g.scale.setScalar(sc); scene.add(g);
+  obstacles.push({ x, z, r: 0.5*sc });
+}
+
+// wayfinding sign: brass frame, black field, gold type, green arrows
+function signTexture(rows, w = 1024, h = 384) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const q = c.getContext('2d'); q.fillStyle = '#0b0a08'; q.fillRect(0, 0, w, h);
+  q.strokeStyle = '#c9a45c'; q.lineWidth = 6; q.strokeRect(12, 12, w-24, h-24); q.lineWidth = 2; q.strokeRect(26, 26, w-52, h-52);
+  const rowH = (h - 70) / rows.length;
+  rows.forEach(([arrowL, text, arrowR, small], i) => {
+    const y = 35 + rowH*i + rowH/2 + 12;
+    q.textAlign = 'center';
+    q.fillStyle = small ? '#8c8476' : '#f2ede3'; q.font = `${small ? 400 : 500} ${small ? 30 : 42}px Futura, "Century Gothic", sans-serif`;
+    q.fillText(text, w/2, y);
+    q.fillStyle = '#33ff66'; q.font = '500 52px Futura, sans-serif';
+    if (arrowL) { q.textAlign = 'left'; q.fillText(arrowL, 56, y + 2); }
+    if (arrowR) { q.textAlign = 'right'; q.fillText(arrowR, w - 56, y + 2); }
+  });
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+function wallSign(rows, x, y, z, ry, w = 1.0, h = 0.375) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: signTexture(rows), roughness:0.5, emissive:0x111111 }));
+  m.position.set(x, y, z); m.rotation.y = ry; scene.add(m); return m;
+}
+function hangingSign(frontRows, backRows, x, y, z) {   // hangs from the ceiling on two gold rods, readable both ways
+  const front = wallSign(frontRows, x, y, z - 0.01, Math.PI, 1.7, 0.64);
+  const back = wallSign(backRows, x, y, z + 0.01, 0, 1.7, 0.64);
+  for (const dx of [-0.7, 0.7]) {
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, HALL_H - y - 0.32, 8), goldMat);
+    rod.position.set(x + dx, (HALL_H + y + 0.32)/2, z); scene.add(rod);
+  }
+  return [front, back];
+}
+
+// ---- Room 01: papyrus columns flank the shabti; winged sun over the exit; bonsai by the door; a sign
+papyrusColumn(-3.45, -D/2 + 0.4);
+papyrusColumn( 3.45, -D/2 + 0.4);
+wingedSun(0, DOOR_H + 0.95, D/2 - 0.04, Math.PI, 1.1);
+torch(-1.5, 2.55, D/2 - 0.02, Math.PI, 4);   // flank the exit so the entrance wall, sign and winged sun read
+torch( 1.5, 2.55, D/2 - 0.02, Math.PI, 4);
+bonsai(-3.7, D/2 - 0.75, 1, 3);
+bonsai( 3.7, D/2 - 0.75, 1, 7);
+wallSign([['', 'THE HALL', '', false], ['', 'Room 02 · The Moons', '↑', false], ['', 'Rooms 03 · 04 · coming soon', '', true]],
+         -2.1, 1.75, D/2 - 0.03, Math.PI, 1.05, 0.4);
+
+// ---- the hall: lotus frieze above the rail, two hanging signs either side of the junction
+for (const side of [-1, 1]) {
+  const segA2 = BZ - BW/2 - hallZ0, segB2 = hallZ1 - (BZ + BW/2);
+  frieze(segA2, side*(HALL_W/2 - 0.015), 3.25, hallZ0 + segA2/2, -side*Math.PI/2);
+  frieze(segB2, side*(HALL_W/2 - 0.015), 3.25, hallZ1 - segB2/2, -side*Math.PI/2);
+}
+// walking toward Room 02, screen-left is +x: Room 03 sits on the +x side, Room 04 on the -x side
+hangingSign([['←', 'Room 03 · soon', '', false], ['', 'Room 02 · The Moons  ↑', '', false], ['', 'Room 04 · soon', '→', false]],
+            [['', 'Room 01 · The Shabti  ↑', '', false], ['', 'The Moon Museum', '', true]], 0, 2.55, BZ - 2.1);
+hangingSign([['', 'Room 02 · The Moons  ↑', '', false], ['', 'The Moon Museum', '', true]],
+            [['←', 'Room 04 · soon', '', false], ['', 'Room 01 · The Shabti  ↑', '', false], ['', 'Room 03 · soon', '→', false]], 0, 2.55, BZ + 2.1);
+
+// ---- side halls to Rooms 03 and 04 (sealed doors, ready for the next rooms)
+for (const side of [1, -1]) {
+  const x0 = side*HALL_W/2, x1 = side*(HALL_W/2 + BL), xm = (x0 + x1)/2, room = side > 0 ? '03' : '04';
+  const bf = decoFloorTexture(); bf.repeat.set(BL/4, BCW/4);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(BL, BCW), new THREE.MeshStandardMaterial({ map:bf, roughness:0.3 }));
+  fl.rotation.x = -Math.PI/2; fl.position.set(xm, 0.003, BZ); scene.add(fl);
+  const ce = new THREE.Mesh(new THREE.PlaneGeometry(BL, BCW), cMat); ce.rotation.x = Math.PI/2; ce.position.set(xm, BCH, BZ); scene.add(ce);
+  wall(BL, BCH, xm, BCH/2, BZ - BCW/2, 0);
+  wall(BL, BCH, xm, BCH/2, BZ + BCW/2, Math.PI);
+  wall(BCW, BCH, x1, BCH/2, BZ, -side*Math.PI/2);
+  // close the gap between the corridor height and the main hall height at the opening
+  const lint = new THREE.Mesh(new THREE.PlaneGeometry(BW, HALL_H - BCH), wallMat);
+  lint.position.set(x0 + side*0.005, BCH + (HALL_H - BCH)/2, BZ); lint.rotation.y = -side*Math.PI/2; scene.add(lint);
+  for (const zz of [BZ - BCW/2 + 0.02, BZ + BCW/2 - 0.02]) {
+    const cove = new THREE.Mesh(new THREE.PlaneGeometry(BL, 0.012), neon);
+    cove.position.set(xm, 0.06, zz); cove.rotation.y = zz < BZ ? 0 : Math.PI; scene.add(cove);
+  }
+  // the sealed door: ebony leaves, gold frame, green seam of light, a sign and a winged sun above
+  const door = new THREE.Group();
+  const leaf = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.4, 0.06), ebony); leaf.position.y = 1.2; door.add(leaf);
+  const seam = new THREE.Mesh(new THREE.PlaneGeometry(0.012, 2.3), neon); seam.position.set(0, 1.2, 0.035); door.add(seam);
+  const fr = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(1.42, 2.5)), new THREE.LineBasicMaterial({ color:0xc9a45c }));
+  fr.position.set(0, 1.25, 0.04); door.add(fr);
+  door.position.set(x1 - side*0.04, 0, BZ); door.rotation.y = -side*Math.PI/2; scene.add(door);
+  wingedSun(x1 - side*0.05, 2.72, BZ, -side*Math.PI/2, 0.8);
+  wallSign([['', `ROOM ${room}`, '', false], ['', 'Coming soon', '', true]], x1 - side*0.05, 1.55, BZ, -side*Math.PI/2, 0.7, 0.27);
+  const bl = new THREE.PointLight(0xffd59a, 7, 4.5, 1.6); bl.position.set(x1 - side*1.6, BCH - 0.3, BZ); scene.add(bl);
+  const bl2 = new THREE.PointLight(0xffd59a, 7, 4.2, 1.6); bl2.position.set(x0 + side*1.4, BCH - 0.3, BZ); scene.add(bl2);
+  // the opening reads as a doorway: gold surround + green neon, seen from the main hall
+  for (const [w, h, zz, y] of [[BW, 0.012, 0, BH], [0.012, BH, -BW/2, BH/2], [0.012, BH, BW/2, BH/2]]) {
+    const bar = new THREE.Mesh(new THREE.PlaneGeometry(w, h), neon);
+    bar.position.set(x0 - side*0.012, y, BZ + zz); bar.rotation.y = -side*Math.PI/2; scene.add(bar);
+  }
+  const sur = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(BW + 0.24, BH + 0.12)), new THREE.LineBasicMaterial({ color:0xc9a45c }));
+  sur.position.set(x0 - side*0.014, (BH + 0.12)/2, BZ); sur.rotation.y = -side*Math.PI/2; scene.add(sur);
+  frieze(BL, xm, 2.6, BZ - BCW/2 + 0.015, 0);
+  frieze(BL, xm, 2.6, BZ + BCW/2 - 0.015, Math.PI);
+  bonsai(x1 - side*0.75, BZ - BCW/2 + 0.45, 0.8, side > 0 ? 11 : 13);
+}
+
+// ---- Room 02: columns flank Luna, a winged sun over the door, bonsai in the corners, a way back
+papyrusColumn(-3.25, R2Z1 - 0.4);
+papyrusColumn( 3.25, R2Z1 - 0.4);
+wingedSun(0, R2_DOOR_H + 0.75, R2Z0 + 0.04, 0, 1.1);
+bonsai(-3.75, R2Z0 + 0.85, 1, 17);
+bonsai( 3.75, R2Z0 + 0.85, 1, 19);
+wallSign([['↓', 'Room 01 · The Shabti', '', false]], -1.45, 1.45, R2Z0 + 0.03, 0, 0.9, 0.2);
+
+// ---- the reflecting pool under the open sky of Room 02: as above, so below
+const POOL_W = 2.6, POOL_L = 4.4, POOL_H = 0.32;
+{
+  const rim = new THREE.Group();
+  for (const [w, d, x, z] of [[POOL_W + 0.3, 0.15, 0, -POOL_L/2 - 0.075], [POOL_W + 0.3, 0.15, 0, POOL_L/2 + 0.075],
+                              [0.15, POOL_L, -POOL_W/2 - 0.075, 0], [0.15, POOL_L, POOL_W/2 + 0.075, 0]]) {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(w, POOL_H, d), ebony); b.position.set(x, POOL_H/2, z); rim.add(b);
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(w + 0.02, 0.025, d + 0.02), goldMat); cap.position.set(x, POOL_H + 0.0125, z); rim.add(cap);
+  }
+  const glow = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(POOL_W, POOL_L)), new THREE.LineBasicMaterial({ color: GREEN }));
+  glow.rotation.x = -Math.PI/2; glow.position.y = POOL_H - 0.04; rim.add(glow);
+  let water;
+  if (!IS_TOUCH && !TOUR) {
+    water = new Reflector(new THREE.PlaneGeometry(POOL_W, POOL_L), {
+      textureWidth: Math.round(innerWidth * 0.6), textureHeight: Math.round(innerHeight * 0.6), color: 0x6f8794, clipBias: 0.003 });
+  } else {
+    water = new THREE.Mesh(new THREE.PlaneGeometry(POOL_W, POOL_L), new THREE.MeshStandardMaterial({ color:0x0a1218, roughness:0.05, metalness:0.9 }));
+  }
+  water.rotation.x = -Math.PI/2; water.position.y = POOL_H - 0.06; rim.add(water);
+  rim.position.set(0, 0, R2C); scene.add(rim);
+  obstacles.push({ box: [-POOL_W/2 - 0.45, POOL_W/2 + 0.45, R2C - POOL_L/2 - 0.45, R2C + POOL_L/2 + 0.45] });
+}
+// a Moon in Room 02's own sky, so the pool has something to hold
+const moon2 = new THREE.Mesh(new THREE.SphereGeometry(1.5, 64, 48), new THREE.MeshStandardMaterial({ map: load('assets/moon.jpg'), roughness:1 }));
+moon2.position.set(0.6, 15, R2C + 1.2); scene.add(moon2);
+const moon2Key = new THREE.SpotLight(0xfff4e0, 60, 10, Math.PI/10, 0.3, 1.2);
+moon2Key.position.set(-4, 19, R2C + 4); moon2Key.target = moon2; scene.add(moon2Key);
+
 // ---------- glow: bloom pass with a high threshold so only the neon green blooms ----------
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.7, 0.45, 0.92);
+const bloom = new UnrealBloomPass(TOUR ? new THREE.Vector2(TW, TH) : new THREE.Vector2(innerWidth, innerHeight), 0.7, 0.45, 0.92);
+if (TOUR) composer.setSize(TW, TH);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
 // FIX 5: walk up to the plaque (or click it) and the full label appears on screen
 const label = document.getElementById('label');
+const roomTitle = document.querySelector('#title b');
 exhibits.push({ pos: plaque.position.clone(), mesh: plaque, info: { k:'Room 01 · No. 01', t:'Shabti of Amenhotep III',
   lines:['Ebony; eyes inlaid with blue, white, black glass','New Kingdom, Dynasty 18, ca. 1386–1347 BCE','The Metropolitan Museum of Art, Rogers Fund, 1915','Accession 15.2.10 · Public domain (Met Open Access)'] } });
 let shown = null, pinned = null;
 function showLabel(ex) {
   if (ex === shown) return; shown = ex;
   if (!ex) { label.classList.remove('show'); return; }
-  label.innerHTML = `<div class="k">${ex.info.k}</div><div class="t">${ex.info.t}</div>` + ex.info.lines.map(l => `<div>${l}</div>`).join('');
+  label.innerHTML = `<div class="k">${ex.info.k}</div><div class="t">${ex.info.t}</div>` + ex.info.lines.map(l => `<div>${l}</div>`).join('')
+    + (ex.info.watch ? `<a class="watch" href="${ex.info.watch}" target="_blank" rel="noopener">▶ Watch the hour</a>` : '');
+  label.style.pointerEvents = ex.info.watch ? 'auto' : 'none';
   label.classList.add('show');
 }
 const ray = new THREE.Raycaster();
@@ -500,10 +818,61 @@ document.querySelectorAll('#walk button').forEach(b => {
   b.addEventListener('pointerleave', () => touchWalk = 0);
 });
 
+
+// ---------- TOUR: the film's shot list (seconds, camera from→to, look-at from→to), eased inside each shot, cuts between ----------
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const MOON_Y = lunar.position.y, BACK = -D/2;
+const SHOTS = [
+  // 0–5 hook: the Moon in its sunburst, tilt down to the shabti
+  { d:5,  p0:V(0, 3.0, -2.2), p1:V(0, 2.1, -1.9),  l0:V(0, MOON_Y, BACK), l1:V(0, 1.75, BACK) },
+  // 5–11 push in on the shabti
+  { d:6,  p0:V(0, 1.9, -1.4), p1:V(0, 2.0, -2.9),  l0:V(0, 1.65, BACK), l1:V(0, 2.05, BACK) },
+  // 11–16 rise to the Moon hub
+  { d:5,  p0:V(0.5, 2.3, -2.6), p1:V(-0.3, 2.9, -2.9), l0:V(0, 2.6, BACK), l1:V(0, MOON_Y, BACK) },
+  // 16–22 a torch flickers on the left wall
+  { d:6,  p0:V(-3.0, 2.3, 1.2), p1:V(-3.5, 2.5, 0.5), l0:V(-4.3, 2.6, 0), l1:V(-4.3, 2.65, 0) },
+  // 22–28 Thoth as the ibis
+  { d:6,  p0:V(-2.3, 1.75, -1.6), p1:V(-2.9, 1.7, -2.05), l0:V(-4.5, 1.65, -2.2), l1:V(-4.5, 1.65, -2.125) },
+  // 28–34 the goddess Maat
+  { d:6,  p0:V(-2.3, 1.75, 2.6), p1:V(-2.9, 1.7, 2.2),  l0:V(-4.5, 1.65, 2.05), l1:V(-4.5, 1.65, 2.125) },
+  // 34–40 ibis with the feather
+  { d:6,  p0:V(2.3, 1.75, -2.6), p1:V(2.9, 1.7, -2.2),  l0:V(4.5, 1.65, -2.05), l1:V(4.5, 1.65, -2.125) },
+  // 40–46 Ramesses IX offering Maat
+  { d:6,  p0:V(2.3, 1.75, 1.6),  p1:V(2.9, 1.7, 2.05),  l0:V(4.5, 1.65, 2.2), l1:V(4.5, 1.65, 2.125) },
+  // 46–54 the whole room, high in the corner
+  { d:8,  p0:V(3.6, 3.6, 3.9),  p1:V(2.6, 3.2, 3.6),  l0:V(-0.6, 1.6, BACK), l1:V(0, 1.9, BACK) },
+  // 54–60 turn to the glowing doorway
+  { d:6,  p0:V(1.4, 1.65, -0.6), p1:V(0.3, 1.65, 0.8), l0:V(-0.5, 1.7, D/2), l1:V(0, 1.6, D/2 + 2) },
+  // 60–70 walk the hallway
+  { d:10, p0:V(0, 1.65, 2.6),  p1:V(0, 1.65, hallZ1 - 3.2), l0:V(0, 1.6, hallZ1), l1:V(0, 1.72, hallZ1) },
+  // 70–76 hold on Room 02
+  { d:6,  p0:V(0, 1.72, hallZ1 - 3.0), p1:V(0, 1.75, hallZ1 - 2.4), l0:V(0, 1.75, hallZ1), l1:V(0, 1.75, hallZ1) },
+];
+const TOUR_LEN = SHOTS.reduce((a, s) => a + s.d, 0);
+const ease = x => x < 0.5 ? 2*x*x : 1 - Math.pow(-2*x + 2, 2)/2;
+function tourCamera(t) {
+  let acc = 0;
+  for (const sh of SHOTS) {
+    if (t < acc + sh.d || sh === SHOTS[SHOTS.length - 1]) {
+      const k = ease(Math.min(1, (t - acc) / sh.d));
+      camera.position.lerpVectors(sh.p0, sh.p1, k);
+      camera.lookAt(new THREE.Vector3().lerpVectors(sh.l0, sh.l1, k));
+      return;
+    }
+    acc += sh.d;
+  }
+}
+let tourFrame = 0;
+const TOUR_FRAMES = Math.round(TOUR_LEN * FPS);
+const RECV = 'http://127.0.0.1:8766/frame/';
+
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+// deep link: ?room=2 starts the visit inside the Moon Room, facing Luna
+if (!TOUR && QS.get('room') === '2') { camera.position.set(0, 1.62, R2Z0 + 1.4); yaw = Math.PI; }
 const clock = new THREE.Clock();
 function step() {
-  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const dt = TOUR ? 1/FPS : Math.min(clock.getDelta(), 0.05), t = TOUR ? tourFrame/FPS : clock.elapsedTime;
+  if (!TOUR) {
   const fwd = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) + touchWalk;
   const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
   const speed = 2.2 * dt;
@@ -511,12 +880,20 @@ function step() {
   camera.position.x += (-Math.sin(yaw)*fwd + Math.cos(yaw)*side) * speed;
   camera.position.z += (-Math.cos(yaw)*fwd - Math.sin(yaw)*side) * speed;
   const inRoom = (x, z) => x > -W/2 + 0.5 && x < W/2 - 0.5 && z > -D/2 + 0.8 && z < D/2 - 0.5;
-  const inHall = (x, z) => x > -HALL_W/2 + 0.45 && x < HALL_W/2 - 0.45 && z > D/2 - 0.8 && z < hallZ1 - 0.6
-                           && (z > D/2 + 0.2 || Math.abs(x) < DOOR_W/2 - 0.3);
-  if (!inRoom(camera.position.x, camera.position.z) && !inHall(camera.position.x, camera.position.z)) {
+  const inHall = (x, z) => x > -HALL_W/2 + 0.45 && x < HALL_W/2 - 0.45 && z > D/2 - 0.8 && z < hallZ1 + 0.8
+                           && (z > D/2 + 0.2 || Math.abs(x) < DOOR_W/2 - 0.3)
+                           && (z < hallZ1 - 0.6 || Math.abs(x) < R2_DOOR_W/2 - 0.3);
+  const inRoom2 = (x, z) => x > -R2W/2 + 0.5 && x < R2W/2 - 0.5 && z > hallZ1 + 0.5 && z < hallZ1 + R2D - 0.8;
+  const inBranch = (x, z) => Math.abs(z - BZ) < BCW/2 - 0.45 && Math.abs(x) > HALL_W/2 - 0.6 && Math.abs(x) < HALL_W/2 + BL - 0.6
+                             && (Math.abs(x) > HALL_W/2 + 0.2 || Math.abs(z - BZ) < BW/2 - 0.3);
+  const blocked = (x, z) => obstacles.some(o => o.box ? (x > o.box[0] && x < o.box[1] && z > o.box[2] && z < o.box[3])
+                                                        : Math.hypot(x - o.x, z - o.z) < o.r);
+  const cx = camera.position.x, cz = camera.position.z;
+  if ((!inRoom(cx, cz) && !inHall(cx, cz) && !inRoom2(cx, cz) && !inBranch(cx, cz)) || blocked(cx, cz)) {
     camera.position.x = prevX; camera.position.z = prevZ;
   }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
+  } else tourCamera(t);
 
   moon.rotation.y = t * 0.02;            // the Moon turns slowly overhead
   stars.rotation.y = t * 0.004;
@@ -535,14 +912,31 @@ function step() {
   }
   let nearest = null, nd = 2.6;
   for (const ex of exhibits) { const d = camera.position.distanceTo(ex.pos); if (d < nd) { nd = d; nearest = ex; } }
-  showLabel(pinned || nearest);
+  if (!TOUR) showLabel(pinned || nearest);
+  if (!TOUR) {   // the corner title follows the visitor from room to room
+    const where = camera.position.z > R2Z0 ? 'Room 02 · The Moons' : Math.abs(camera.position.x) > HALL_W/2 + 0.3 && camera.position.z > D/2 ? (camera.position.x > 0 ? 'To Room 03' : 'To Room 04') : camera.position.z > D/2 ? 'The Hall' : 'Room 01';
+    if (roomTitle.textContent !== where) roomTitle.textContent = where;
+  }
   composer.render();
-  requestAnimationFrame(step);
+  if (!TOUR) { requestAnimationFrame(step); return; }
+  if (QS.has('preview')) { requestAnimationFrame(step); return; }   // hold one moment of the film for checking a shot
+  renderer.domElement.toBlob(async blob => {
+    try { await fetch(RECV + String(tourFrame).padStart(5, '0'), { method:'POST', body: blob }); }
+    catch (e) { document.title = 'TOUR ERROR ' + e; return; }
+    tourFrame++;
+    document.title = `TOUR ${tourFrame}/${TOUR_FRAMES}`;
+    if (tourFrame < TOUR_FRAMES) requestAnimationFrame(step); else document.title = 'TOUR DONE';
+  }, 'image/jpeg', 0.93);
 }
-step();
+if (TOUR) {
+  if (QS.has('preview')) tourFrame = Math.round(Number(QS.get('preview')) * FPS);
+  // record only after every texture has arrived, so no frame shows a blank wall
+  THREE.DefaultLoadingManager.onLoad = () => setTimeout(step, 500);
+} else step();
 
 document.getElementById('enter').addEventListener('click', e => e.currentTarget.remove());
-if (new URLSearchParams(location.search).has('skip')) document.getElementById('enter').remove();  // for screenshots / direct links
+if (QS.has('skip') || TOUR) document.getElementById('enter').remove();
+if (TOUR) for (const id of ['hud', 'walk', 'label']) document.getElementById(id).style.display = 'none';  // for screenshots / direct links
 addEventListener('resize', () => {
   camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
