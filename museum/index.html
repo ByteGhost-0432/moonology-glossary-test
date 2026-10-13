@@ -464,7 +464,7 @@ function hang(file, ar, x, z, ry, info, maxH = 1.4, maxW = 1.55, y = 1.65) {
     const wp = new THREE.Vector3(0, 1.4, 1.8).applyAxisAngle(new THREE.Vector3(0, 1, 0), ry).add(g.position);
     sp.position.set(wp.x, 3.9, wp.z); sp.target = box; scene.add(sp);
   }
-  exhibits.push({ pos: g.position.clone(), mesh: lab, info });
+  exhibits.push({ pos: g.position.clone(), mesh: g, info });   // the whole piece (frame, picture, label) opens its card
 }
 const L = -W/2 + 0.02, R = W/2 - 0.02;
 hang('thoth_ibis_inlay.jpg', 1347/1800, L, -2.125,  Math.PI/2, { k:'Room 01 · No. 02', t:'Inlay depicting Thoth as the ibis with a Maat feather',
@@ -815,7 +815,7 @@ let labelPinned = false;
 renderer.domElement.addEventListener('click', e => {
   const m = new THREE.Vector2(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1);
   ray.setFromCamera(m, camera);
-  const hit = exhibits.find(ex => ray.intersectObject(ex.mesh).length > 0);
+  const hit = exhibits.find(ex => ray.intersectObject(ex.mesh, true).length > 0);
   pinned = hit && hit !== pinned ? hit : null;
 });
 
