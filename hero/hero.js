@@ -14,7 +14,7 @@
   // 2026-09-24: the words are editable FROM WORDPRESS. The Elementor HTML widget that holds
   // <div id="mng-hero-mount" data-tagline="..."> sets the banner line; no data-tagline = default.
   var TAGLINE = mount.dataset.tagline || 'As above, so below.';
-  mount.innerHTML="<div class=\"mng-hero\" id=\"mngHero\">\n  <canvas class=\"mng-sky\" aria-hidden=\"true\"></canvas>\n  <img class=\"mng-moon\" alt=\"\" aria-hidden=\"true\"\n       src=\"https://test.moonologyartgallery.com/hero/current.webp\">\n  <div class=\"mng-vig\" aria-hidden=\"true\"></div>\n\n  <div class=\"mng-copy\">\n    <h1 class=\"mng-h1\"></h1>\n    <div class=\"mng-cta\"><a class=\"mng-btn\" href=\"https://test.moonologyartgallery.com/museum/\">🏛️ Enter the Moonology Art Gallery Museum <i>→</i></a></div>\n  </div>\n</div>";
+  mount.innerHTML="<div class=\"mng-hero\" id=\"mngHero\">\n  <canvas class=\"mng-sky\" aria-hidden=\"true\"></canvas>\n  <img class=\"mng-moon\" alt=\"\" aria-hidden=\"true\"\n       src=\"https://test.moonologyartgallery.com/hero/current.webp\">\n  <div class=\"mng-vig\" aria-hidden=\"true\"></div>\n\n  <div class=\"mng-copy\">\n    <h1 class=\"mng-h1\"></h1>\n    <div class=\"mng-cta\"><a class=\"mng-btn\" href=\"https://test.moonologyartgallery.com/museum/\">🏛️ Enter the Museum <i>→</i></a></div>\n  </div>\n</div>";
   mount.querySelector('.mng-h1').textContent = TAGLINE;   // textContent: WordPress text is never HTML
   // 2026-10-12: the button under the banner line opens the Moonology Art Gallery Museum (Room 01, /museum/).
   (function(){
