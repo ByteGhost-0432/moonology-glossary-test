@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moonology Museum · Room 01</title>
+<style>
+  :root { --bg:#050505; --gold:#c9a45c; --ink:#f2ede3; --dim:#8c8476; }
+  html,body { margin:0; height:100%; background:var(--bg); overflow:hidden;
+    font-family: Futura, "Futura PT", "Century Gothic", "Trebuchet MS", sans-serif; color:var(--ink); }
+  canvas { display:block; }
+  #hud { position:fixed; left:16px; bottom:16px; right:16px; pointer-events:none;
+    display:flex; justify-content:space-between; align-items:flex-end; gap:12px; }
+  #title { letter-spacing:.28em; font-size:12px; color:var(--dim); text-transform:uppercase; }
+  #title b { color:#33ff66; font-weight:500; text-shadow:0 0 8px rgba(51,255,102,.5); }
+  #help { font-size:12px; color:var(--dim); text-align:right; line-height:1.6; }
+  #label { position:fixed; top:16px; right:16px; max-width:min(380px, calc(100vw - 32px)); padding:16px 18px;
+    background:rgba(8,8,7,.86); border:1px solid #c9a45c; box-shadow:0 0 0 1px rgba(51,255,102,.25), 0 0 18px rgba(51,255,102,.18);
+    font-size:13px; line-height:1.6; color:#cfc7b8; opacity:0; transform:translateY(-6px); transition:.35s; pointer-events:none; }
+  #label.show { opacity:1; transform:none; }
+  #label .k { color:#33ff66; letter-spacing:.22em; font-size:11px; text-transform:uppercase; }
+  #label .t { color:#f2ede3; font-size:18px; margin:4px 0 6px; }
+  #walk { position:fixed; right:16px; bottom:64px; display:none; flex-direction:column; gap:10px; }
+  #walk button { width:56px; height:56px; border-radius:50%; border:1px solid #c9a45c; background:rgba(8,8,7,.7);
+    color:#33ff66; font-size:20px; box-shadow:0 0 12px rgba(51,255,102,.25); touch-action:none; }
+  @media (pointer: coarse) { #walk { display:flex; } #help { display:none; } }
+  #title { white-space:nowrap; }
+  @media (max-width: 600px) { #title { font-size:10px; letter-spacing:.18em; } #help { display:none; } }
+  #enter { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; background:rgba(5,5,5,.92); cursor:pointer; text-align:center; padding:16px; }
+  #enter h1 { font-weight:500; letter-spacing:.32em; font-size:clamp(18px,4vw,34px); margin:0 0 8px; }
+  #enter h1 span { color:var(--gold); }
+  #enter p { color:var(--dim); letter-spacing:.2em; font-size:12px; text-transform:uppercase; margin:6px 0; }
+  #enter .rule { width:120px; height:1px; background:var(--gold); margin:14px 0; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="enter">
+  <p>Moonology Art Gallery</p>
+  <h1>THE <span>MOON</span> MUSEUM</h1>
+  <div class="rule"></div>
+  <p>Room 01 · The Shabti of Amenhotep III</p>
+  <p style="margin-top:22px;color:#33ff66;text-shadow:0 0 10px rgba(51,255,102,.6)">Click to enter</p>
+</div>
+<div id="label">
+  <div class="k">Room 01 · No. 01</div>
+  <div class="t">Shabti of Amenhotep III</div>
+  <div>Ebony; eyes inlaid with blue, white, black glass</div>
+  <div>New Kingdom, Dynasty 18, ca. 1386–1347 BCE</div>
+  <div>The Metropolitan Museum of Art, Rogers Fund, 1915</div>
+  <div>Accession 15.2.10 · Public domain (Met Open Access)</div>
+</div>
+<div id="walk"><button data-d="1" aria-label="Walk forward">▲</button><button data-d="-1" aria-label="Walk back">▼</button></div>
+<div id="hud">
+  <div id="title">Moonology Art Gallery · <b>Room 01</b></div>
+  <div id="help">Drag to look · W A S D or arrows to walk</div>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// Palette, 60-30-10: black (walls/floor) · warm gold (architecture) · terminal green (accent only)
+const GREEN = 0x33ff66;
+const neon = new THREE.MeshBasicMaterial({ color: GREEN, toneMapped: false });
+const neonLine = new THREE.LineBasicMaterial({ color: GREEN, toneMapped: false });
+
+// ---------- renderer / scene ----------
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+const IS_TOUCH = matchMedia('(pointer: coarse)').matches;
+renderer.setPixelRatio(Math.min(devicePixelRatio, IS_TOUCH ? 1.5 : 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = !IS_TOUCH;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x020203);
+scene.fog = new THREE.Fog(0x020203, 14, 34);
+
+const camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.05, 200);
+camera.position.set(0, 1.62, 0.2);
+
+const tex = new THREE.TextureLoader();
+const load = (url) => { const t = tex.load(url); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+
+// ---------- room: 9 wide x 9 deep x 5 high (Deco height), skylight overhead ----------
+const W = 9, D = 9, H = 5.0;
+const wallMat  = new THREE.MeshStandardMaterial({ color:0x15130f, roughness:0.92 });
+// Art Deco floor: black marble squares, cream diamonds, gold inlay lines
+function decoFloorTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 1024;
+  const g = c.getContext('2d'), s = 256;
+  for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) {
+    g.fillStyle = (x + y) % 2 ? '#0b0a09' : '#100e0c'; g.fillRect(x*s, y*s, s, s);
+    g.save(); g.translate(x*s + s/2, y*s + s/2); g.rotate(Math.PI/4);
+    g.fillStyle = '#3b352c'; g.fillRect(-16, -16, 32, 32); g.restore();
+  }
+  g.strokeStyle = '#6e5a35'; g.lineWidth = 2;
+  for (let i = 0; i <= 4; i++) { g.beginPath(); g.moveTo(i*s, 0); g.lineTo(i*s, 1024); g.stroke();
+                                 g.beginPath(); g.moveTo(0, i*s); g.lineTo(1024, i*s); g.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(W/4, D/4); t.anisotropy = 8; return t;
+}
+const floorMat = new THREE.MeshStandardMaterial({ map: decoFloorTexture(), roughness:0.3, metalness:0.1 });
+const goldMat  = new THREE.MeshStandardMaterial({ color:0xc9a45c, roughness:0.35, metalness:0.85 });
+
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), floorMat);
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+
+function wall(w, h, x, y, z, ry) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), wallMat);
+  m.position.set(x, y, z); m.rotation.y = ry; m.receiveShadow = true; scene.add(m); return m;
+}
+wall(W, H, 0, H/2, -D/2, 0);            // back wall (the piece)
+wall(W, H, 0, H/2,  D/2, Math.PI);      // entrance wall
+wall(D, H, -W/2, H/2, 0,  Math.PI/2);   // left
+wall(D, H,  W/2, H/2, 0, -Math.PI/2);   // right
+
+// ceiling with a square skylight opening
+const ceil = new THREE.Group();
+const cMat = new THREE.MeshStandardMaterial({ color:0x0d0c0a, roughness:1, side:THREE.DoubleSide });
+const hole = 3.2;
+[[W, (D-hole)/2, 0, -(D+hole)/4], [W, (D-hole)/2, 0, (D+hole)/4],
+ [(W-hole)/2, hole, -(W+hole)/4, 0], [(W-hole)/2, hole, (W+hole)/4, 0]].forEach(([w,d,x,z]) => {
+  const p = new THREE.Mesh(new THREE.PlaneGeometry(w, d), cMat);
+  p.rotation.x = Math.PI/2; p.position.set(x, H, z); ceil.add(p);
+});
+scene.add(ceil);
+
+// thin gold rail around the room at 3.3 m
+const railY = 4.45;
+[[W, 0, -D/2+0.01, 0], [W, 0, D/2-0.01, Math.PI], [D, -W/2+0.01, 0, Math.PI/2], [D, W/2-0.01, 0, -Math.PI/2]]
+  .forEach(([len, x, z, ry]) => {
+    const r = new THREE.Mesh(new THREE.BoxGeometry(len, 0.025, 0.02), goldMat);
+    r.position.set(x, railY, z); r.rotation.y = ry; scene.add(r);
+  });
+
+// terminal-green cove line at the foot of every wall (accent lighting, 10% of the palette)
+for (const [len, x, z, ry] of [[W, 0, -D/2+0.02, 0], [W, 0, D/2-0.02, Math.PI], [D, -W/2+0.02, 0, Math.PI/2], [D, W/2-0.02, 0, -Math.PI/2]]) {
+  const cove = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.012), neon);
+  cove.position.set(x, 0.06, z); cove.rotation.y = ry; scene.add(cove);
+}
+
+// ---------- Art Deco architecture ----------
+// fluted gold-edged pilasters along both side walls
+const pilMat = new THREE.MeshStandardMaterial({ color:0x1e1b16, roughness:0.6 });
+for (const side of [-1, 1]) for (const z of [-3.2, -1.05, 1.05, 3.2]) {
+  const p = new THREE.Group();
+  p.add(new THREE.Mesh(new THREE.BoxGeometry(0.12, H, 0.46), pilMat));
+  for (const off of [-0.15, -0.05, 0.05, 0.15]) {           // gold flutes
+    const f = new THREE.Mesh(new THREE.BoxGeometry(0.02, H - 0.6, 0.012), goldMat);
+    f.position.set(-0.065, 0, off); p.add(f);
+  }
+  for (const yy of [H/2 - 0.25, H/2 - 0.12]) {               // stepped capital
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.05, yy > H/2 - 0.2 ? 0.62 : 0.54), goldMat);
+    cap.position.y = yy; p.add(cap);
+  }
+  p.position.set(side*(W/2 - 0.06), H/2, z); if (side > 0) p.rotation.y = Math.PI;
+  scene.add(p);
+}
+
+// the piece's size and hang: 20 x 28 in canvas shown at 2.6x; centre at 1.6 m (museum eye-level hang)
+const cw = 0.508*2.6, ch = 0.711*2.6, depth = 0.05, artY = 1.6;
+
+// stepped (ziggurat) frame behind the piece: three receding gold-edged panels
+const frameGroup = new THREE.Group();
+[[0.78, 0x0f0e0c], [0.52, 0x1a1712], [0.28, 0x0b0a09]].forEach(([m, col], i) => {
+  const w = cw + m, h = ch + m;
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.02), new THREE.MeshStandardMaterial({ color:col, roughness:0.8 }));
+  panel.position.z = i * 0.012; frameGroup.add(panel);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(w, h, 0.02)),
+    new THREE.LineBasicMaterial({ color:0xc9a45c }));
+  e.position.z = i * 0.012 + 0.001; frameGroup.add(e);
+});
+// terminal-green neon outline: a thin glowing line just outside the canvas edge
+{
+  const gw = cw + 0.1, gh = ch + 0.1, t = 0.012;
+  for (const [w, h, x, y] of [[gw, t, 0, gh/2], [gw, t, 0, -gh/2], [t, gh, -gw/2, 0], [t, gh, gw/2, 0]]) {
+    const bar = new THREE.Mesh(new THREE.PlaneGeometry(w, h), neon);
+    bar.position.set(x, y, 0.04); frameGroup.add(bar);
+  }
+}
+frameGroup.position.set(0, artY, -D/2 + 0.012);
+scene.add(frameGroup);
+
+// FIX 3: the Moon as the hub of the sunburst — a small lunar globe in a gold-and-green ring above the piece
+const frameTop = artY + (ch + 0.78)/2;
+const hubY = frameTop + 0.42;
+const lunar = new THREE.Mesh(new THREE.SphereGeometry(0.3, 64, 48),
+  new THREE.MeshStandardMaterial({ map: load('assets/moon.jpg'), roughness:1 }));
+lunar.position.set(0, hubY, -D/2 + 0.18); scene.add(lunar);
+const lunarKey = new THREE.SpotLight(0xfff1dc, 14, 3, Math.PI/10, 0.5, 1.5);
+lunarKey.position.set(-0.9, hubY + 0.9, -D/2 + 1.6); lunarKey.target = lunar; scene.add(lunarKey);
+const ringGold = new THREE.Mesh(new THREE.RingGeometry(0.34, 0.37, 96), goldMat);
+ringGold.position.set(0, hubY, -D/2 + 0.03); scene.add(ringGold);
+const ringNeon = new THREE.Mesh(new THREE.RingGeometry(0.385, 0.395, 96), neon);
+ringNeon.position.set(0, hubY, -D/2 + 0.031); scene.add(ringNeon);
+
+// sunburst fan radiating from the Moon (upper half)
+const fan = new THREE.Group();
+const rays = 17;
+for (let i = 0; i < rays; i++) {
+  const a = Math.PI * (i + 0.5) / rays;
+  const len = i % 2 ? 0.42 : 0.62, r0 = 0.44;
+  const ray = new THREE.Mesh(new THREE.BoxGeometry(0.022, len, 0.01), goldMat);
+  ray.position.set(Math.cos(a) * (r0 + len/2), Math.sin(a) * (r0 + len/2), 0);
+  ray.rotation.z = a - Math.PI/2; fan.add(ray);
+}
+fan.position.set(0, hubY, -D/2 + 0.03);
+scene.add(fan);
+
+// stepped skylight coffer: three gold-edged rings around the opening
+for (let i = 0; i < 3; i++) {
+  const s = hole + 0.5 + i*0.55, y = H - 0.02 - i*0.09;
+  const ring = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(s, s)),
+    new THREE.LineBasicMaterial({ color:0xc9a45c }));
+  ring.rotation.x = Math.PI/2; ring.position.y = y; scene.add(ring);
+}
+
+// chevron frieze along the gold rail on the back wall
+const chev = new THREE.Group();
+for (let x = -W/2 + 0.3; x < W/2 - 0.2; x += 0.3) for (const s of [-1, 1]) {
+  if (Math.abs(x) < 1.3) continue;   // leave the sunburst clear
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.014, 0.01), goldMat);
+  bar.position.set(x + s*0.065, railY + 0.1, -D/2 + 0.02); bar.rotation.z = s * 0.6; chev.add(bar);
+}
+scene.add(chev);
+
+// ---------- the Moon, seen through the skylight ----------
+const moon = new THREE.Mesh(
+  new THREE.SphereGeometry(2.2, 64, 48),
+  new THREE.MeshStandardMaterial({ map: load('assets/moon.jpg'), roughness:1, metalness:0 })
+);
+moon.position.set(0, 16, -3);
+scene.add(moon);
+const moonKey = new THREE.DirectionalLight(0xfff4e0, 2.2);
+moonKey.position.set(-8, 22, 4); moonKey.target = moon; scene.add(moonKey);
+
+// stars above the skylight
+const starGeo = new THREE.BufferGeometry(); const sp = [];
+for (let i = 0; i < 900; i++) {
+  const r = 60 + Math.random()*20, th = Math.random()*Math.PI*2, ph = Math.random()*Math.PI*0.42;
+  sp.push(r*Math.sin(ph)*Math.cos(th), 8 + r*Math.cos(ph), r*Math.sin(ph)*Math.sin(th));
+}
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color:0xffffff, size:0.18, sizeAttenuation:true, fog:false }));
+scene.add(stars);
+
+// cool moonlight pouring down through the skylight
+const moonShaft = new THREE.SpotLight(0x9fb4d6, 30, 14, Math.PI/7, 0.8, 1.4);
+moonShaft.position.set(0, H + 0.5, 0); moonShaft.target.position.set(0, 0, -0.5);
+scene.add(moonShaft, moonShaft.target);
+scene.add(new THREE.AmbientLight(0x3a332a, 1.6));
+scene.add(new THREE.HemisphereLight(0x8fa3c4, 0x1a140c, 0.6));
+// warm wall-wash lights so the side walls and pilasters read
+for (const [x, z] of [[-3.3, -2.2], [3.3, -2.2], [-3.3, 2.2], [3.3, 2.2]]) {
+  const w = new THREE.PointLight(0xffd59a, 6, 7, 1.6); w.position.set(x, 3.6, z); scene.add(w);
+}
+
+// ---------- the piece: Amenhotep III shabti canvas, 20 x 28 in (0.508 x 0.711 m) shown at 2x for a museum wall ----------
+const art = new THREE.Group();
+const canvasFace = new THREE.MeshStandardMaterial({ map: load('assets/shabti.jpg'), roughness:0.85 });
+const edge = new THREE.MeshStandardMaterial({ color:0x050505, roughness:0.9 });
+const box = new THREE.Mesh(new THREE.BoxGeometry(cw, ch, depth), [edge, edge, edge, edge, canvasFace, edge]);
+box.castShadow = true; art.add(box);
+art.position.set(0, artY, -D/2 + depth/2 + 0.02);
+scene.add(art);
+
+// warm gallery spot on the canvas
+const spot = new THREE.SpotLight(0xffe2b0, 60, 9, Math.PI/11, 0.55, 1.6);
+spot.position.set(0, H - 0.2, -D/2 + 2.6); spot.target = art;
+spot.castShadow = true; spot.shadow.mapSize.set(1024, 1024);
+scene.add(spot);
+
+// ---------- plaque (text re-verified 2026-10-12 at the Met collection API, object 544492: isPublicDomain true) ----------
+function plaqueTexture() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+  const g = c.getContext('2d');
+  g.fillStyle = '#0e0d0b'; g.fillRect(0, 0, c.width, c.height);
+  g.fillStyle = '#c9a45c'; g.fillRect(64, 70, 120, 3);
+  const font = (s, w=400) => `${w} ${s}px Futura, "Century Gothic", sans-serif`;
+  g.fillStyle = '#c9a45c'; g.font = font(26); g.fillText('R O O M   0 1   ·   N O .  0 1', 64, 54);
+  g.fillStyle = '#f2ede3'; g.font = font(48, 500); g.fillText('Shabti of Amenhotep III', 64, 140);
+  g.fillStyle = '#b8b0a2'; g.font = font(27);
+  [ 'Ebony; eyes inlaid with blue, white, black glass',
+    'New Kingdom, Dynasty 18, ca. 1386–1347 BCE',
+    'The Metropolitan Museum of Art, Rogers Fund, 1915',
+    'Accession 15.2.10  ·  Public domain (Met Open Access)' ].forEach((t, i) => g.fillText(t, 64, 205 + i*48));
+  g.fillStyle = '#8c8476'; g.font = font(22);
+  g.fillText('Moonology Art Gallery  ·  As above, so below.', 64, 470);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+const plaque = new THREE.Mesh(new THREE.PlaneGeometry(0.88, 0.44),
+  new THREE.MeshStandardMaterial({ map: plaqueTexture(), roughness:0.6 }));
+plaque.position.set(cw/2 + 0.39 + 0.62, 1.45, -D/2 + 0.025);
+const plaqueLight = new THREE.SpotLight(0xffe2b0, 8, 4, Math.PI/14, 0.6, 1.5);
+plaqueLight.position.set(plaque.position.x, 3.4, -D/2 + 1.6); plaqueLight.target = plaque; scene.add(plaqueLight);
+scene.add(plaque);
+
+// a low bench to sit and look
+const bench = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.42, 0.5),
+  new THREE.MeshStandardMaterial({ color:0x1c1915, roughness:0.7 }));
+bench.position.set(0, 0.21, -1.4); bench.castShadow = bench.receiveShadow = true; scene.add(bench);
+
+// ---------- slow drifting dust in the moonlight (the "living" layer) ----------
+const N = 260, dg = new THREE.BufferGeometry(), dp = new Float32Array(N*3), seeds = new Float32Array(N);
+for (let i = 0; i < N; i++) {
+  { const r = Math.sqrt(Math.random())*1.1, a = Math.random()*Math.PI*2;
+    dp[i*3] = Math.cos(a)*r; dp[i*3+1] = 0.4 + Math.random()*(H-0.6); dp[i*3+2] = Math.sin(a)*r - 0.2; }
+  seeds[i] = Math.random()*100;
+}
+dg.setAttribute('position', new THREE.BufferAttribute(dp, 3));
+const dust = new THREE.Points(dg, new THREE.PointsMaterial({ color:0xd8e2f2, size:1.6, sizeAttenuation:false, transparent:true, opacity:0.35, depthWrite:false }));
+scene.add(dust);
+
+// ---------- glow: bloom pass with a high threshold so only the neon green blooms ----------
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.7, 0.45, 0.92);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+// FIX 5: walk up to the plaque (or click it) and the full label appears on screen
+const label = document.getElementById('label');
+const ray = new THREE.Raycaster();
+let labelPinned = false;
+renderer.domElement.addEventListener('click', e => {
+  const m = new THREE.Vector2(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1);
+  ray.setFromCamera(m, camera);
+  labelPinned = ray.intersectObject(plaque).length > 0 ? !labelPinned : false;
+});
+
+// ---------- controls: drag to look, WASD / arrows to walk, two-finger touch to walk ----------
+let yaw = 0, pitch = 0, dragging = false, lx = 0, ly = 0;
+const keys = {};
+const el = renderer.domElement;
+el.addEventListener('pointerdown', e => { dragging = true; lx = e.clientX; ly = e.clientY; });
+addEventListener('pointerup', () => dragging = false);
+addEventListener('pointermove', e => {
+  if (!dragging) return;
+  yaw   -= (e.clientX - lx) * 0.0032;
+  pitch -= (e.clientY - ly) * 0.0032;
+  pitch = Math.max(-1.1, Math.min(1.25, pitch));
+  lx = e.clientX; ly = e.clientY;
+});
+addEventListener('keydown', e => keys[e.code] = true);
+addEventListener('keyup',   e => keys[e.code] = false);
+let touchWalk = 0;
+document.querySelectorAll('#walk button').forEach(b => {
+  const d = Number(b.dataset.d);
+  b.addEventListener('pointerdown', e => { e.stopPropagation(); touchWalk = d; });
+  b.addEventListener('pointerup', () => touchWalk = 0);
+  b.addEventListener('pointerleave', () => touchWalk = 0);
+});
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const clock = new THREE.Clock();
+function step() {
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  const fwd = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) + touchWalk;
+  const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
+  const speed = 2.2 * dt;
+  camera.position.x += (-Math.sin(yaw)*fwd + Math.cos(yaw)*side) * speed;
+  camera.position.z += (-Math.cos(yaw)*fwd - Math.sin(yaw)*side) * speed;
+  camera.position.x = clamp(camera.position.x, -W/2 + 0.5, W/2 - 0.5);
+  camera.position.z = clamp(camera.position.z, -D/2 + 0.8, D/2 - 0.5);
+  camera.rotation.set(pitch, yaw, 0, 'YXZ');
+
+  moon.rotation.y = t * 0.02;            // the Moon turns slowly overhead
+  stars.rotation.y = t * 0.004;
+  const p = dg.attributes.position;      // dust drifts down and sways
+  for (let i = 0; i < N; i++) {
+    let y = p.getY(i) - dt * 0.05; if (y < 0.4) y = H - 0.2;
+    p.setY(i, y); p.setX(i, p.getX(i) + Math.sin(t*0.3 + seeds[i]) * 0.0006);
+  }
+  p.needsUpdate = true;
+  spot.intensity = 60 + Math.sin(t * 0.4) * 2;   // a barely-there breathing of the gallery light
+
+  lunar.rotation.y = t * 0.05;
+  const near = camera.position.distanceTo(plaque.position) < 2.6;
+  label.classList.toggle('show', near || labelPinned);
+  composer.render();
+  requestAnimationFrame(step);
+}
+step();
+
+document.getElementById('enter').addEventListener('click', e => e.currentTarget.remove());
+if (new URLSearchParams(location.search).has('skip')) document.getElementById('enter').remove();  // for screenshots / direct links
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
