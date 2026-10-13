@@ -21,6 +21,12 @@
   #label .k { color:#33ff66; letter-spacing:.22em; font-size:11px; text-transform:uppercase; }
   #label .watch { display:inline-block; margin-top:10px; padding:8px 14px; border:1px solid #33ff66; color:#33ff66;
     text-decoration:none; letter-spacing:.14em; font-size:12px; text-transform:uppercase; box-shadow:0 0 10px rgba(51,255,102,.3); }
+  #label { max-height:min(70vh, 560px); overflow:auto; }
+  #label details { margin-top:10px; border-top:1px solid rgba(201,164,92,.35); padding-top:8px; }
+  #label summary { cursor:pointer; color:#c9a45c; letter-spacing:.12em; font-size:12px; text-transform:uppercase; }
+  #label .story { margin:8px 0 6px; color:#e6e0d4; font-size:13.5px; line-height:1.6; }
+  #label .more { font-size:12px; color:#8c8476; }
+  #label .more a { color:#33ff66; text-decoration:none; display:block; margin-top:3px; }
   #label .t { color:#f2ede3; font-size:18px; margin:4px 0 6px; }
   #walk { position:fixed; right:16px; bottom:64px; display:none; flex-direction:column; gap:10px; }
   #walk button { width:56px; height:56px; border-radius:50%; border:1px solid #c9a45c; background:rgba(8,8,7,.7);
@@ -669,6 +675,8 @@ function hangingSign(frontRows, backRows, x, y, z) {   // hangs from the ceiling
 papyrusColumn(-3.45, -D/2 + 0.4);
 papyrusColumn( 3.45, -D/2 + 0.4);
 wingedSun(0, DOOR_H + 0.95, D/2 - 0.04, Math.PI, 1.1);
+{ const ws = new THREE.SpotLight(0xffe2b0, 16, 4, Math.PI/9, 0.6, 1.5); ws.position.set(0, 2.2, D/2 - 2.2);
+  ws.target.position.set(0, DOOR_H + 0.95, D/2); scene.add(ws, ws.target); }   // light the winged sun over the exit
 torch(-1.5, 2.55, D/2 - 0.02, Math.PI, 4);   // flank the exit so the entrance wall, sign and winged sun read
 torch( 1.5, 2.55, D/2 - 0.02, Math.PI, 4);
 bonsai(-3.7, D/2 - 0.75, 1, 3);
@@ -733,6 +741,8 @@ papyrusColumn(-3.25, R2Z1 - 0.4);
 papyrusColumn( 3.25, R2Z1 - 0.4);
 wingedSun(0, R2_DOOR_H + 0.75, R2Z0 + 0.04, 0, 1.1);
 bonsai(-3.75, R2Z0 + 0.85, 1, 17);
+for (const bx of [-3.75, 3.75]) { const bs = new THREE.SpotLight(0xffe2b0, 9, 3.2, Math.PI/8, 0.6, 1.5);
+  bs.position.set(bx * 0.7, 3.0, R2Z0 + 2.0); bs.target.position.set(bx, 0.9, R2Z0 + 0.85); scene.add(bs, bs.target); }   // pick the bonsai out of the dark
 bonsai( 3.75, R2Z0 + 0.85, 1, 19);
 wallSign([['↓', 'Room 01 · The Shabti', '', false]], -1.45, 1.45, R2Z0 + 0.03, 0, 0.9, 0.2);
 
@@ -748,9 +758,9 @@ const POOL_W = 2.6, POOL_L = 4.4, POOL_H = 0.32;
   const glow = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(POOL_W, POOL_L)), new THREE.LineBasicMaterial({ color: GREEN }));
   glow.rotation.x = -Math.PI/2; glow.position.y = POOL_H - 0.04; rim.add(glow);
   let water;
-  if (!IS_TOUCH && !TOUR) {
+  if (!IS_TOUCH) {   // the film records on a desktop, so it gets the real mirror too
     water = new Reflector(new THREE.PlaneGeometry(POOL_W, POOL_L), {
-      textureWidth: Math.round(innerWidth * 0.6), textureHeight: Math.round(innerHeight * 0.6), color: 0x6f8794, clipBias: 0.003 });
+      textureWidth: TOUR ? 648 : Math.round(innerWidth * 0.6), textureHeight: TOUR ? 1152 : Math.round(innerHeight * 0.6), color: 0x6f8794, clipBias: 0.003 });
   } else {
     water = new THREE.Mesh(new THREE.PlaneGeometry(POOL_W, POOL_L), new THREE.MeshStandardMaterial({ color:0x0a1218, roughness:0.05, metalness:0.9 }));
   }
@@ -759,10 +769,11 @@ const POOL_W = 2.6, POOL_L = 4.4, POOL_H = 0.32;
   obstacles.push({ box: [-POOL_W/2 - 0.45, POOL_W/2 + 0.45, R2C - POOL_L/2 - 0.45, R2C + POOL_L/2 + 0.45] });
 }
 // a Moon in Room 02's own sky, so the pool has something to hold
-const moon2 = new THREE.Mesh(new THREE.SphereGeometry(1.5, 64, 48), new THREE.MeshStandardMaterial({ map: load('assets/moon.jpg'), roughness:1 }));
+const moon2Tex = load('assets/moon.jpg');
+const moon2 = new THREE.Mesh(new THREE.SphereGeometry(1.5, 64, 48), new THREE.MeshStandardMaterial({ map: moon2Tex, emissiveMap: moon2Tex, emissive: 0xffffff, emissiveIntensity: 0.55, roughness:1 }));   // a full Moon glows on its own, whatever the room lights do
 moon2.position.set(0.6, 15, R2C + 1.2); scene.add(moon2);
-const moon2Key = new THREE.SpotLight(0xfff4e0, 60, 10, Math.PI/10, 0.3, 1.2);
-moon2Key.position.set(-4, 19, R2C + 4); moon2Key.target = moon2; scene.add(moon2Key);
+const moon2Key = new THREE.SpotLight(0xfff4e0, 60, 13, Math.PI/14, 0.3, 1.2);
+moon2Key.position.set(0.2, 5.5, R2C - 1.5);   // from below, so a visitor looking up sees the lit face moon2Key.target = moon2; scene.add(moon2Key);
 
 // ---------- glow: bloom pass with a high threshold so only the neon green blooms ----------
 const composer = new EffectComposer(renderer);
@@ -778,12 +789,25 @@ const roomTitle = document.querySelector('#title b');
 exhibits.push({ pos: plaque.position.clone(), mesh: plaque, info: { k:'Room 01 · No. 01', t:'Shabti of Amenhotep III',
   lines:['Ebony; eyes inlaid with blue, white, black glass','New Kingdom, Dynasty 18, ca. 1386–1347 BCE','The Metropolitan Museum of Art, Rogers Fund, 1915','Accession 15.2.10 · Public domain (Met Open Access)'] } });
 let shown = null, pinned = null;
+// history stories: verified text + further-reading links, kept in a separate file so they can be edited without touching the code
+let STORIES = {};
+fetch('assets/stories.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : []).then(list => {
+  for (const it of list) STORIES[it.key] = it; shown = null;
+}).catch(() => {});
+const KEY_BY_TITLE = { 'Shabti of Amenhotep III':'shabti', 'Inlay depicting Thoth as the ibis with a Maat feather':'thoth_ibis_inlay',
+  'Figure of the goddess Maat':'maat_figure', 'Ibis with maat feather':'ibis_feather',
+  'Ostracon depicting Ramesses IX offering Maat, attributed to the chief draftsman Amenhotep':'ostracon_ramesses',
+  'Luna':'luna', 'Europa':'europa', 'Mimas':'mimas', 'Enceladus':'enceladus', 'Titan':'titan', 'Io':'io', 'Ganymede':'ganymede' };
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 function showLabel(ex) {
   if (ex === shown) return; shown = ex;
   if (!ex) { label.classList.remove('show'); return; }
   label.innerHTML = `<div class="k">${ex.info.k}</div><div class="t">${ex.info.t}</div>` + ex.info.lines.map(l => `<div>${l}</div>`).join('')
     + (ex.info.watch ? `<a class="watch" href="${ex.info.watch}" target="_blank" rel="noopener">▶ Watch the hour</a>` : '');
-  label.style.pointerEvents = ex.info.watch ? 'auto' : 'none';
+  const st = STORIES[KEY_BY_TITLE[ex.info.t]];
+  if (st) label.innerHTML += `<details><summary>📖 The story</summary><div class="story">${esc(st.story)}</div>`
+    + `<div class="more">Read more${st.readMore.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">→ ${esc(l.label)}</a>`).join('')}</div></details>`;
+  label.style.pointerEvents = (ex.info.watch || st) ? 'auto' : 'none';
   label.classList.add('show');
 }
 const ray = new THREE.Raycaster();
@@ -823,30 +847,28 @@ document.querySelectorAll('#walk button').forEach(b => {
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const MOON_Y = lunar.position.y, BACK = -D/2;
 const SHOTS = [
-  // 0–5 hook: the Moon in its sunburst, tilt down to the shabti
-  { d:5,  p0:V(0, 3.0, -2.2), p1:V(0, 2.1, -1.9),  l0:V(0, MOON_Y, BACK), l1:V(0, 1.75, BACK) },
-  // 5–11 push in on the shabti
-  { d:6,  p0:V(0, 1.9, -1.4), p1:V(0, 2.0, -2.9),  l0:V(0, 1.65, BACK), l1:V(0, 2.05, BACK) },
-  // 11–16 rise to the Moon hub
-  { d:5,  p0:V(0.5, 2.3, -2.6), p1:V(-0.3, 2.9, -2.9), l0:V(0, 2.6, BACK), l1:V(0, MOON_Y, BACK) },
-  // 16–22 a torch flickers on the left wall
-  { d:6,  p0:V(-3.0, 2.3, 1.2), p1:V(-3.5, 2.5, 0.5), l0:V(-4.3, 2.6, 0), l1:V(-4.3, 2.65, 0) },
-  // 22–28 Thoth as the ibis
-  { d:6,  p0:V(-2.3, 1.75, -1.6), p1:V(-2.9, 1.7, -2.05), l0:V(-4.5, 1.65, -2.2), l1:V(-4.5, 1.65, -2.125) },
-  // 28–34 the goddess Maat
-  { d:6,  p0:V(-2.3, 1.75, 2.6), p1:V(-2.9, 1.7, 2.2),  l0:V(-4.5, 1.65, 2.05), l1:V(-4.5, 1.65, 2.125) },
-  // 34–40 ibis with the feather
-  { d:6,  p0:V(2.3, 1.75, -2.6), p1:V(2.9, 1.7, -2.2),  l0:V(4.5, 1.65, -2.05), l1:V(4.5, 1.65, -2.125) },
-  // 40–46 Ramesses IX offering Maat
-  { d:6,  p0:V(2.3, 1.75, 1.6),  p1:V(2.9, 1.7, 2.05),  l0:V(4.5, 1.65, 2.2), l1:V(4.5, 1.65, 2.125) },
-  // 46–54 the whole room, high in the corner
-  { d:8,  p0:V(3.6, 3.6, 3.9),  p1:V(2.6, 3.2, 3.6),  l0:V(-0.6, 1.6, BACK), l1:V(0, 1.9, BACK) },
-  // 54–60 turn to the glowing doorway
-  { d:6,  p0:V(1.4, 1.65, -0.6), p1:V(0.3, 1.65, 0.8), l0:V(-0.5, 1.7, D/2), l1:V(0, 1.6, D/2 + 2) },
-  // 60–70 walk the hallway
-  { d:10, p0:V(0, 1.65, 2.6),  p1:V(0, 1.65, hallZ1 - 3.2), l0:V(0, 1.6, hallZ1), l1:V(0, 1.72, hallZ1) },
-  // 70–76 hold on Room 02
-  { d:6,  p0:V(0, 1.72, hallZ1 - 3.0), p1:V(0, 1.75, hallZ1 - 2.4), l0:V(0, 1.75, hallZ1), l1:V(0, 1.75, hallZ1) },
+  // ROOM 01
+  { d:5, p0:V(0, 3.0, -2.2), p1:V(0, 2.1, -1.9),  l0:V(0, MOON_Y, BACK), l1:V(0, 1.75, BACK) },               // hook: Moon hub → shabti
+  { d:5, p0:V(0, 1.9, -1.4), p1:V(0, 2.0, -2.9),  l0:V(0, 1.65, BACK), l1:V(0, 2.05, BACK) },                 // push in on the shabti
+  { d:5, p0:V(2.2, 2.2, -2.2), p1:V(2.6, 2.8, -2.8), l0:V(3.45, 3.9, -4.1), l1:V(3.45, 3.4, -4.1) },          // papyrus column capital
+  { d:5, p0:V(-2.3, 1.75, -1.6), p1:V(-2.9, 1.7, -2.05), l0:V(-4.5, 1.65, -2.2), l1:V(-4.5, 1.65, -2.125) },  // Thoth as the ibis
+  { d:5, p0:V(-2.3, 1.75, 2.6), p1:V(-2.9, 1.7, 2.2),  l0:V(-4.5, 1.65, 2.05), l1:V(-4.5, 1.65, 2.125) },     // Ma'at
+  { d:5, p0:V(2.3, 1.75, -2.6), p1:V(2.9, 1.7, -2.2),  l0:V(4.5, 1.65, -2.05), l1:V(4.5, 1.65, -2.125) },     // ibis with feather
+  { d:5, p0:V(2.3, 1.75, 1.6),  p1:V(2.9, 1.7, 2.05),  l0:V(4.5, 1.65, 2.2), l1:V(4.5, 1.65, 2.125) },        // Ramesses IX ostracon
+  { d:6, p0:V(3.6, 3.6, 3.9),  p1:V(2.6, 3.2, 3.6),  l0:V(-0.6, 1.6, BACK), l1:V(0, 1.9, BACK) },             // the whole room
+  { d:5, p0:V(0, 1.7, 1.0),    p1:V(0, 1.8, 2.2),    l0:V(0, 2.6, D/2), l1:V(0, 3.2, D/2) },                  // exit: winged sun over the door
+  // THE HALL
+  { d:7, p0:V(0, 1.65, 5.2),   p1:V(0, 1.65, 8.4),   l0:V(0, 2.2, hallZ1), l1:V(0, 2.3, hallZ1) },           // walk to the junction, signs
+  { d:6, p0:V(0.3, 1.65, BZ),  p1:V(4.4, 1.65, BZ),  l0:V(HALL_W/2 + BL, 1.6, BZ), l1:V(HALL_W/2 + BL, 1.75, BZ) }, // side hall to Room 03
+  { d:5, p0:V(0, 1.65, 12.5),  p1:V(0, 1.65, 16.3),  l0:V(0, 2.2, hallZ1), l1:V(0, 2.4, hallZ1 + 6) },        // on to the Moon Room
+  // ROOM 02 · THE MOONS
+  { d:7, p0:V(0, 1.7, R2Z0 + 0.5), p1:V(0, 2.1, R2Z0 + 1.7), l0:V(0, 1.4, R2Z1), l1:V(0, 1.2, R2Z1 - 2) },     // reveal
+  { d:6, p0:V(1.2, 0.75, R2C - 3.2), p1:V(0.4, 0.65, R2C - 2.6), l0:V(0, 0.2, R2C + 1), l1:V(0, 0.25, R2C + 2.5) }, // the pool
+  { d:7, p0:V(-1.8, 1.75, R2Z0 + 1.7), p1:V(-1.8, 1.75, R2Z0 + 9.3), l0:V(-4.5, 1.65, R2Z0 + 2.5), l1:V(-4.5, 1.65, R2Z0 + 8.5) }, // Europa · Mimas · Enceladus
+  { d:7, p0:V(1.8, 1.75, R2Z0 + 9.3), p1:V(1.8, 1.75, R2Z0 + 1.7), l0:V(4.5, 1.65, R2Z0 + 8.5), l1:V(4.5, 1.65, R2Z0 + 2.5) },    // Ganymede · Io · Titan
+  { d:6, p0:V(0, 1.9, R2Z1 - 3.0), p1:V(0, 1.9, R2Z1 - 1.9), l0:V(0, 1.85, R2Z1), l1:V(0, 1.85, R2Z1) },      // Luna between the columns
+  { d:4, p0:V(-2.6, 1.4, R2Z0 + 2.1), p1:V(-2.9, 1.3, R2Z0 + 1.7), l0:V(-3.75, 1.05, R2Z0 + 0.85), l1:V(-3.75, 1.05, R2Z0 + 0.85) }, // bonsai
+  { d:7, p0:V(0, 1.6, R2C - 2), p1:V(0, 3.2, R2C - 1), l0:V(0, 4, R2C + 0.5), l1:V(0.6, 15, R2C + 1.2) },     // rise to the Moon overhead
 ];
 const TOUR_LEN = SHOTS.reduce((a, s) => a + s.d, 0);
 const ease = x => x < 0.5 ? 2*x*x : 1 - Math.pow(-2*x + 2, 2)/2;
@@ -863,8 +885,10 @@ function tourCamera(t) {
   }
 }
 let tourFrame = 0;
+// recording loop runs on a message channel, not requestAnimationFrame, so it keeps going if the tab loses focus
+const tourTick = new MessageChannel(); tourTick.port1.onmessage = () => step();
 const TOUR_FRAMES = Math.round(TOUR_LEN * FPS);
-const RECV = 'http://127.0.0.1:8766/frame/';
+const RECV = `http://127.0.0.1:${QS.get('port') || 8766}/frame/`;
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 // deep link: ?room=2 starts the visit inside the Moon Room, facing Luna
@@ -925,11 +949,12 @@ function step() {
     catch (e) { document.title = 'TOUR ERROR ' + e; return; }
     tourFrame++;
     document.title = `TOUR ${tourFrame}/${TOUR_FRAMES}`;
-    if (tourFrame < TOUR_FRAMES) requestAnimationFrame(step); else document.title = 'TOUR DONE';
+    if (tourFrame < TOUR_FRAMES) tourTick.port2.postMessage(0); else document.title = 'TOUR DONE';
   }, 'image/jpeg', 0.93);
 }
 if (TOUR) {
   if (QS.has('preview')) tourFrame = Math.round(Number(QS.get('preview')) * FPS);
+  if (QS.has('start')) tourFrame = Number(QS.get('start'));   // resume a recording that was interrupted
   // record only after every texture has arrived, so no frame shows a blank wall
   THREE.DefaultLoadingManager.onLoad = () => setTimeout(step, 500);
 } else step();
