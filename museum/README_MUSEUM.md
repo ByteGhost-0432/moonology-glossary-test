@@ -1,4 +1,4 @@
-# The Moon Museum — build notes (kept for future resale)
+# The Moonology Art Gallery Museum — build notes (kept for future resale)
 
 **What it is:** a walk-through Art Deco / Egyptian Revival gallery that runs in any modern browser.
 One HTML file (`index.html`) + an `assets/` folder. No build step, no server code, no accounts.

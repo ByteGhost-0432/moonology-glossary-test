@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Moonology Museum · Room 01</title>
+<title>Moonology Art Gallery Museum</title>
 <style>
   :root { --bg:#050505; --gold:#c9a45c; --ink:#f2ede3; --dim:#8c8476; }
   html,body { margin:0; height:100%; background:var(--bg); overflow:hidden;
@@ -30,7 +30,7 @@
   @media (max-width: 600px) { #title { font-size:10px; letter-spacing:.18em; } #help { display:none; } }
   #enter { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center;
     justify-content:center; background:rgba(5,5,5,.92); cursor:pointer; text-align:center; padding:16px; }
-  #enter h1 { font-weight:500; letter-spacing:.32em; font-size:clamp(18px,4vw,34px); margin:0 0 8px; }
+  #enter h1 { font-weight:500; letter-spacing:.2em; font-size:clamp(17px,3.4vw,32px); margin:0 0 8px; line-height:1.35; max-width:22em; }
   #enter h1 span { color:var(--gold); }
   #enter p { color:var(--dim); letter-spacing:.2em; font-size:12px; text-transform:uppercase; margin:6px 0; }
   #enter .rule { width:120px; height:1px; background:var(--gold); margin:14px 0; }
@@ -42,8 +42,8 @@
 </head>
 <body>
 <div id="enter">
-  <p>Moonology Art Gallery</p>
-  <h1>THE <span>MOON</span> MUSEUM</h1>
+  <p>Welcome to</p>
+  <h1>THE <span>MOONOLOGY ART GALLERY</span> MUSEUM</h1>
   <div class="rule"></div>
   <p>Room 01 · The Shabti of Amenhotep III</p>
   <p style="margin-top:22px;color:#33ff66;text-shadow:0 0 10px rgba(51,255,102,.6)">Click to enter</p>
@@ -396,7 +396,7 @@ const BZ = hallZ0 + 5.5;   // where the side halls branch off
   g.textAlign = 'center';
   g.fillStyle = '#33ff66'; g.font = '400 30px Futura, "Century Gothic", sans-serif'; g.fillText('R O O M   0 2', 512, 170);
   g.fillStyle = '#f2ede3'; g.font = '500 72px Futura, "Century Gothic", sans-serif'; g.fillText('The Moons', 512, 270);
-  g.fillStyle = '#8c8476'; g.font = '400 28px Futura, "Century Gothic", sans-serif'; g.fillText('The Moon Museum  ·  As above, so below.', 512, 370);
+  g.fillStyle = '#8c8476'; g.font = '400 28px Futura, "Century Gothic", sans-serif'; g.fillText('Moonology Art Gallery Museum  ·  As above, so below.', 512, 370);
   const st = new THREE.CanvasTexture(c); st.colorSpace = THREE.SRGBColorSpace;
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.5), new THREE.MeshStandardMaterial({ map:st, roughness:0.6 }));
   sign.position.set(0, R2_DOOR_H + 0.55, hallZ1 - 0.02); sign.rotation.y = Math.PI; scene.add(sign);
@@ -684,8 +684,8 @@ for (const side of [-1, 1]) {
 }
 // walking toward Room 02, screen-left is +x: Room 03 sits on the +x side, Room 04 on the -x side
 hangingSign([['←', 'Room 03 · soon', '', false], ['', 'Room 02 · The Moons  ↑', '', false], ['', 'Room 04 · soon', '→', false]],
-            [['', 'Room 01 · The Shabti  ↑', '', false], ['', 'The Moon Museum', '', true]], 0, 2.55, BZ - 2.1);
-hangingSign([['', 'Room 02 · The Moons  ↑', '', false], ['', 'The Moon Museum', '', true]],
+            [['', 'Room 01 · The Shabti  ↑', '', false], ['', 'Moonology Art Gallery Museum', '', true]], 0, 2.55, BZ - 2.1);
+hangingSign([['', 'Room 02 · The Moons  ↑', '', false], ['', 'Moonology Art Gallery Museum', '', true]],
             [['←', 'Room 04 · soon', '', false], ['', 'Room 01 · The Shabti  ↑', '', false], ['', 'Room 03 · soon', '→', false]], 0, 2.55, BZ + 2.1);
 
 // ---- side halls to Rooms 03 and 04 (sealed doors, ready for the next rooms)
