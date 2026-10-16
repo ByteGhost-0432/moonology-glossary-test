@@ -18,6 +18,12 @@
     background:rgba(8,8,7,.86); border:1px solid #c9a45c; box-shadow:0 0 0 1px rgba(51,255,102,.25), 0 0 18px rgba(51,255,102,.18);
     font-size:13px; line-height:1.6; color:#cfc7b8; opacity:0; transform:translateY(-6px); transition:.35s; pointer-events:none; }
   #label.show { opacity:1; transform:none; }
+  #label.chip { padding:9px 14px; cursor:pointer; max-height:none; overflow:hidden; }
+  #label .chipline { display:flex; flex-direction:column; gap:2px; }
+  #label .chipline .ct { color:#f2ede3; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:min(320px, calc(100vw - 64px)); }
+  #label .chipline .tap { color:#33ff66; font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  #label .x { float:right; margin:-6px -6px 0 10px; width:34px; height:34px; border:1px solid #c9a45c; background:transparent;
+    color:#c9a45c; font-size:20px; line-height:1; cursor:pointer; border-radius:50%; }
   #label .k { color:#33ff66; letter-spacing:.22em; font-size:11px; text-transform:uppercase; }
   #label .watch { display:inline-block; margin-top:10px; padding:8px 14px; border:1px solid #33ff66; color:#33ff66;
     text-decoration:none; letter-spacing:.14em; font-size:12px; text-transform:uppercase; box-shadow:0 0 10px rgba(51,255,102,.3); }
@@ -1356,7 +1362,7 @@ for (const s of [-1, 1]) {
 
 // ---- the elevator's state, and its sound (all synthesised here: no recordings, nothing licensed)
 const elev = { cabY: 0, floor: 0, target: 0, door: 0, state: 'closed', timer: 0, moveT: 0, fromY: 0, called: -1 };
-let ELEV_BUF = null, elevSrc = null, musicWant = false, AC = null, master = null, musicGain = null, humGain = null, musicOn = false, nextStep = 0, stepIdx = 0;
+let ELEV_LOOP = [0, 31.0], ELEV_BUF = null, elevSrc = null, musicWant = false, AC = null, master = null, musicGain = null, humGain = null, musicOn = false, nextStep = 0, stepIdx = 0;
 function audio() {
   if (TOUR) return null;
   if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)();
@@ -1372,7 +1378,14 @@ function audio() {
     // 10/16 HIS CALL: the elevator plays HIS museum-Short music, calm_beatv2 — a seamless 31.0 s loop
     // (3.0 s equal-power blend, the same fix as the Short's loop dip on 10/13). Decoded once, looped gapless.
     fetch('assets/elevator_calm_beatv2_loop31.m4a').then(r => r.arrayBuffer()).then(b => AC.decodeAudioData(b))
-      .then(d => { ELEV_BUF = d; if (musicWant) music(true); }).catch(() => {});
+      .then(d => {
+        // 🔴 10/16 HE HEARD A SKIP ON EVERY LOOP. AAC carries encoder silence: the file decodes to 31.019 s, not
+        // 31.000 (≈19 ms padding at the tail), and some browsers also keep ≈21 ms of priming at the head. Looping
+        // the whole buffer plays that gap every 31 s. Loop EXACTLY the music: find where it starts, take 31.000 s.
+        const c0 = d.getChannelData(0), c1 = d.numberOfChannels > 1 ? d.getChannelData(1) : c0;
+        let i = 0; while (i < d.length && Math.abs(c0[i]) < 1e-4 && Math.abs(c1[i]) < 1e-4) i++;
+        ELEV_LOOP = [i/d.sampleRate, Math.min(d.duration, i/d.sampleRate + 31.0)];
+        ELEV_BUF = d; if (musicWant) music(true); }).catch(() => {});
   } catch (e) { AC = null; } }
   if (AC && AC.state === 'suspended') AC.resume();
   return AC;
@@ -1421,7 +1434,8 @@ function music(on) {
   if (!audio()) return;
   if (on && !elevSrc && ELEV_BUF) {
     elevSrc = AC.createBufferSource(); elevSrc.buffer = ELEV_BUF; elevSrc.loop = true;
-    elevSrc.connect(musicGain); elevSrc.start(); musicOn = true;
+    elevSrc.loopStart = ELEV_LOOP[0]; elevSrc.loopEnd = ELEV_LOOP[1];      // sample-exact, no encoder silence
+    elevSrc.connect(musicGain); elevSrc.start(0, ELEV_LOOP[0]); musicOn = true;
   }
   musicGain.gain.cancelScheduledValues(AC.currentTime);
   musicGain.gain.setTargetAtTime(on ? 0.8 : 0, AC.currentTime, on ? 0.6 : 0.9);
@@ -1516,17 +1530,32 @@ const KEY_BY_TITLE = { 'Shabti of Amenhotep III':'shabti', 'Inlay depicting Thot
   'Ostracon depicting Ramesses IX offering Maat, attributed to the chief draftsman Amenhotep':'ostracon_ramesses',
   'Luna':'luna', 'Europa':'europa', 'Mimas':'mimas', 'Enceladus':'enceladus', 'Titan':'titan', 'Io':'io', 'Ganymede':'ganymede' };
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+// 10/16 HIS PHONE TEST: "card stays in the way while walking" → near a piece you get a one-line TAG;
+// tap/click it for the full card (× closes it). Walking on folds it back. Clicking a piece opens it directly.
+let expanded = false, shownKey = '';
 function showLabel(ex) {
-  if (ex === shown) return; shown = ex;
-  if (!ex) { label.classList.remove('show'); return; }
-  label.innerHTML = `<div class="k">${ex.info.k}</div><div class="t">${ex.info.t}</div>` + ex.info.lines.map(l => `<div>${l}</div>`).join('')
+  if (ex !== shown && ex !== pinned) expanded = false;
+  const full = !!ex && (expanded || ex === pinned);
+  const key = ex ? (full ? 'f' : 'c') : '';
+  if (ex === shown && key === shownKey) return; shown = ex; shownKey = key;
+  if (!ex) { label.classList.remove('show', 'chip'); return; }
+  if (!full) {
+    label.innerHTML = `<div class="chipline"><span class="k">${ex.info.k}</span><span class="ct">${esc(ex.info.t)}</span><span class="tap">ⓘ ${IS_TOUCH ? 'Tap' : 'Click'} for the card</span></div>`;
+    label.classList.add('show', 'chip'); label.style.pointerEvents = 'auto'; return;
+  }
+  label.classList.remove('chip');
+  label.innerHTML = `<button class="x" type="button" aria-label="Close the card">×</button><div class="k">${ex.info.k}</div><div class="t">${ex.info.t}</div>` + ex.info.lines.map(l => `<div>${l}</div>`).join('')
     + (ex.info.watch ? `<a class="watch" href="${ex.info.watch}" target="_blank" rel="noopener">▶ Watch the hour</a>` : '');
   const st = STORIES[KEY_BY_TITLE[ex.info.t]];
   if (st) label.innerHTML += `<details><summary>📖 The story</summary><div class="story">${esc(st.story)}</div>`
     + `<div class="more">Read more${st.readMore.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">→ ${esc(l.label)}</a>`).join('')}</div></details>`;
-  label.style.pointerEvents = (ex.info.watch || st) ? 'auto' : 'none';
+  label.style.pointerEvents = 'auto';
   label.classList.add('show');
 }
+label.addEventListener('click', e => {
+  if (e.target.closest('.x')) { expanded = false; pinned = null; shownKey = ''; return; }   // key change alone forces the redraw
+  if (label.classList.contains('chip')) { expanded = true; shownKey = ''; }
+});
 const ray = new THREE.Raycaster();
 let labelPinned = false;
 renderer.domElement.addEventListener('click', e => {
