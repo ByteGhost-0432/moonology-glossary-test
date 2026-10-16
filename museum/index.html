@@ -34,6 +34,9 @@
   @media (pointer: coarse) { #walk { display:flex; } #help { display:none; } }
   #title { white-space:nowrap; }
   @media (max-width: 600px) { #title { font-size:10px; letter-spacing:.18em; } #help { display:none; } }
+  #act { position:fixed; left:50%; bottom:72px; transform:translateX(-50%); display:none; padding:12px 20px;
+    background:rgba(8,8,7,.86); border:1px solid #c9a45c; color:#33ff66; letter-spacing:.14em; font:500 13px Futura, sans-serif;
+    text-transform:uppercase; box-shadow:0 0 14px rgba(51,255,102,.3); cursor:pointer; max-width:calc(100vw - 32px); }
   #enter { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center;
     justify-content:center; background:rgba(5,5,5,.92); cursor:pointer; text-align:center; padding:16px; }
   #enter h1 { font-weight:500; letter-spacing:.2em; font-size:clamp(17px,3.4vw,32px); margin:0 0 8px; line-height:1.35; max-width:22em; }
@@ -55,10 +58,11 @@
   <p style="margin-top:22px;color:#33ff66;text-shadow:0 0 10px rgba(51,255,102,.6)">Click to enter</p>
 </div>
 <div id="label"></div>
+<button id="act" type="button"></button>
 <div id="walk"><button data-d="1" aria-label="Walk forward">▲</button><button data-d="-1" aria-label="Walk back">▼</button></div>
 <div id="hud">
   <div id="title">Moonology Art Gallery · <b>Room 01</b></div>
-  <div id="help">Drag to look · W A S D or arrows to walk</div>
+  <div id="help">Drag to look · W A S D or arrows to walk · E to use the elevator</div>
 </div>
 <script type="module">
 import * as THREE from 'three';
@@ -459,10 +463,10 @@ function hang(file, ar, x, z, ry, info, maxH = 1.4, maxW = 1.55, y = 1.65) {
   const lt = new THREE.CanvasTexture(c); lt.colorSpace = THREE.SRGBColorSpace;
   const lab = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.125), new THREE.MeshStandardMaterial({ map:lt, roughness:0.6 }));
   lab.position.set(0, -h/2 - 0.3, 0.02); g.add(lab);
-  if (!IS_TOUCH) {
+  if (!IS_TOUCH && !info.noSpot) {
     const sp = new THREE.SpotLight(0xffe2b0, 14, 6, Math.PI/12, 0.7, 1.6);
     const wp = new THREE.Vector3(0, 1.4, 1.8).applyAxisAngle(new THREE.Vector3(0, 1, 0), ry).add(g.position);
-    sp.position.set(wp.x, 3.9, wp.z); sp.target = box; scene.add(sp);
+    sp.position.set(wp.x, y + 2.25, wp.z); sp.target = box; scene.add(sp);
   }
   exhibits.push({ pos: g.position.clone(), mesh: g, info });   // the whole piece (frame, picture, label) opens its card
 }
@@ -557,7 +561,7 @@ const ebony = new THREE.MeshStandardMaterial({ color:0x15120e, roughness:0.45, m
 const lapis = new THREE.MeshStandardMaterial({ color:0x1d3f6e, roughness:0.4, metalness:0.3 });
 
 // papyrus column: square plinth, tapered black shaft bound with gold, open bell capital, abacus
-function papyrusColumn(x, z, h = 4.2) {
+function papyrusColumn(x, z, h = 4.2, y0 = 0, lvl = 0) {
   const g = new THREE.Group();
   const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.5), ebony); plinth.position.y = 0.09; g.add(plinth);
   const ph = h - 0.18 - 0.62 - 0.08;
@@ -573,8 +577,8 @@ function papyrusColumn(x, z, h = 4.2) {
   const prof = [[0.15, 0], [0.18, 0.12], [0.26, 0.34], [0.33, 0.52], [0.35, 0.6], [0.0, 0.62]].map(([r, y]) => new THREE.Vector2(r, y));
   const cap = new THREE.Mesh(new THREE.LatheGeometry(prof, 32), goldMat); cap.position.y = 0.18 + ph; g.add(cap);
   const abacus = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.08, 0.42), ebony); abacus.position.y = h - 0.04; g.add(abacus);
-  g.position.set(x, 0, z); scene.add(g);
-  obstacles.push({ x, z, r: 0.45 });
+  g.position.set(x, y0, z); scene.add(g);
+  obstacles.push({ x, z, r: 0.45, lvl });
 }
 
 // winged sun disk: gold disk, lapis wings in stepped Deco feather bands, a thin green line beneath
@@ -681,7 +685,7 @@ torch(-1.5, 2.55, D/2 - 0.02, Math.PI, 4);   // flank the exit so the entrance w
 torch( 1.5, 2.55, D/2 - 0.02, Math.PI, 4);
 bonsai(-3.7, D/2 - 0.75, 1, 3);
 bonsai( 3.7, D/2 - 0.75, 1, 7);
-wallSign([['', 'THE HALL', '', false], ['', 'Room 02 · The Moons', '↑', false], ['', 'Rooms 03 · 04 · coming soon', '', true]],
+wallSign([['', 'THE HALL', '', false], ['', 'Room 02 · The Moons', '↑', false], ['', "Room 03 · Hall of Ma'at · Room 04 soon", '', true]],
          -2.1, 1.75, D/2 - 0.03, Math.PI, 1.05, 0.4);
 
 // ---- the hall: lotus frieze above the rail, two hanging signs either side of the junction
@@ -691,10 +695,10 @@ for (const side of [-1, 1]) {
   frieze(segB2, side*(HALL_W/2 - 0.015), 3.25, hallZ1 - segB2/2, -side*Math.PI/2);
 }
 // walking toward Room 02, screen-left is +x: Room 03 sits on the +x side, Room 04 on the -x side
-hangingSign([['←', 'Room 03 · soon', '', false], ['', 'Room 02 · The Moons  ↑', '', false], ['', 'Room 04 · soon', '→', false]],
+hangingSign([['←', "Room 03 · Hall of Ma'at", '', false], ['', 'Room 02 · The Moons  ↑', '', false], ['', 'Room 04 · soon', '→', false]],
             [['', 'Room 01 · The Shabti  ↑', '', false], ['', 'Moonology Art Gallery Museum', '', true]], 0, 2.55, BZ - 2.1);
 hangingSign([['', 'Room 02 · The Moons  ↑', '', false], ['', 'Moonology Art Gallery Museum', '', true]],
-            [['←', 'Room 04 · soon', '', false], ['', 'Room 01 · The Shabti  ↑', '', false], ['', 'Room 03 · soon', '→', false]], 0, 2.55, BZ + 2.1);
+            [['←', 'Room 04 · soon', '', false], ['', 'Room 01 · The Shabti  ↑', '', false], ['', "Room 03 · Hall of Ma'at", '→', false]], 0, 2.55, BZ + 2.1);
 
 // ---- side halls to Rooms 03 and 04 (sealed doors, ready for the next rooms)
 for (const side of [1, -1]) {
@@ -705,7 +709,7 @@ for (const side of [1, -1]) {
   const ce = new THREE.Mesh(new THREE.PlaneGeometry(BL, BCW), cMat); ce.rotation.x = Math.PI/2; ce.position.set(xm, BCH, BZ); scene.add(ce);
   wall(BL, BCH, xm, BCH/2, BZ - BCW/2, 0);
   wall(BL, BCH, xm, BCH/2, BZ + BCW/2, Math.PI);
-  wall(BCW, BCH, x1, BCH/2, BZ, -side*Math.PI/2);
+  if (side < 0) wall(BCW, BCH, x1, BCH/2, BZ, -side*Math.PI/2);   // +x runs on into the cactus gallery (10/16)
   // close the gap between the corridor height and the main hall height at the opening
   const lint = new THREE.Mesh(new THREE.PlaneGeometry(BW, HALL_H - BCH), wallMat);
   lint.position.set(x0 + side*0.005, BCH + (HALL_H - BCH)/2, BZ); lint.rotation.y = -side*Math.PI/2; scene.add(lint);
@@ -713,6 +717,7 @@ for (const side of [1, -1]) {
     const cove = new THREE.Mesh(new THREE.PlaneGeometry(BL, 0.012), neon);
     cove.position.set(xm, 0.06, zz); cove.rotation.y = zz < BZ ? 0 : Math.PI; scene.add(cove);
   }
+  if (side < 0) {
   // the sealed door: ebony leaves, gold frame, green seam of light, a sign and a winged sun above
   const door = new THREE.Group();
   const leaf = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.4, 0.06), ebony); leaf.position.y = 1.2; door.add(leaf);
@@ -722,6 +727,7 @@ for (const side of [1, -1]) {
   door.position.set(x1 - side*0.04, 0, BZ); door.rotation.y = -side*Math.PI/2; scene.add(door);
   wingedSun(x1 - side*0.05, 2.72, BZ, -side*Math.PI/2, 0.8);
   wallSign([['', `ROOM ${room}`, '', false], ['', 'Coming soon', '', true]], x1 - side*0.05, 1.55, BZ, -side*Math.PI/2, 0.7, 0.27);
+  }
   const bl = new THREE.PointLight(0xffd59a, 7, 4.5, 1.6); bl.position.set(x1 - side*1.6, BCH - 0.3, BZ); scene.add(bl);
   const bl2 = new THREE.PointLight(0xffd59a, 7, 4.2, 1.6); bl2.position.set(x0 + side*1.4, BCH - 0.3, BZ); scene.add(bl2);
   // the opening reads as a doorway: gold surround + green neon, seen from the main hall
@@ -733,7 +739,7 @@ for (const side of [1, -1]) {
   sur.position.set(x0 - side*0.014, (BH + 0.12)/2, BZ); sur.rotation.y = -side*Math.PI/2; scene.add(sur);
   frieze(BL, xm, 2.6, BZ - BCW/2 + 0.015, 0);
   frieze(BL, xm, 2.6, BZ + BCW/2 - 0.015, Math.PI);
-  bonsai(x1 - side*0.75, BZ - BCW/2 + 0.45, 0.8, side > 0 ? 11 : 13);
+  if (side < 0) bonsai(x1 - side*0.75, BZ - BCW/2 + 0.45, 0.8, 13);
 }
 
 // ---- Room 02: columns flank Luna, a winged sun over the door, bonsai in the corners, a way back
@@ -774,6 +780,613 @@ const moon2 = new THREE.Mesh(new THREE.SphereGeometry(1.5, 64, 48), new THREE.Me
 moon2.position.set(0.6, 15, R2C + 1.2); scene.add(moon2);
 const moon2Key = new THREE.SpotLight(0xfff4e0, 60, 13, Math.PI/14, 0.3, 1.2);
 moon2Key.position.set(0.2, 5.5, R2C - 1.5);   // from below, so a visitor looking up sees the lit face moon2Key.target = moon2; scene.add(moon2Key);
+
+
+// ======================================================================================
+// 2026-10-16 · HIS LAYOUT: walk the decorated +x side hall into the AFRICAN CACTUS & SUCCULENT
+// GALLERY, call an Art Deco ELEVATOR (security camera watching, blinking light, elevator music),
+// ride down, and the doors open on ROOM 03 · THE HALL OF MA'AT on the lower level.
+// ======================================================================================
+const GX0 = HALL_W/2 + BL, GL = 14, GX1 = GX0 + GL, GW = 5, GH = 4.0, GC = GX0 + GL/2;
+const BASE = -8;                                   // lower-level floor
+const EW = 1.4, EH = 2.4, CAB_D = 2.0, CAB_W = 2.0, CAB_H = 2.7;
+const R3X0 = GX1 - 11, R3W = 9, R3H = 4.6, R3C = (R3X0 + GX1)/2;
+const blinkers = [];                               // red LEDs: {m, rate, phase}
+const secCams = [];                                // pivots that follow the visitor
+
+// ---- the gallery box
+{
+  const f = decoFloorTexture(); f.repeat.set(GL/4, GW/4);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(GL, GW), new THREE.MeshStandardMaterial({ map:f, roughness:0.3, metalness:0.1 }));
+  fl.rotation.x = -Math.PI/2; fl.position.set(GC, 0.003, BZ); fl.receiveShadow = true; scene.add(fl);
+  const ce = new THREE.Mesh(new THREE.PlaneGeometry(GL, GW), cMat); ce.rotation.x = Math.PI/2; ce.position.set(GC, GH, BZ); scene.add(ce);
+  wall(GL, GH, GC, GH/2, BZ - GW/2, 0);
+  wall(GL, GH, GC, GH/2, BZ + GW/2, Math.PI);
+  const sd = (GW - BCW)/2;                         // entrance wall around the corridor mouth
+  wall(sd, GH, GX0, GH/2, BZ - BCW/2 - sd/2, Math.PI/2);
+  wall(sd, GH, GX0, GH/2, BZ + BCW/2 + sd/2, Math.PI/2);
+  wall(BCW, GH - BCH, GX0, BCH + (GH - BCH)/2, BZ, Math.PI/2);
+  for (const zz of [BZ - GW/2 + 0.02, BZ + GW/2 - 0.02]) {
+    const cove = new THREE.Mesh(new THREE.PlaneGeometry(GL, 0.012), neon);
+    cove.position.set(GC, 0.06, zz); cove.rotation.y = zz < BZ ? 0 : Math.PI; scene.add(cove);
+  }
+  frieze(GL, GC, 3.4, BZ - GW/2 + 0.015, 0);
+  frieze(GL, GC, 3.4, BZ + GW/2 - 0.015, Math.PI);
+  for (const x of [GX0 + 3.2, GX1 - 3.6]) { const l = new THREE.PointLight(0xffd59a, 7, 6, 1.6); l.position.set(x, GH - 0.3, BZ); scene.add(l); }
+  torch(GC, 2.7, BZ - GW/2 + 0.02, 0, 3.5);
+  torch(GC, 2.7, BZ + GW/2 - 0.02, Math.PI, 3.5);
+  wallSign([['', 'THE CACTUS', '', false], ['', '& Succulent Gallery', '', false], ['', 'Africa · the Americas · elevator ahead', '→', true]],
+           HALL_W/2 + 1.6, 1.85, BZ - BCW/2 + 0.03, 0, 1.0, 0.375);
+}
+
+// ---- the plants: built here, named by us. The museum is global (his call 10/16): Africa AND the Americas.
+// Facts on every plaque checked 10/16 (Kew POWO / Britannica / IUCN-citing sources).
+const cm = (color, r = 0.75) => new THREE.MeshStandardMaterial({ color, roughness:r, flatShading:true });
+const CACT = { green:cm(0x4c6b3c), blue:cm(0x6f8a78, 0.7), grey:cm(0x7d8a6e, 0.8), dark:cm(0x2f4a2a),
+               bark:cm(0xb9ad8c, 0.9), spine:cm(0xe8dcc0, 0.6), sand:cm(0xc8ad7f, 1), flesh:cm(0x8e4a44, 0.6),
+               trail:cm(0x6f9a4a), berry:cm(0xf2efe6, 0.5) };
+const PTOP = 0.8;                                  // top of the sand in every planter
+function planter(g, w = 0.85) {
+  const base = new THREE.Mesh(new THREE.BoxGeometry(w - 0.1, 0.45, w - 0.1), ebony); base.position.y = 0.225; g.add(base);
+  const pot = new THREE.Mesh(new THREE.BoxGeometry(w, 0.3, w), ebony); pot.position.y = 0.6; g.add(pot);
+  const band = new THREE.Mesh(new THREE.BoxGeometry(w + 0.06, 0.04, w + 0.06), goldMat); band.position.y = 0.76; g.add(band);
+  const sand = new THREE.Mesh(new THREE.BoxGeometry(w - 0.06, 0.02, w - 0.06), CACT.sand); sand.position.y = PTOP; g.add(sand);
+}
+const cyl = (r0, r1, h, seg, mat) => new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, h, seg), mat);
+const PLANTS = {
+  candelabra(g) {                                   // Euphorbia ingens: ribbed arms rising from a short trunk
+    const t = cyl(0.07, 0.09, 0.5, 6, CACT.bark); t.position.y = PTOP + 0.25; g.add(t);
+    const mid = cyl(0.06, 0.07, 1.25, 5, CACT.green); mid.position.y = PTOP + 1.1; g.add(mid);
+    for (let i = 0; i < 6; i++) {
+      const a = i/6*Math.PI*2 + 0.3, r = 0.2 + (i % 2)*0.07, y = PTOP + 0.55 + (i % 3)*0.12, h = 0.7 + ((i*37) % 5)*0.08;
+      const elbow = new THREE.Mesh(new THREE.SphereGeometry(0.055, 6, 5), CACT.green);
+      elbow.position.set(Math.cos(a)*r*0.5, y, Math.sin(a)*r*0.5); g.add(elbow);
+      const arm = cyl(0.05, 0.055, r, 5, CACT.green); arm.position.set(Math.cos(a)*r*0.5, y, Math.sin(a)*r*0.5);
+      arm.rotation.set(0, -a, Math.PI/2); g.add(arm);
+      const col = cyl(0.045, 0.052, h, 5, CACT.green); col.position.set(Math.cos(a)*r, y + h/2, Math.sin(a)*r); g.add(col);
+      const tip = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.08, 5), CACT.green); tip.position.set(Math.cos(a)*r, y + h + 0.04, Math.sin(a)*r); g.add(tip);
+    }
+  },
+  cushion(g) {                                      // Euphorbia resinifera: a low cushion of four-angled stems
+    for (let i = 0; i < 46; i++) {
+      const a = i*2.399, rr = 0.32*Math.sqrt(i/46), h = 0.42 - rr*0.55;
+      const s = new THREE.Mesh(new THREE.BoxGeometry(0.05, h, 0.05), CACT.grey);
+      s.position.set(Math.cos(a)*rr, PTOP + h/2, Math.sin(a)*rr); s.rotation.y = Math.PI/4; g.add(s);
+    }
+  },
+  quiver(g) {                                       // Aloidendron dichotomum: pale trunk, forked branches, aloe rosettes
+    const tr = cyl(0.075, 0.12, 0.8, 10, CACT.bark); tr.position.y = PTOP + 0.4; g.add(tr);
+    const fork = (p, dir, len, depth) => {
+      const end = p.clone().addScaledVector(dir, len);
+      const mid = p.clone().lerp(end, 0.5);
+      const b = cyl(0.03 + depth*0.012, 0.035 + depth*0.014, len, 8, CACT.bark);
+      b.position.copy(mid); b.quaternion.setFromUnitVectors(V3(0, 1, 0), dir.clone().normalize()); g.add(b);
+      if (depth === 0) {
+        for (let k = 0; k < 14; k++) {
+          const a = k/14*Math.PI*2, up = 0.55 + (k % 3)*0.15;
+          const lf = new THREE.Mesh(new THREE.ConeGeometry(0.022, 0.24, 4), CACT.blue);
+          const d = V3(Math.cos(a)*(1 - up), up, Math.sin(a)*(1 - up)).normalize();
+          lf.position.copy(end).addScaledVector(d, 0.11); lf.quaternion.setFromUnitVectors(V3(0, 1, 0), d); g.add(lf);
+        }
+        return;
+      }
+      for (const s of [-1, 1]) {
+        const nd = dir.clone().applyAxisAngle(V3(0, 1, 0), s*0.9 + depth).applyAxisAngle(V3(1, 0, 0), s*0.28).normalize();
+        nd.y = Math.max(nd.y, 0.55); nd.normalize();
+        fork(end, nd, len*0.72, depth - 1);
+      }
+    };
+    fork(V3(0, PTOP + 0.8, 0), V3(0.15, 1, 0.05).normalize(), 0.4, 2);
+  },
+  pachy(g) {                                        // Pachypodium lamerei: swollen spiny trunk, a crown of strap leaves
+    const prof = [[0.0, 0], [0.11, 0], [0.13, 0.25], [0.11, 0.7], [0.085, 1.15], [0.07, 1.3], [0.0, 1.32]].map(([r, y]) => new THREE.Vector2(r, y));
+    const trunk = new THREE.Mesh(new THREE.LatheGeometry(prof, 14), CACT.bark); trunk.position.y = PTOP; g.add(trunk);
+    for (let i = 0; i < 90; i++) {
+      const y = 0.08 + (i/90)*1.15, a = i*0.9, r = 0.12 - (y/1.3)*0.04;
+      const sp = new THREE.Mesh(new THREE.ConeGeometry(0.008, 0.05, 4), CACT.spine);
+      const d = V3(Math.cos(a), 0.25, Math.sin(a)).normalize();
+      sp.position.set(Math.cos(a)*r, PTOP + y, Math.sin(a)*r); sp.quaternion.setFromUnitVectors(V3(0, 1, 0), d); g.add(sp);
+    }
+    for (let k = 0; k < 16; k++) {
+      const a = k/16*Math.PI*2, lf = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.42, 0.006), CACT.dark);
+      const d = V3(Math.cos(a)*0.55, 1, Math.sin(a)*0.55).normalize();
+      lf.position.set(Math.cos(a)*0.12, PTOP + 1.32 + d.y*0.18, Math.sin(a)*0.12); lf.quaternion.setFromUnitVectors(V3(0, 1, 0), d); g.add(lf);
+    }
+  },
+  hoodia(g) {                                       // Hoodia gordonii: a clump of ribbed stems and star-shaped flowers
+    for (let i = 0; i < 8; i++) {
+      const a = i*2.399, rr = 0.06 + (i % 4)*0.05, h = 0.32 + ((i*13) % 7)*0.05;
+      const s = cyl(0.04, 0.045, h, 10, CACT.grey); s.position.set(Math.cos(a)*rr, PTOP + h/2, Math.sin(a)*rr); g.add(s);
+      for (let k = 0; k < 6; k++) {
+        const ka = k/6*Math.PI*2 + i, sp = new THREE.Mesh(new THREE.ConeGeometry(0.006, 0.03, 4), CACT.spine);
+        sp.position.set(Math.cos(a)*rr + Math.cos(ka)*0.045, PTOP + h*(0.3 + (k % 3)*0.25), Math.sin(a)*rr + Math.sin(ka)*0.045);
+        sp.quaternion.setFromUnitVectors(V3(0, 1, 0), V3(Math.cos(ka), 0.3, Math.sin(ka)).normalize()); g.add(sp);
+      }
+      if (i % 3 === 0) {
+        const fl = new THREE.Mesh(new THREE.CircleGeometry(0.06, 5), CACT.flesh);
+        fl.position.set(Math.cos(a)*rr, PTOP + h + 0.01, Math.sin(a)*rr); fl.rotation.x = -Math.PI/2 + 0.4; g.add(fl);
+      }
+    }
+  },
+  saguaro(g) {                                     // Carnegiea gigantea: a ribbed column with two raised arms
+    const c = cyl(0.11, 0.12, 2.1, 14, CACT.green); c.position.y = PTOP + 1.05; g.add(c);
+    const top = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 7, 0, Math.PI*2, 0, Math.PI/2), CACT.green); top.position.y = PTOP + 2.1; g.add(top);
+    for (const [s, y, r, h] of [[-1, 0.95, 0.3, 0.75], [1, 1.25, 0.26, 0.55]]) {
+      const el = new THREE.CatmullRomCurve3([V3(0, PTOP + y, 0), V3(s*r*0.7, PTOP + y - 0.02, 0), V3(s*r, PTOP + y + 0.15, 0), V3(s*r, PTOP + y + h, 0)]);
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(el, 16, 0.075, 12), CACT.green));
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 6, 0, Math.PI*2, 0, Math.PI/2), CACT.green); cap.position.set(s*r, PTOP + y + h, 0); g.add(cap);
+    }
+  },
+  barrel(g) {                                       // Echinocactus grusonii: a ribbed golden-spined globe
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.3, 22, 12), CACT.green); b.scale.y = 0.82; b.position.y = PTOP + 0.22; g.add(b);
+    const gold = cm(0xe8c35a, 0.5);
+    for (let i = 0; i < 22; i++) for (let k = 1; k < 6; k++) {
+      const a = i/22*Math.PI*2, el = k/6*Math.PI*0.5, n = V3(Math.cos(a)*Math.cos(el), Math.sin(el)*0.82, Math.sin(a)*Math.cos(el)).normalize();
+      const sp = new THREE.Mesh(new THREE.ConeGeometry(0.006, 0.07, 3), gold);
+      sp.position.set(Math.cos(a)*Math.cos(el)*0.3, PTOP + 0.22 + Math.sin(el)*0.3*0.82, Math.sin(a)*Math.cos(el)*0.3);
+      sp.quaternion.setFromUnitVectors(V3(0, 1, 0), n); g.add(sp);
+    }
+    const crown = new THREE.Mesh(new THREE.CircleGeometry(0.06, 16), cm(0xf0e2b0, 1)); crown.rotation.x = -Math.PI/2; crown.position.y = PTOP + 0.47; g.add(crown);
+  },
+  oldman(g) {                                       // Cephalocereus senilis: a column hidden in long white hair
+    const c = cyl(0.085, 0.095, 1.5, 12, CACT.green); c.position.y = PTOP + 0.75; g.add(c);
+    const hair = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.125, 1.45, 18), new THREE.MeshStandardMaterial({ color:0xf1eee6, roughness:1, transparent:true, opacity:0.82 }));
+    hair.position.y = PTOP + 0.76; g.add(hair);
+    const hm = new THREE.LineBasicMaterial({ color:0xffffff, transparent:true, opacity:0.7 }), pts = [];
+    for (let i = 0; i < 260; i++) { const a = i*2.399, y = PTOP + 0.05 + (i/260)*1.45, r = 0.12;
+      pts.push(Math.cos(a)*r, y, Math.sin(a)*r, Math.cos(a + 0.4)*(r + 0.05), y - 0.09, Math.sin(a + 0.4)*(r + 0.05)); }
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); g.add(new THREE.LineSegments(geo, hm));
+  },
+  trailing(g) {                                     // Rhipsalis baccifera: pencil-thin strands spilling from a raised bowl
+    const stand = cyl(0.03, 0.03, 0.75, 8, goldMat); stand.position.y = PTOP + 0.375; g.add(stand);
+    const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.12, 0.14, 16), ebony); bowl.position.y = PTOP + 0.82; g.add(bowl);
+    for (let i = 0; i < 34; i++) {
+      const a = i*2.399, r0 = 0.15, drop = 0.45 + ((i*7) % 6)*0.08;
+      const p0 = V3(Math.cos(a)*r0*0.5, PTOP + 0.9, Math.sin(a)*r0*0.5);
+      const p1 = V3(Math.cos(a)*(r0 + 0.08), PTOP + 0.92, Math.sin(a)*(r0 + 0.08));
+      const p2 = V3(Math.cos(a)*(r0 + 0.13), PTOP + 0.9 - drop*0.6, Math.sin(a)*(r0 + 0.13));
+      const p3 = V3(Math.cos(a)*(r0 + 0.15), PTOP + 0.9 - drop, Math.sin(a)*(r0 + 0.15));
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([p0, p1, p2, p3]), 10, 0.006, 4), CACT.trail));
+      if (i % 3 === 0) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 4), CACT.berry); b.position.copy(p2); g.add(b); }
+    }
+  },
+};
+function plaqueCanvas(k, t, sub) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 160;
+  const q = c.getContext('2d'); q.fillStyle = '#0e0d0b'; q.fillRect(0, 0, 512, 160);
+  q.strokeStyle = '#c9a45c'; q.lineWidth = 3; q.strokeRect(6, 6, 500, 148);
+  q.fillStyle = '#c9a45c'; q.font = '400 19px Futura, sans-serif'; q.fillText(k.toUpperCase(), 22, 40);
+  q.fillStyle = '#f2ede3'; q.font = '500 30px Futura, sans-serif'; q.fillText(t, 22, 84);
+  q.fillStyle = '#33ff66'; q.font = 'italic 400 21px Futura, sans-serif'; q.fillText(sub, 22, 122);
+  const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx;
+}
+function specimen(kind, x, z, face, info) {        // face: +1 plaque toward +z, -1 toward -z
+  const g = new THREE.Group(); planter(g); PLANTS[kind](g);
+  const pl = new THREE.Mesh(new THREE.PlaneGeometry(0.64, 0.2), new THREE.MeshStandardMaterial({ map: plaqueCanvas(info.k, info.t, info.sp), roughness:0.6 }));
+  pl.position.set(0, 0.5, face*0.426); pl.rotation.y = face > 0 ? 0 : Math.PI; g.add(pl);
+  g.position.set(x, 0, z); scene.add(g);
+  if (!IS_TOUCH) {
+    const s = new THREE.SpotLight(0xffe7c2, 10, 5, Math.PI/9, 0.6, 1.5);
+    s.position.set(x, GH - 0.1, z + face*1.2); s.target.position.set(x, 1.3, z); scene.add(s, s.target);
+  }
+  obstacles.push({ x, z, r: 0.62 });
+  exhibits.push({ pos: V3(x, 1.2, z + face*0.6), mesh: g, info: { k: info.k, t: info.t, lines: info.lines } });
+}
+const SPEC = [
+  ['trailing',   'Gallery · No. 01', "Nut's Veil", 'Rhipsalis baccifera · mistletoe cactus', [
+    'Rhipsalis baccifera, the mistletoe cactus',
+    'Wild in tropical Africa, Madagascar and Sri Lanka, as well as the Americas',
+    'Britannica calls it the only Old World member of the cactus family: the one true cactus native to Africa.'] ],
+  ['candelabra', 'Gallery · No. 02', "Sah's Candelabra", 'Euphorbia ingens · candelabra tree', [
+    'Euphorbia ingens, the candelabra tree',
+    'Native range: Eritrea to South Africa (Kew, Plants of the World Online)',
+    'Not a cactus. A spurge that grew the same look on its own.'] ],
+  ['quiver',     'Gallery · No. 03', "Sopdet's Quiver", 'Aloidendron dichotomum · quiver tree', [
+    'Aloidendron dichotomum, the quiver tree',
+    "Native range: Namibia and South Africa's Northern Cape (Kew, POWO)",
+    'Not a cactus. An aloe that grows into a tree.'] ],
+  ['cushion',    'Gallery · No. 04', "Khonsu's Cushion", 'Euphorbia resinifera · resin spurge', [
+    'Euphorbia resinifera, the resin spurge',
+    'Native to Morocco, on the slopes of the Atlas Mountains',
+    'Not a cactus. A spurge that grows in low, wide cushions.'] ],
+  ['hoodia',     'Gallery · No. 05', 'The Imperishable Stars', 'Hoodia gordonii · named for its star flowers', [
+    'Hoodia gordonii',
+    "Native range: Namibia to South Africa's Free State (Kew, POWO)",
+    'Not a cactus. A member of the dogbane family, with star-shaped flowers.'] ],
+  ['pachy',      'Gallery · No. 06', 'The Duat Sentinel', 'Pachypodium lamerei · Madagascar palm', [
+    'Pachypodium lamerei, the Madagascar palm',
+    'Native range: south-central and southern Madagascar (Kew, POWO)',
+    'Not a palm and not a cactus. A spiny succulent of the dogbane family.'] ],
+  ['saguaro',    'Gallery · No. 07', 'The Pillar of Shu', 'Carnegiea gigantea · saguaro', [
+    'Carnegiea gigantea, the saguaro',
+    'Native range: southeastern California to southern Arizona and northwest Mexico (Kew, POWO)',
+    'A true cactus of the Sonoran Desert.'] ],
+  ['barrel',     'Gallery · No. 08', 'The Disk of Ra', 'Echinocactus grusonii · golden barrel', [
+    'Echinocactus grusonii, the golden barrel cactus',
+    'Native to central Mexico',
+    'A true cactus. Rare in the wild today, though common in gardens.'] ],
+  ['oldman',     'Gallery · No. 09', "Geb's Beard", 'Cephalocereus senilis · old man cactus', [
+    'Cephalocereus senilis, the old man cactus',
+    'Native to central-eastern Mexico, including Hidalgo',
+    'A true cactus. The white "hair" is a coat of long spines.'] ],
+];
+SPEC.forEach(([kind, k, t, sp, lines], i) => {
+  const left = i % 2 === 0, x = GX0 + 2.0 + Math.floor(i/2)*2.3;
+  specimen(kind, x, left ? BZ - GW/2 + 0.75 : BZ + GW/2 - 0.75, left ? 1 : -1, { k, t, sp, lines: ['Named by the Moonology Art Gallery', ...lines] });
+});
+
+// ---- the elevator: Art Deco doors, a needle dial, a brass call panel, a security camera that watches
+function sunburstCanvas() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 1756;
+  const q = c.getContext('2d'); q.fillStyle = '#0b0a08'; q.fillRect(0, 0, 1024, 1756);
+  q.strokeStyle = '#c9a45c';
+  for (let i = 0; i <= 26; i++) { const a = Math.PI*(i/26); q.lineWidth = i % 2 ? 3 : 7;
+    q.beginPath(); q.moveTo(512, 1180); q.lineTo(512 + Math.cos(a)*1100, 1180 - Math.sin(a)*1100); q.stroke(); }
+  q.fillStyle = '#0b0a08'; q.beginPath(); q.arc(512, 1180, 170, 0, Math.PI*2); q.fill();
+  q.lineWidth = 6; q.beginPath(); q.arc(512, 1180, 170, Math.PI, 0); q.stroke();
+  q.fillStyle = '#c9a45c'; q.beginPath(); q.arc(512, 1180, 110, Math.PI, 0); q.fill();
+  q.fillStyle = '#0b0a08'; q.fillRect(0, 1180, 1024, 576);
+  q.lineWidth = 5; for (let k = 0; k < 6; k++) { const y = 1250 + k*80; q.beginPath();      // chevrons below the horizon
+    for (let x = 0; x <= 1024; x += 128) q.lineTo(x, y + ((x/128) % 2 ? 40 : 0)); q.stroke(); }
+  q.lineWidth = 14; q.strokeRect(14, 14, 996, 1728); q.lineWidth = 4; q.strokeRect(40, 40, 944, 1676);
+  return c;
+}
+const SB = sunburstCanvas();
+function leafMat(half) {
+  const t = new THREE.CanvasTexture(SB); t.colorSpace = THREE.SRGBColorSpace; t.repeat.set(0.5, 1); t.offset.set(half*0.5, 0);
+  return new THREE.MeshStandardMaterial({ map:t, roughness:0.35, metalness:0.6 });
+}
+const LEAF = [leafMat(0), leafMat(1)];
+function doorPair(x, y0, z) {                      // two leaves, sliding apart along z
+  const L = [];
+  for (const s of [-1, 1]) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.04, EH, EW/2), [edge, LEAF[s < 0 ? 0 : 1], edge, edge, edge, edge]);
+    m.position.set(x, y0 + EH/2, z + s*EW/4); scene.add(m); L.push({ m, s, z0: z + s*EW/4 });
+  }
+  return L;
+}
+function dialCanvas() {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 288;
+  const q = c.getContext('2d'); q.fillStyle = '#0b0a08'; q.fillRect(0, 0, 512, 288);
+  q.strokeStyle = '#c9a45c'; q.lineWidth = 8; q.beginPath(); q.arc(256, 250, 210, Math.PI, 0); q.stroke();
+  q.lineWidth = 3; q.beginPath(); q.arc(256, 250, 180, Math.PI, 0); q.stroke();
+  q.fillStyle = '#f2ede3'; q.font = '500 46px Futura, sans-serif'; q.textAlign = 'center';
+  q.fillText('G', 256 + Math.cos(Math.PI*0.80)*150, 250 - Math.sin(Math.PI*0.80)*150 + 16);
+  q.fillText('B', 256 + Math.cos(Math.PI*0.20)*150, 250 - Math.sin(Math.PI*0.20)*150 + 16);
+  q.fillStyle = '#c9a45c'; q.font = '400 20px Futura, sans-serif'; q.fillText('LOWER LEVEL · ROOM 03', 256, 282);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const dialTex = dialCanvas(), needles = [], callLamps = [];
+function elevatorFront(y0, lvl) {                  // everything on the wall at x = GX1, facing -x, on one floor
+  const x = GX1 - 0.012, ry = -Math.PI/2;
+  for (const [w, h, zz, yy] of [[EW, 0.012, 0, EH], [0.012, EH, -EW/2, EH/2], [0.012, EH, EW/2, EH/2]]) {
+    const bar = new THREE.Mesh(new THREE.PlaneGeometry(w, h), neon); bar.position.set(x, y0 + yy, BZ + zz); bar.rotation.y = ry; scene.add(bar);
+  }
+  for (const [w, h] of [[EW + 0.24, EH + 0.14], [EW + 0.42, EH + 0.3]]) {          // stepped gold surround
+    const s = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(w, h)), new THREE.LineBasicMaterial({ color:0xc9a45c }));
+    s.position.set(x - 0.002, y0 + h/2, BZ); s.rotation.y = ry; scene.add(s);
+  }
+  const dial = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.45), new THREE.MeshStandardMaterial({ map:dialTex, roughness:0.5, emissive:0x111111 }));
+  dial.position.set(x - 0.004, y0 + EH + 0.48, BZ); dial.rotation.y = ry; scene.add(dial);
+  const piv = new THREE.Group(); piv.position.set(x - 0.01, y0 + EH + 0.3, BZ); piv.rotation.y = ry; scene.add(piv);
+  const nd = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.3, 0.006), goldMat); nd.position.y = 0.15; piv.add(nd);
+  const hub = new THREE.Mesh(new THREE.CircleGeometry(0.025, 16), goldMat); hub.position.z = 0.004; piv.add(hub);
+  needles.push(piv);
+  // brass call panel to the right of the doors, one round button that lights green when pressed
+  const pnl = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.36, 0.2), goldMat); pnl.position.set(x - 0.01, y0 + 1.15, BZ + EW/2 + 0.42); scene.add(pnl);
+  const btnMat = new THREE.MeshBasicMaterial({ color:0x1b2a1f, toneMapped:false });
+  const btn = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.025, 20), btnMat);
+  btn.rotation.z = Math.PI/2; btn.position.set(x - 0.03, y0 + 1.15, BZ + EW/2 + 0.42); scene.add(btn);
+  callLamps.push({ mat: btnMat, lvl });
+  wingedSun(x - 0.02, y0 + EH + 0.95, BZ, ry, 0.75);
+  // the security camera, high in the corner, panning to follow the visitor; red light blinking
+  const cam = new THREE.Group(); cam.position.set(GX1 - 0.25, y0 + (lvl ? R3H : GH) - 0.28, BZ - (lvl ? R3W : GW)/2 + 0.3); scene.add(cam);
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.2, 0.04), ebony); arm.position.y = 0.12; cam.add(arm);
+  const head = new THREE.Group(); cam.add(head);
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.12, 0.13), new THREE.MeshStandardMaterial({ color:0xd9d4c8, roughness:0.4, metalness:0.3 }));
+  body.position.x = -0.1; head.add(body);
+  const hood = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.015, 0.16), ebony); hood.position.set(-0.1, 0.07, 0); head.add(hood);
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.04, 16), new THREE.MeshStandardMaterial({ color:0x050505, roughness:0.1, metalness:0.9 }));
+  lens.rotation.z = Math.PI/2; lens.position.x = -0.27; head.add(lens);
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), new THREE.MeshBasicMaterial({ color:0xff2a2a, toneMapped:false }));
+  led.position.set(-0.2, 0.0, 0.07); head.add(led);
+  blinkers.push({ m: led, rate: 1.0, phase: lvl*0.5 });
+  secCams.push({ head, pos: cam.position, lvl });
+}
+elevatorFront(0, 0);
+elevatorFront(BASE, 1);
+// walls around the door on the gallery level (the lower-level room builds its own)
+{ const sw = (GW - EW)/2;
+  wall(sw, GH, GX1, GH/2, BZ - EW/2 - sw/2, -Math.PI/2);
+  wall(sw, GH, GX1, GH/2, BZ + EW/2 + sw/2, -Math.PI/2);
+  wall(EW, GH - EH, GX1, EH + (GH - EH)/2, BZ, -Math.PI/2); }
+{ const lw = new THREE.SpotLight(0xffe2b0, 18, 6, Math.PI/6, 0.6, 1.4);      // light the elevator front: doors, dial, call panel
+  lw.position.set(GX1 - 2.2, GH - 0.15, BZ); lw.target.position.set(GX1, 1.6, BZ + 0.2); scene.add(lw, lw.target); }
+const outerDoors = [doorPair(GX1 + 0.03, 0, BZ), doorPair(GX1 + 0.03, BASE, BZ)];
+
+// the cab: moves between floors with its own inner doors, a brass rail, a lit ceiling, a dome camera
+const cab = new THREE.Group(); scene.add(cab);
+{
+  const cf = decoFloorTexture(); cf.repeat.set(0.5, 0.5);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(CAB_D, CAB_W), new THREE.MeshStandardMaterial({ map:cf, roughness:0.3 }));
+  fl.rotation.x = -Math.PI/2; fl.position.set(GX1 + CAB_D/2, 0.004, BZ); cab.add(fl);
+  const panelMat = new THREE.MeshStandardMaterial({ color:0x2a2116, roughness:0.4, metalness:0.5, side:THREE.DoubleSide });
+  const add = (w, h, x, y, z, ry, mat = panelMat) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); m.position.set(x, y, z); m.rotation.y = ry; cab.add(m); return m; };
+  add(CAB_W, CAB_H, GX1 + CAB_D, CAB_H/2, BZ, -Math.PI/2);
+  add(CAB_D, CAB_H, GX1 + CAB_D/2, CAB_H/2, BZ - CAB_W/2, 0);
+  add(CAB_D, CAB_H, GX1 + CAB_D/2, CAB_H/2, BZ + CAB_W/2, Math.PI);
+  const jw = (CAB_W - EW)/2;                        // the cab's own front: jambs either side of the doors and a header, so nothing outside shows mid-ride
+  add(jw, CAB_H, GX1 + 0.06, CAB_H/2, BZ - EW/2 - jw/2, Math.PI/2);
+  add(jw, CAB_H, GX1 + 0.06, CAB_H/2, BZ + EW/2 + jw/2, Math.PI/2);
+  add(EW, CAB_H - EH, GX1 + 0.06, EH + (CAB_H - EH)/2, BZ, Math.PI/2);
+  const top = new THREE.Mesh(new THREE.PlaneGeometry(CAB_D, CAB_W), panelMat); top.rotation.x = Math.PI/2; top.position.set(GX1 + CAB_D/2, CAB_H, BZ); cab.add(top);
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.0), new THREE.MeshBasicMaterial({ color:0x9c8459 }));
+  glow.rotation.x = Math.PI/2; glow.position.set(GX1 + CAB_D/2, CAB_H - 0.01, BZ); cab.add(glow);
+  const cl = new THREE.PointLight(0xffe2b0, 2.2, 3.2, 1.5); cl.position.set(GX1 + CAB_D/2, CAB_H - 0.3, BZ); cab.add(cl);
+  for (const [len, x, z, ry] of [[CAB_W - 0.2, GX1 + CAB_D - 0.06, BZ, Math.PI/2], [CAB_D - 0.3, GX1 + CAB_D/2, BZ - CAB_W/2 + 0.06, 0], [CAB_D - 0.3, GX1 + CAB_D/2, BZ + CAB_W/2 - 0.06, 0]]) {
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, len, 10), goldMat); rail.rotation.set(0, ry, Math.PI/2); rail.position.set(x, 0.95, z); cab.add(rail);
+  }
+  for (const [w, x, z, ry] of [[CAB_W, GX1 + CAB_D - 0.005, BZ, -Math.PI/2], [CAB_D, GX1 + CAB_D/2, BZ - CAB_W/2 + 0.005, 0], [CAB_D, GX1 + CAB_D/2, BZ + CAB_W/2 - 0.005, Math.PI]]) {
+    const c = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.012), neon); c.position.set(x, 0.05, z); c.rotation.y = ry; cab.add(c);
+  }
+  const pc = document.createElement('canvas'); pc.width = 256; pc.height = 512; const q = pc.getContext('2d');
+  q.fillStyle = '#c9a45c'; q.fillRect(0, 0, 256, 512); q.fillStyle = '#1a150e'; q.fillRect(14, 14, 228, 484);
+  q.font = '500 64px Futura, sans-serif'; q.textAlign = 'center';
+  for (const [t, y] of [['G', 150], ['B', 330]]) { q.strokeStyle = '#c9a45c'; q.lineWidth = 6; q.beginPath(); q.arc(128, y, 62, 0, Math.PI*2); q.stroke(); q.fillStyle = '#f2ede3'; q.fillText(t, 128, y + 22); }
+  q.fillStyle = '#c9a45c'; q.font = '400 22px Futura, sans-serif'; q.fillText('MOONOLOGY', 128, 460);
+  const pt = new THREE.CanvasTexture(pc); pt.colorSpace = THREE.SRGBColorSpace;
+  add(0.22, 0.44, GX1 + 0.45, 1.2, BZ + CAB_W/2 - 0.01, Math.PI, new THREE.MeshStandardMaterial({ map:pt, roughness:0.4, emissive:0x0a0a0a }));
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 8, 0, Math.PI*2, 0, Math.PI/2), new THREE.MeshStandardMaterial({ color:0x111111, roughness:0.1, metalness:0.8 }));
+  dome.rotation.x = Math.PI; dome.position.set(GX1 + CAB_D - 0.2, CAB_H - 0.01, BZ - CAB_W/2 + 0.2); cab.add(dome);
+  const dl = new THREE.Mesh(new THREE.SphereGeometry(0.01, 8, 6), new THREE.MeshBasicMaterial({ color:0xff2a2a, toneMapped:false }));
+  dl.position.set(GX1 + CAB_D - 0.2, CAB_H - 0.09, BZ - CAB_W/2 + 0.2); cab.add(dl); blinkers.push({ m: dl, rate: 1.6, phase: 0.2 });
+}
+const innerDoors = (() => { const L = [];
+  for (const s of [-1, 1]) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.03, EH, EW/2), [LEAF[s < 0 ? 1 : 0], edge, edge, edge, edge, edge]);   // the rider faces the sunburst too
+    m.position.set(GX1 + 0.1, EH/2, BZ + s*EW/4); cab.add(m); L.push({ m, s, z0: BZ + s*EW/4 }); }
+  return L; })();
+
+// ---- ROOM 03 · THE HALL OF MA'AT, lower level
+{
+  const y0 = BASE, L3 = GX1 - R3X0;
+  const f3 = decoFloorTexture(); f3.repeat.set(L3/4, R3W/4);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(L3, R3W), new THREE.MeshStandardMaterial({ map:f3, roughness:0.3, metalness:0.1 }));
+  fl.rotation.x = -Math.PI/2; fl.position.set(R3C, y0 + 0.002, BZ); fl.receiveShadow = true; scene.add(fl);
+  const ce = new THREE.Mesh(new THREE.PlaneGeometry(L3, R3W), cMat); ce.rotation.x = Math.PI/2; ce.position.set(R3C, y0 + R3H, BZ); scene.add(ce);
+  wall(R3W, R3H, R3X0, y0 + R3H/2, BZ, Math.PI/2);
+  wall(L3, R3H, R3C, y0 + R3H/2, BZ - R3W/2, 0);
+  wall(L3, R3H, R3C, y0 + R3H/2, BZ + R3W/2, Math.PI);
+  const sw = (R3W - EW)/2;
+  wall(sw, R3H, GX1, y0 + R3H/2, BZ - EW/2 - sw/2, -Math.PI/2);
+  wall(sw, R3H, GX1, y0 + R3H/2, BZ + EW/2 + sw/2, -Math.PI/2);
+  wall(EW, R3H - EH, GX1, y0 + EH + (R3H - EH)/2, BZ, -Math.PI/2);
+  for (const [len, x, z, ry] of [[R3W, R3X0 + 0.01, BZ, Math.PI/2], [L3, R3C, BZ - R3W/2 + 0.01, 0], [L3, R3C, BZ + R3W/2 - 0.01, Math.PI]]) {
+    const c = new THREE.Mesh(new THREE.PlaneGeometry(len, 0.012), neon); c.position.set(x, y0 + 0.06, z); c.rotation.y = ry; scene.add(c);
+  }
+  frieze(L3, R3C, y0 + 3.75, BZ - R3W/2 + 0.015, 0);
+  frieze(L3, R3C, y0 + 3.75, BZ + R3W/2 - 0.015, Math.PI);
+  for (let i = 0; i < 3; i++) {                     // coffer rings over the balance
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.6 - i*0.35, 0.02, 8, 64), i === 1 ? neon : goldMat);
+    ring.rotation.x = Math.PI/2; ring.position.set(R3C, y0 + R3H - 0.03 - i*0.08, BZ); scene.add(ring);
+  }
+  for (const x of [R3X0 + 2.2, R3C, GX1 - 2.2]) { const l = new THREE.PointLight(0xffd59a, 7, 6.5, 1.5); l.position.set(x, y0 + R3H - 0.4, BZ); scene.add(l); }
+  torch(R3X0 + 0.02, y0 + 2.7, BZ - 3.2, Math.PI/2, 4);
+  torch(R3X0 + 0.02, y0 + 2.7, BZ + 3.2, Math.PI/2, 4);
+  papyrusColumn(R3X0 + 0.45, BZ - 2.45, 4.2, y0, 1);
+  papyrusColumn(R3X0 + 0.45, BZ + 2.45, 4.2, y0, 1);
+  wingedSun(R3X0 + 0.04, y0 + 3.85, BZ, Math.PI/2, 1.1);
+  if (!IS_TOUCH) for (const [zw, dir] of [[BZ - R3W/2, 1], [BZ + R3W/2, -1]]) {   // one wash per side wall, not one spot per piece
+    for (const x of [R3X0 + 3.0, R3X0 + 7.4]) {
+      const s = new THREE.SpotLight(0xffe2b0, 16, 7, Math.PI/7, 0.7, 1.5);
+      s.position.set(x, y0 + R3H - 0.15, zw + dir*2.2); s.target.position.set(x, y0 + 1.7, zw); scene.add(s, s.target);
+    }
+  }
+  wallSign([['', "ROOM 03", '', false], ['', "The Hall of Ma'at", '', false], ['', 'Lower level', '', true]], GX1 - 0.03, y0 + 1.6, BZ - EW/2 - 1.0, -Math.PI/2, 0.95, 0.36);
+}
+const MET = 'The Metropolitan Museum of Art', OA = 'Public domain (Met Open Access)';
+const NS = { noSpot: true };
+hang('r3_ani.jpg', 1800/1056, R3X0 + 0.02, BZ, Math.PI/2, { k:'Room 03 · No. 01', t:'Papyrus of Ani: the weighing of the heart',
+  lines:['Facsimile plate, E. A. Wallis Budge, 1913', 'Original: British Museum EA10470,3', 'Public domain'] }, 2.0, 3.6, BASE + 1.95);
+const R3L = BZ - R3W/2 + 0.02, R3R = BZ + R3W/2 - 0.02;
+[[ 'r3_nakhtamun.jpg', 1800/1736, R3L, 0, 'No. 02', 'Anubis Weighing the Heart, Tomb of Nakhtamun',
+   ['Tempera on paper: a modern facsimile of the tomb painting', 'New Kingdom, Ramesside, Dynasty 19, ca. 1290–1224 BCE', `${MET}, Rogers Fund, 1933`, `Accession 33.8.21 · ${OA}`]],
+ [ 'r3_hunefer.jpg', 1800/818, R3L, 0, 'No. 03', 'Papyrus of Hunefer: the judgment scene', ['Image: public domain, via Wikimedia Commons']],
+ [ 'r3_ring.jpg', 1061/1800, R3L, 0, 'No. 04', 'Ring Inscribed with the Hieroglyphs Nefer Maat',
+   ['Faience', 'New Kingdom, Dynasty 18, ca. 1386–1347 BCE', `${MET}, Rogers Fund, 1911`, `Accession 11.215.97 · ${OA}`]],
+ [ 'r3_maat.jpg', 1200/1800, R3L, 0, 'No. 05', 'Maat',
+   ['Bright blue faience', 'Late Period–Ptolemaic Period, 664–30 BCE', `${MET}, Gift of Lily S. Place, 1921`, `Accession 21.6.51 · ${OA}`]],
+ [ 'r3_scarab.jpg', 1440/1800, R3R, Math.PI, 'No. 06', 'Heart Scarab inscribed for Gautsoshen',
+   ['Slate', 'Third Intermediate Period, Dynasty 21, ca. 1080–945 BCE', `${MET}, Rogers Fund, 1925`, `Accession 25.3.163 · ${OA}`]],
+ [ 'r3_painedjem.jpg', 1286/1800, R3R, Math.PI, 'No. 07', 'Heart amulet of Painedjem I',
+   ['Serpentinite', 'Third Intermediate Period, Dynasty 21, ca. 1080–1042 BCE', `${MET}, Rogers Fund, 1922`, `Accession 22.2.24 · ${OA}`]],
+ [ 'r3_thoth.jpg', 915/1800, R3R, Math.PI, 'No. 08', 'Amulet of the God Thoth',
+   ['Faience', 'Egypt, Late Period, Dynasties 26–31 (664–332 BCE)', 'The Art Institute of Chicago, Gift of Henry H. Getty, Charles L. Hutchinson, and Norman W. Harris', 'Reference 1894.190 · Public domain (CC0)']],
+ [ 'r3_anubis.jpg', 1800/1362, R3R, Math.PI, 'No. 09', 'Statue of Anubis as a recumbent canid',
+   ['Limestone, originally painted black', 'End of Late Period–Ptolemaic Period, 343–30 BCE', `${MET}, Adelaide Milton de Groot Fund, in memory of the de Groot and Hawley families, 1969`, `Accession 69.105 · ${OA}`]],
+].forEach(([file, ar, z, ry, n, t, lines], i) => {
+  const x = R3X0 + 1.9 + (i % 4)*2.2;
+  hang(file, ar, x, z, ry, { k:`Room 03 · ${n}`, t, lines, ...NS }, 1.4, 1.8, BASE + 1.65);
+});
+
+// the balance: a Moonology sculpture for the centre of the room. A heart on one pan, a feather on the other.
+const balanceBeam = (() => {
+  const y0 = BASE, g = new THREE.Group(); g.position.set(R3C, y0, BZ); scene.add(g);
+  const s1 = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.22, 1.3), ebony); s1.position.y = 0.11; g.add(s1);
+  const s2 = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.5, 0.95), ebony); s2.position.y = 0.47; g.add(s2);
+  const s3 = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.04, 1.0), goldMat); s3.position.y = 0.74; g.add(s3);
+  const post = cyl(0.035, 0.05, 1.6, 16, goldMat); post.position.y = 0.76 + 0.8; g.add(post);
+  const fin = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 12), goldMat); fin.position.y = 2.42; g.add(fin);
+  const beam = new THREE.Group(); beam.position.y = 2.32; g.add(beam);
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 1.5), goldMat); beam.add(bar);
+  const pans = [];
+  for (const s of [-1, 1]) {
+    const hangp = new THREE.Group(); hangp.position.z = s*0.7; beam.add(hangp);
+    for (let k = 0; k < 3; k++) {
+      const a = k/3*Math.PI*2, cord = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.78, 4), goldMat);
+      cord.position.set(Math.cos(a)*0.08, -0.38, Math.sin(a)*0.08); cord.rotation.set(Math.sin(a)*0.2, 0, -Math.cos(a)*0.2); hangp.add(cord);
+    }
+    const pan = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.14, 0.04, 32), goldMat); pan.position.y = -0.78; hangp.add(pan);
+    pans.push(hangp);
+  }
+  // the heart: a jar with two lugs, the way the papyri draw it
+  const jp = [[0, 0], [0.06, 0.01], [0.09, 0.06], [0.085, 0.13], [0.05, 0.17], [0.055, 0.2], [0, 0.2]].map(([r, y]) => new THREE.Vector2(r, y));
+  const jar = new THREE.Mesh(new THREE.LatheGeometry(jp, 24), new THREE.MeshStandardMaterial({ color:0x7a2e22, roughness:0.5 }));
+  jar.position.y = -0.76; pans[0].add(jar);
+  for (const s of [-1, 1]) { const lug = new THREE.Mesh(new THREE.TorusGeometry(0.025, 0.008, 6, 12), jar.material); lug.position.set(s*0.085, -0.62, 0); lug.rotation.y = Math.PI/2; pans[0].add(lug); }
+  // the feather: upright in a small gold holder
+  const fs = new THREE.Shape(); fs.moveTo(0, 0); fs.quadraticCurveTo(0.07, 0.12, 0.05, 0.34); fs.quadraticCurveTo(0.0, 0.4, -0.02, 0.33); fs.quadraticCurveTo(-0.04, 0.12, 0, 0);
+  const fe = new THREE.Mesh(new THREE.ShapeGeometry(fs, 16), new THREE.MeshStandardMaterial({ color:0xf3efe6, roughness:0.7, side:THREE.DoubleSide }));
+  fe.position.y = -0.72; fe.rotation.y = Math.PI/2; pans[1].add(fe);
+  const quill = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.36, 4), goldMat); quill.position.y = -0.58; pans[1].add(quill);
+  const hold = cyl(0.02, 0.03, 0.05, 12, goldMat); hold.position.y = -0.735; pans[1].add(hold);
+  // the plumb bob
+  const str = new THREE.Mesh(new THREE.CylinderGeometry(0.002, 0.002, 0.3, 4), goldMat); str.position.y = -0.15; beam.add(str);
+  const bob = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.07, 12), goldMat); bob.rotation.x = Math.PI; bob.position.y = -0.33; beam.add(bob);
+  const sp = new THREE.SpotLight(0xffe7c2, IS_TOUCH ? 8 : 22, 7, Math.PI/10, 0.5, 1.4);
+  sp.position.set(R3C - 1.2, y0 + R3H - 0.1, BZ); sp.target = fin; scene.add(sp);
+  obstacles.push({ x: R3C, z: BZ, r: 1.0, lvl: 1 });
+  exhibits.push({ pos: V3(R3C - 0.9, y0 + 1.4, BZ), mesh: g, info: { k:'Room 03 · Centre', t:'The Balance',
+    lines:['A Moonology Art Gallery sculpture, made for this room', 'After the weighing scenes on these walls: a heart on one pan, the feather on the other'] } });
+  return { beam, pans };
+})();
+
+// ---- the elevator's state, and its sound (all synthesised here: no recordings, nothing licensed)
+const elev = { cabY: 0, floor: 0, target: 0, door: 0, state: 'closed', timer: 0, moveT: 0, fromY: 0, called: -1 };
+let ELEV_BUF = null, elevSrc = null, musicWant = false, AC = null, master = null, musicGain = null, humGain = null, musicOn = false, nextStep = 0, stepIdx = 0;
+function audio() {
+  if (TOUR) return null;
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.9; master.connect(AC.destination);
+    musicGain = AC.createGain(); musicGain.gain.value = 0; musicGain.connect(master);
+    humGain = AC.createGain(); humGain.gain.value = 0; humGain.connect(master);
+    const len = AC.sampleRate*2, buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random()*2 - 1;
+    const n = AC.createBufferSource(); n.buffer = buf; n.loop = true;
+    const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 140;
+    n.connect(lp); lp.connect(humGain); n.start();
+    AC._noise = buf;
+    // 10/16 HIS CALL: the elevator plays HIS museum-Short music, calm_beatv2 — a seamless 31.0 s loop
+    // (3.0 s equal-power blend, the same fix as the Short's loop dip on 10/13). Decoded once, looped gapless.
+    fetch('assets/elevator_calm_beatv2_loop31.m4a').then(r => r.arrayBuffer()).then(b => AC.decodeAudioData(b))
+      .then(d => { ELEV_BUF = d; if (musicWant) music(true); }).catch(() => {});
+  } catch (e) { AC = null; } }
+  if (AC && AC.state === 'suspended') AC.resume();
+  return AC;
+}
+// his tuning: A = 432, and only the notes G · B · D · E
+const A432 = n => 432*Math.pow(2, n/12);
+const NT = { E2:A432(-29), G2:A432(-26), B2:A432(-22), D3:A432(-19), G3:A432(-14), B3:A432(-10), D4:A432(-7), E4:A432(-5),
+            G4:A432(-2), B4:A432(2), D5:A432(5), E5:A432(7), G5:A432(10), B5:A432(14) };
+function tone(f, when, dur, vel, dest, bright = 0.22) {
+  const g = AC.createGain(); g.gain.setValueAtTime(0, when);
+  g.gain.linearRampToValueAtTime(vel, when + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+  g.connect(dest);
+  for (const [m, a] of [[1, 1], [2, bright], [3, bright*0.25]]) {
+    const o = AC.createOscillator(); o.type = 'sine'; o.frequency.value = f*m;
+    const og = AC.createGain(); og.gain.value = a; o.connect(og); og.connect(g); o.start(when); o.stop(when + dur + 0.05);
+  }
+}
+function brush(when, vel) {
+  const s = AC.createBufferSource(); s.buffer = AC._noise; const hp = AC.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 6000;
+  const g = AC.createGain(); g.gain.setValueAtTime(vel, when); g.gain.exponentialRampToValueAtTime(0.0001, when + 0.09);
+  s.connect(hp); hp.connect(g); g.connect(musicGain); s.start(when, Math.random()); s.stop(when + 0.12);
+}
+function ding() {
+  if (!audio()) return; const t = AC.currentTime + 0.02;
+  tone(NT.B5, t, 2.2, 0.16, master, 0.4); tone(NT.G5, t + 0.32, 2.6, 0.14, master, 0.4);
+}
+// a slow lounge loop at 96 bpm: bass, soft keys on a bossa push, a melody in the same four notes, brushes
+const EIGHTH = 60/96/2;
+const BASS = [NT.G2, NT.E2, NT.B2, NT.D3];
+const CHORD = [[NT.G3, NT.B3, NT.D4, NT.E4], [NT.E4, NT.G4, NT.B3, NT.D4], [NT.B3, NT.D4, NT.E4, NT.G4], [NT.D4, NT.E4, NT.G4, NT.B4]];
+const MEL = [NT.D5, 0, NT.E5, 0, NT.D5, NT.B4, 0, 0,  NT.G4, 0, NT.B4, 0, NT.E5, 0, NT.D5, 0,
+             NT.B4, 0, NT.D5, 0, NT.G5, 0, NT.E5, NT.D5,  0, NT.B4, 0, NT.G4, 0, 0, 0, 0];
+function schedule() {
+  if (!AC || !musicOn) return;
+  while (nextStep < AC.currentTime + 0.15) {
+    const s = stepIdx % 32, bar = Math.floor(s/8), e = s % 8, t = nextStep + (e % 2 ? EIGHTH*0.12 : 0);   // a touch of swing
+    if (e === 0 || e === 5) tone(BASS[bar], t, EIGHTH*3, 0.22, musicGain, 0.1);
+    if (e === 0 || e === 3 || e === 6) CHORD[bar].forEach((f, k) => tone(f, t + k*0.012, EIGHTH*2.4, 0.05, musicGain, 0.3));
+    if (MEL[s]) tone(MEL[s], t, EIGHTH*2.6, 0.075, musicGain, 0.18);
+    brush(t, e % 4 === 2 ? 0.05 : 0.025);
+    nextStep += EIGHTH; stepIdx++;
+  }
+}
+// setInterval(schedule, 40);   // the synthesised lounge loop is retired: his own music plays instead (10/16)
+function music(on) {
+  if (!audio()) return;
+  if (on && !elevSrc && ELEV_BUF) {
+    elevSrc = AC.createBufferSource(); elevSrc.buffer = ELEV_BUF; elevSrc.loop = true;
+    elevSrc.connect(musicGain); elevSrc.start(); musicOn = true;
+  }
+  musicGain.gain.cancelScheduledValues(AC.currentTime);
+  musicGain.gain.setTargetAtTime(on ? 0.8 : 0, AC.currentTime, on ? 0.6 : 0.9);
+  if (!on) setTimeout(() => { if (!musicWant && elevSrc) { elevSrc.stop(); elevSrc = null; musicOn = false; } }, 4500);
+}
+const lvlOf = () => camera.position.y < BASE/2 ? 1 : 0;
+const inCab = (x, z) => x > GX1 + 0.25 && x < GX1 + CAB_D - 0.3 && Math.abs(z - BZ) < CAB_W/2 - 0.3;
+const inDoorway = (x, z) => x > GX1 - 0.5 && x < GX1 + 0.35 && Math.abs(z - BZ) < EW/2 - 0.25;
+function request(floor) {
+  if (elev.state === 'moving') return;
+  elev.target = floor; elev.called = floor;
+  if (elev.floor === floor) { if (elev.state !== 'open') { elev.state = 'opening'; ding(); } }
+  else elev.state = elev.door > 0 ? 'closing' : 'moving';
+  if (elev.state === 'moving') { elev.fromY = elev.cabY; elev.moveT = 0; }
+}
+function doAct() {
+  audio();
+  const x = camera.position.x, z = camera.position.z, L = lvlOf();
+  if (inCab(x, z) && elev.state === 'closed') request(elev.floor);            // open the doors where you are
+  else if (inCab(x, z) && elev.state !== 'moving') request(elev.floor === 0 ? 1 : 0);
+  else if (Math.hypot(x - GX1, z - BZ) < 2.8) request(L);
+}
+function elevUpdate(dt, t) {
+  const x = camera.position.x, z = camera.position.z, riding = inCab(x, z) && lvlOf() === elev.floor;
+  if (elev.state === 'opening') { elev.door = Math.min(1, elev.door + dt/1.5); if (elev.door >= 1) { elev.state = 'open'; elev.timer = 0; elev.called = -1; } }
+  else if (elev.state === 'open') { elev.timer += dt; if (elev.timer > 9 && !inDoorway(x, z) && !inCab(x, z)) elev.state = 'closing'; }   // 10/16 fix: never close on a rider (one was shut in)
+  else if (elev.state === 'closing') {
+    if (inDoorway(x, z)) { elev.state = 'opening'; }                   // the doors bump back, like the real thing
+    else { elev.door = Math.max(0, elev.door - dt/1.5);
+      if (elev.door <= 0) { if (elev.target !== elev.floor) { elev.state = 'moving'; elev.fromY = elev.cabY; elev.moveT = 0; } else elev.state = 'closed'; } }
+  }
+  else if (elev.state === 'moving') {
+    elev.moveT = Math.min(1, elev.moveT + dt/7.0);
+    const e = elev.moveT*elev.moveT*(3 - 2*elev.moveT), toY = elev.target ? BASE : 0;
+    elev.cabY = elev.fromY + (toY - elev.fromY)*e;
+    if (humGain && AC) humGain.gain.setTargetAtTime(riding || inCab(x, z) ? 0.05*Math.sin(Math.PI*elev.moveT) + 0.01 : 0, AC.currentTime, 0.2);
+    if (elev.moveT >= 1) { elev.floor = elev.target; elev.cabY = toY; elev.state = 'opening'; ding(); if (humGain) humGain.gain.setTargetAtTime(0, AC.currentTime, 0.3); }
+  }
+  const ride = inCab(x, z) && (elev.state === 'moving' || riding);
+  if (ride && elev.state === 'moving') camera.position.y = elev.cabY + 1.62 + Math.sin(t*31)*0.0016;
+  cab.position.y = elev.cabY;
+  const open = elev.door*elev.door*(3 - 2*elev.door);
+  outerDoors.forEach((pair, f) => pair.forEach(d => { d.m.position.z = d.z0 + d.s*(f === elev.floor ? open : 0)*(EW/2 - 0.02); }));
+  innerDoors.forEach(d => { d.m.position.z = d.z0 + d.s*open*(EW/2 - 0.04); });
+  const frac = elev.cabY/BASE;                                          // 0 at G, 1 at B
+  needles.forEach(n => n.rotation.set(0, -Math.PI/2, Math.PI*0.30 - frac*Math.PI*0.60));
+  callLamps.forEach(c => c.mat.color.setHex(elev.called === c.lvl && elev.state !== 'open' ? 0x33ff66 : 0x1b2a1f));
+  const inside = inCab(x, z) && Math.abs(camera.position.y - (elev.cabY + 1.62)) < 0.6;
+  if (inside !== musicWant) { musicWant = inside; music(inside); }
+  for (const b of blinkers) b.m.visible = ((t*b.rate + b.phase) % 1) < 0.5;
+  const L = lvlOf();
+  for (const c of secCams) {                                            // the camera follows you while you are on its floor
+    const want = c.lvl === L ? Math.atan2(-(z - c.pos.z), x - c.pos.x) + Math.PI : Math.PI*0.75 + Math.sin(t*0.3)*0.5;
+    let d = want - c.head.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d));
+    c.head.rotation.y += d*Math.min(1, dt*1.5);
+    c.head.rotation.z = c.lvl === L ? 0.35 : 0.25;
+  }
+  balanceBeam.beam.rotation.x = Math.sin(t*0.45)*0.02;
+  balanceBeam.pans.forEach(p => p.rotation.x = -balanceBeam.beam.rotation.x);
+  // the action button: call the car, or choose a floor
+  let txt = '';
+  if (inCab(x, z) && elev.state === 'closed') txt = '◀ ▶  Open the doors';
+  else if (inCab(x, z) && elev.state !== 'moving' && elev.state !== 'closing') txt = elev.floor === 0 ? "▼  Lower level · Room 03 · Hall of Ma'at" : '▲  Ground floor · the galleries';
+  else if (!inCab(x, z) && Math.hypot(x - GX1, z - BZ) < 2.8 && (elev.floor !== L || elev.state === 'closed' || elev.state === 'closing')) txt = '◉  Call the elevator';
+  if (actBtn.textContent !== txt) { actBtn.textContent = txt; actBtn.style.display = txt ? 'block' : 'none'; }
+}
+const actBtn = document.getElementById('act');
+actBtn.addEventListener('pointerdown', e => { e.stopPropagation(); doAct(); });
+addEventListener('keydown', e => { if (e.code === 'KeyE' || e.code === 'Enter') doAct(); });
 
 // ---------- glow: bloom pass with a high threshold so only the neon green blooms ----------
 const composer = new EffectComposer(renderer);
@@ -847,27 +1460,26 @@ document.querySelectorAll('#walk button').forEach(b => {
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const MOON_Y = lunar.position.y, BACK = -D/2;
 const SHOTS = [
+  // COLD OPEN: the strongest image first
+  { d:3, exp:2.0, p0:V(0.9, 0.72, R2C - 3.1), p1:V(0.6, 0.68, R2C - 2.8), l0:V(0, 0.25, R2C + 2), l1:V(0, 0.25, R2C + 2.3) },  // the pool
   // ROOM 01
-  { d:5, p0:V(0, 3.0, -2.2), p1:V(0, 2.1, -1.9),  l0:V(0, MOON_Y, BACK), l1:V(0, 1.75, BACK) },               // hook: Moon hub → shabti
+  { d:5, p0:V(0, 3.0, -2.2), p1:V(0, 2.1, -1.9),  l0:V(0, MOON_Y, BACK), l1:V(0, 1.75, BACK) },               // Moon hub → shabti
   { d:5, p0:V(0, 1.9, -1.4), p1:V(0, 2.0, -2.9),  l0:V(0, 1.65, BACK), l1:V(0, 2.05, BACK) },                 // push in on the shabti
-  { d:5, p0:V(2.2, 2.2, -2.2), p1:V(2.6, 2.8, -2.8), l0:V(3.45, 3.9, -4.1), l1:V(3.45, 3.4, -4.1) },          // papyrus column capital
+  { d:5, exp:2.0, p0:V(2.2, 2.2, -2.2), p1:V(2.6, 2.8, -2.8), l0:V(3.45, 3.9, -4.1), l1:V(3.45, 3.4, -4.1) }, // papyrus column capital
   { d:5, p0:V(-2.3, 1.75, -1.6), p1:V(-2.9, 1.7, -2.05), l0:V(-4.5, 1.65, -2.2), l1:V(-4.5, 1.65, -2.125) },  // Thoth as the ibis
-  { d:5, p0:V(-2.3, 1.75, 2.6), p1:V(-2.9, 1.7, 2.2),  l0:V(-4.5, 1.65, 2.05), l1:V(-4.5, 1.65, 2.125) },     // Ma'at
-  { d:5, p0:V(2.3, 1.75, -2.6), p1:V(2.9, 1.7, -2.2),  l0:V(4.5, 1.65, -2.05), l1:V(4.5, 1.65, -2.125) },     // ibis with feather
+  { d:5, exp:1.8, p0:V(-2.3, 1.75, 2.6), p1:V(-2.9, 1.7, 2.2),  l0:V(-4.5, 1.65, 2.05), l1:V(-4.5, 1.65, 2.125) }, // Ma'at
+  { d:5, p0:V(2.3, 1.75, -2.6), p1:V(2.9, 1.7, -2.2),  l0:V(4.5, 1.65, -2.05), l1:V(4.5, 1.65, -2.125) },     // ibis amulet
   { d:5, p0:V(2.3, 1.75, 1.6),  p1:V(2.9, 1.7, 2.05),  l0:V(4.5, 1.65, 2.2), l1:V(4.5, 1.65, 2.125) },        // Ramesses IX ostracon
-  { d:6, p0:V(3.6, 3.6, 3.9),  p1:V(2.6, 3.2, 3.6),  l0:V(-0.6, 1.6, BACK), l1:V(0, 1.9, BACK) },             // the whole room
-  { d:5, p0:V(0, 1.7, 1.0),    p1:V(0, 1.8, 2.2),    l0:V(0, 2.6, D/2), l1:V(0, 3.2, D/2) },                  // exit: winged sun over the door
-  // THE HALL
-  { d:7, p0:V(0, 1.65, 5.2),   p1:V(0, 1.65, 8.4),   l0:V(0, 2.2, hallZ1), l1:V(0, 2.3, hallZ1) },           // walk to the junction, signs
-  { d:6, p0:V(0.3, 1.65, BZ),  p1:V(4.4, 1.65, BZ),  l0:V(HALL_W/2 + BL, 1.6, BZ), l1:V(HALL_W/2 + BL, 1.75, BZ) }, // side hall to Room 03
-  { d:5, p0:V(0, 1.65, 12.5),  p1:V(0, 1.65, 16.3),  l0:V(0, 2.2, hallZ1), l1:V(0, 2.4, hallZ1 + 6) },        // on to the Moon Room
+  { d:6, exp:3.4, p0:V(3.6, 3.6, 3.9),  p1:V(2.6, 3.2, 3.6),  l0:V(-0.6, 1.6, BACK), l1:V(0, 1.9, BACK) },    // the whole room
+  // THE HALL (trimmed)
+  { d:6, exp:1.9, p0:V(0, 1.65, 5.6),   p1:V(0, 1.65, 8.4),   l0:V(0, 2.2, hallZ1), l1:V(0, 2.3, hallZ1) },  // the hall, the signs
+  { d:5, exp:2.0, p0:V(0.3, 1.65, BZ),  p1:V(4.4, 1.65, BZ),  l0:V(HALL_W/2 + BL, 1.6, BZ), l1:V(HALL_W/2 + BL, 1.75, BZ) }, // Room 03, sealed
   // ROOM 02 · THE MOONS
-  { d:7, p0:V(0, 1.7, R2Z0 + 0.5), p1:V(0, 2.1, R2Z0 + 1.7), l0:V(0, 1.4, R2Z1), l1:V(0, 1.2, R2Z1 - 2) },     // reveal
-  { d:6, p0:V(1.2, 0.75, R2C - 3.2), p1:V(0.4, 0.65, R2C - 2.6), l0:V(0, 0.2, R2C + 1), l1:V(0, 0.25, R2C + 2.5) }, // the pool
-  { d:7, p0:V(-1.8, 1.75, R2Z0 + 1.7), p1:V(-1.8, 1.75, R2Z0 + 9.3), l0:V(-4.5, 1.65, R2Z0 + 2.5), l1:V(-4.5, 1.65, R2Z0 + 8.5) }, // Europa · Mimas · Enceladus
-  { d:7, p0:V(1.8, 1.75, R2Z0 + 9.3), p1:V(1.8, 1.75, R2Z0 + 1.7), l0:V(4.5, 1.65, R2Z0 + 8.5), l1:V(4.5, 1.65, R2Z0 + 2.5) },    // Ganymede · Io · Titan
-  { d:6, p0:V(0, 1.9, R2Z1 - 3.0), p1:V(0, 1.9, R2Z1 - 1.9), l0:V(0, 1.85, R2Z1), l1:V(0, 1.85, R2Z1) },      // Luna between the columns
-  { d:4, p0:V(-2.6, 1.4, R2Z0 + 2.1), p1:V(-2.9, 1.3, R2Z0 + 1.7), l0:V(-3.75, 1.05, R2Z0 + 0.85), l1:V(-3.75, 1.05, R2Z0 + 0.85) }, // bonsai
+  { d:7, exp:2.6, p0:V(0, 1.7, R2Z0 + 0.5), p1:V(0, 2.1, R2Z0 + 1.7), l0:V(0, 1.4, R2Z1), l1:V(0, 1.2, R2Z1 - 2) },     // reveal
+  { d:6, exp:2.0, p0:V(1.2, 0.75, R2C - 3.2), p1:V(0.4, 0.65, R2C - 2.6), l0:V(0, 0.2, R2C + 1), l1:V(0, 0.25, R2C + 2.5) }, // the pool
+  { d:7, exp:1.9, p0:V(-1.8, 1.75, R2Z0 + 1.7), p1:V(-1.8, 1.75, R2Z0 + 9.3), l0:V(-4.5, 1.65, R2Z0 + 2.5), l1:V(-4.5, 1.65, R2Z0 + 8.5) }, // Europa · Mimas · Enceladus
+  { d:7, exp:1.7, p0:V(1.8, 1.75, R2Z0 + 9.3), p1:V(1.8, 1.75, R2Z0 + 1.7), l0:V(4.5, 1.65, R2Z0 + 8.5), l1:V(4.5, 1.65, R2Z0 + 2.5) },    // Ganymede · Io · Titan
+  { d:6, exp:1.6, p0:V(0, 1.9, R2Z1 - 3.0), p1:V(0, 1.9, R2Z1 - 1.9), l0:V(0, 1.85, R2Z1), l1:V(0, 1.85, R2Z1) },      // Luna between the columns
   { d:7, p0:V(0, 1.6, R2C - 2), p1:V(0, 3.2, R2C - 1), l0:V(0, 4, R2C + 0.5), l1:V(0.6, 15, R2C + 1.2) },     // rise to the Moon overhead
 ];
 const TOUR_LEN = SHOTS.reduce((a, s) => a + s.d, 0);
@@ -877,6 +1489,7 @@ function tourCamera(t) {
   for (const sh of SHOTS) {
     if (t < acc + sh.d || sh === SHOTS[SHOTS.length - 1]) {
       const k = ease(Math.min(1, (t - acc) / sh.d));
+      renderer.toneMappingExposure = sh.exp ?? 1.3;   // per-shot exposure: lift the dark rooms for phone screens
       camera.position.lerpVectors(sh.p0, sh.p1, k);
       camera.lookAt(new THREE.Vector3().lerpVectors(sh.l0, sh.l1, k));
       return;
@@ -892,13 +1505,17 @@ const RECV = `http://127.0.0.1:${QS.get('port') || 8766}/frame/`;
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 // deep link: ?room=2 starts the visit inside the Moon Room, facing Luna
+if (!TOUR && QS.get('room') === '3') { elev.floor = elev.target = 1; elev.cabY = BASE; camera.position.set(GX1 - 1.8, BASE + 1.62, BZ); yaw = Math.PI/2; }
+if (!TOUR && QS.get('room') === 'lift') { camera.position.set(GX1 - 3.4, 1.62, BZ - 0.4); yaw = -Math.PI/2 + 0.12; pitch = 0.12; }
+if (!TOUR && QS.get('room') === 'gallery') { camera.position.set(GX0 + 1.0, 1.62, BZ); yaw = -Math.PI/2; }
 if (!TOUR && QS.get('room') === '2') { camera.position.set(0, 1.62, R2Z0 + 1.4); yaw = Math.PI; }
 const clock = new THREE.Clock();
 function step() {
   const dt = TOUR ? 1/FPS : Math.min(clock.getDelta(), 0.05), t = TOUR ? tourFrame/FPS : clock.elapsedTime;
   if (!TOUR) {
-  const fwd = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) + touchWalk;
-  const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
+  const lockRide = inCab(camera.position.x, camera.position.z) && (elev.state === 'moving' || elev.state === 'closing');
+  const fwd = lockRide ? 0 : (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) + touchWalk;
+  const side = lockRide ? 0 : (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
   const speed = 2.2 * dt;
   const prevX = camera.position.x, prevZ = camera.position.z;
   camera.position.x += (-Math.sin(yaw)*fwd + Math.cos(yaw)*side) * speed;
@@ -908,12 +1525,20 @@ function step() {
                            && (z > D/2 + 0.2 || Math.abs(x) < DOOR_W/2 - 0.3)
                            && (z < hallZ1 - 0.6 || Math.abs(x) < R2_DOOR_W/2 - 0.3);
   const inRoom2 = (x, z) => x > -R2W/2 + 0.5 && x < R2W/2 - 0.5 && z > hallZ1 + 0.5 && z < hallZ1 + R2D - 0.8;
-  const inBranch = (x, z) => Math.abs(z - BZ) < BCW/2 - 0.45 && Math.abs(x) > HALL_W/2 - 0.6 && Math.abs(x) < HALL_W/2 + BL - 0.6
+  const inBranch = (x, z) => Math.abs(z - BZ) < BCW/2 - 0.45 && Math.abs(x) > HALL_W/2 - 0.6 && Math.abs(x) < HALL_W/2 + BL - (x > 0 ? -0.3 : 0.6)
                              && (Math.abs(x) > HALL_W/2 + 0.2 || Math.abs(z - BZ) < BW/2 - 0.3);
-  const blocked = (x, z) => obstacles.some(o => o.box ? (x > o.box[0] && x < o.box[1] && z > o.box[2] && z < o.box[3])
+  const LV = lvlOf();
+  const inGallery = (x, z) => (x > GX0 - 0.75 && x < GX0 + 0.3 && Math.abs(z - BZ) < BCW/2 - 0.45)
+                           || (x >= GX0 + 0.3 && x < GX1 - 0.4 && Math.abs(z - BZ) < GW/2 - 0.4);
+  const inRoom3 = (x, z) => x > R3X0 + 0.5 && x < GX1 - 0.4 && Math.abs(z - BZ) < R3W/2 - 0.5;
+  const cabHere = elev.floor === LV && elev.state !== 'moving';
+  const lift = (x, z) => (inDoorway(x, z) && cabHere && elev.door > 0.85) || (inCab(x, z) && (cabHere || elev.state === 'moving'));
+  const blocked = (x, z) => obstacles.some(o => (o.lvl || 0) !== LV ? false : o.box ? (x > o.box[0] && x < o.box[1] && z > o.box[2] && z < o.box[3])
                                                         : Math.hypot(x - o.x, z - o.z) < o.r);
   const cx = camera.position.x, cz = camera.position.z;
-  if ((!inRoom(cx, cz) && !inHall(cx, cz) && !inRoom2(cx, cz) && !inBranch(cx, cz)) || blocked(cx, cz)) {
+  const okHere = LV === 1 ? (inRoom3(cx, cz) || lift(cx, cz))
+                          : (inRoom(cx, cz) || inHall(cx, cz) || inRoom2(cx, cz) || inBranch(cx, cz) || inGallery(cx, cz) || lift(cx, cz));
+  if (!okHere || blocked(cx, cz)) {
     camera.position.x = prevX; camera.position.z = prevZ;
   }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
@@ -929,6 +1554,7 @@ function step() {
   p.needsUpdate = true;
   spot.intensity = 60 + Math.sin(t * 0.4) * 2;   // a barely-there breathing of the gallery light
 
+  elevUpdate(dt, t);
   lunar.rotation.y = t * 0.05;
   for (const tc of torches) {   // flame flicker
     const f = 0.85 + 0.15*Math.sin(t*9 + tc.seed) + 0.08*Math.sin(t*23 + tc.seed*2);
@@ -938,7 +1564,8 @@ function step() {
   for (const ex of exhibits) { const d = camera.position.distanceTo(ex.pos); if (d < nd) { nd = d; nearest = ex; } }
   if (!TOUR) showLabel(pinned || nearest);
   if (!TOUR) {   // the corner title follows the visitor from room to room
-    const where = camera.position.z > R2Z0 ? 'Room 02 · The Moons' : Math.abs(camera.position.x) > HALL_W/2 + 0.3 && camera.position.z > D/2 ? (camera.position.x > 0 ? 'To Room 03' : 'To Room 04') : camera.position.z > D/2 ? 'The Hall' : 'Room 01';
+    const cp = camera.position;
+    const where = cp.y < BASE/2 ? "Room 03 · The Hall of Ma'at" : inCab(cp.x, cp.z) ? 'The Elevator' : cp.x > GX0 - 0.3 && Math.abs(cp.z - BZ) < GW/2 ? 'Cactus & Succulent Gallery' : camera.position.z > R2Z0 ? 'Room 02 · The Moons' : Math.abs(camera.position.x) > HALL_W/2 + 0.3 && camera.position.z > D/2 ? (camera.position.x > 0 ? 'To Room 03' : 'To Room 04') : camera.position.z > D/2 ? 'The Hall' : 'Room 01';
     if (roomTitle.textContent !== where) roomTitle.textContent = where;
   }
   composer.render();
@@ -959,7 +1586,16 @@ if (TOUR) {
   THREE.DefaultLoadingManager.onLoad = () => setTimeout(step, 500);
 } else step();
 
-document.getElementById('enter').addEventListener('click', e => e.currentTarget.remove());
+// ?elevtest — a scripted ride for checking the elevator headless: call, step in, choose B, ride, arrive
+if (QS.has('elevtest')) {
+  window.__m = { elev, camera, cab, innerDoors, outerDoors, keys, doAct };
+  camera.position.set(GX1 - 1.6, 1.62, BZ); yaw = -Math.PI/2;
+  setTimeout(() => doAct(), 300);
+  setTimeout(() => { camera.position.set(GX1 + 1.0, 1.62, BZ); yaw = Math.PI/2; }, 2600);
+  setTimeout(() => doAct(), 3000);
+  if (QS.get('elevtest') === 'look') setTimeout(() => { yaw = -Math.PI/2; }, 3100);
+}
+document.getElementById('enter').addEventListener('click', e => { e.currentTarget.remove(); audio(); });
 if (QS.has('skip') || TOUR) document.getElementById('enter').remove();
 if (TOUR) for (const id of ['hud', 'walk', 'label']) document.getElementById(id).style.display = 'none';  // for screenshots / direct links
 addEventListener('resize', () => {
