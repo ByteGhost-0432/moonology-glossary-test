@@ -37,5 +37,7 @@ unless written into the deal.
   aspect ratio, position and a label `{ k, t, lines, watch? }`.
 - Room 02: the `hang('moon_…')` calls. `watch` adds a "▶ Watch" button to the label.
 - New rooms: open the sealed door at the end of a side hall (search "the sealed door").
+- Mirrors: `mirror(parent, x, y, z, ry, w, h, zone)`. Each arrival picks a random piece from `MIRROR_POOL` (images already in `assets/`) that fades up in the glass, then a Like & Subscribe line breathes in and out. The elevator has one; any new mirror built with `mirror()` behaves the same.
+- ↻ / T turns the visitor 180°.
 - Room 03: the `hang('r3_…')` calls; the plants are the `SPEC` list (kind · plaque · facts). `?elevtest` runs a scripted ride for checking.
 - Film mode: `?tour` renders the 76 s vertical tour (1080×1920, 25 fps) frame by frame.

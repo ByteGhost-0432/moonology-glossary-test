@@ -37,6 +37,10 @@
   #act { position:fixed; left:50%; bottom:72px; transform:translateX(-50%); display:none; padding:12px 20px;
     background:rgba(8,8,7,.86); border:1px solid #c9a45c; color:#33ff66; letter-spacing:.14em; font:500 13px Futura, sans-serif;
     text-transform:uppercase; box-shadow:0 0 14px rgba(51,255,102,.3); cursor:pointer; max-width:calc(100vw - 32px); }
+  #turn { position:fixed; right:16px; bottom:200px; width:56px; height:56px; border-radius:50%; border:1px solid #c9a45c;
+    background:rgba(8,8,7,.7); color:#33ff66; font-size:26px; line-height:1; box-shadow:0 0 12px rgba(51,255,102,.25);
+    cursor:pointer; touch-action:none; z-index:5; }
+  @media (pointer: fine) { #turn { bottom:56px; } }
   #enter { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center;
     justify-content:center; background:rgba(5,5,5,.92); cursor:pointer; text-align:center; padding:16px; }
   #enter h1 { font-weight:500; letter-spacing:.2em; font-size:clamp(17px,3.4vw,32px); margin:0 0 8px; line-height:1.35; max-width:22em; }
@@ -59,10 +63,11 @@
 </div>
 <div id="label"></div>
 <button id="act" type="button"></button>
+<button id="turn" type="button" aria-label="Turn around" title="Turn around (T)">↻</button>
 <div id="walk"><button data-d="1" aria-label="Walk forward">▲</button><button data-d="-1" aria-label="Walk back">▼</button></div>
 <div id="hud">
   <div id="title">Moonology Art Gallery · <b>Room 01</b></div>
-  <div id="help">Drag to look · W A S D or arrows to walk · E to use the elevator</div>
+  <div id="help">Drag to look · W A S D or arrows to walk · E elevator · T turn around</div>
 </div>
 <script type="module">
 import * as THREE from 'three';
@@ -1141,6 +1146,89 @@ const cab = new THREE.Group(); scene.add(cab);
   const dl = new THREE.Mesh(new THREE.SphereGeometry(0.01, 8, 6), new THREE.MeshBasicMaterial({ color:0xff2a2a, toneMapped:false }));
   dl.position.set(GX1 + CAB_D - 0.2, CAB_H - 0.09, BZ - CAB_W/2 + 0.2); cab.add(dl); blinkers.push({ m: dl, rate: 1.6, phase: 0.2 });
 }
+
+// ---- MIRRORS (10/16 his call): a real mirror in an Art Deco frame. Each time a visitor arrives at it, it
+// picks a random piece from the museum's OWN collection (images already on these walls, rights already
+// cleared), and that piece rises out of the glass like an apparition while they look into it. Every mirror
+// in the museum is built with mirror(), so every mirror behaves this way.
+const MIRROR_POOL = ['shabti', 'thoth_ibis_inlay', 'maat_figure', 'ibis_feather', 'ostracon_ramesses',
+  'moon_luna', 'moon_europa', 'moon_mimas', 'moon_enceladus', 'moon_titan', 'moon_io', 'moon_ganymede',
+  'r3_ani', 'r3_nakhtamun', 'r3_hunefer', 'r3_ring', 'r3_maat', 'r3_scarab', 'r3_painedjem', 'r3_thoth', 'r3_anubis'];
+const ghostCache = {};
+function ghostTexture(name, cb) {                  // the picture, feathered to nothing at the edges so it floats in the glass
+  if (ghostCache[name]) return cb(ghostCache[name]);
+  const img = new Image(); img.onload = () => {
+    const ar = img.width/img.height, w = 512, h = Math.round(512/ar);
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const q = c.getContext('2d');
+    q.drawImage(img, 0, 0, w, h);
+    q.globalCompositeOperation = 'destination-in';
+    const g = q.createRadialGradient(w/2, h/2, Math.min(w, h)*0.18, w/2, h/2, Math.max(w, h)*0.62);
+    g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)'); q.fillStyle = g; q.fillRect(0, 0, w, h);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    ghostCache[name] = { t, ar }; cb(ghostCache[name]);
+  };
+  img.src = 'assets/' + name + '.jpg';
+}
+const mirrors = [];
+function mirror(parent, x, y, z, ry, w, h, zone) {  // zone(x, z): where a visitor counts as "arrived" at this mirror
+  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; parent.add(g);
+  let glass;
+  if (!IS_TOUCH) {
+    glass = new Reflector(new THREE.PlaneGeometry(w, h), { textureWidth: 1024, textureHeight: Math.round(1024*h/w), color: 0xb7b2a6 });
+  } else {                                          // phones: a dark polished glass instead of a live reflection
+    glass = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ color:0x1a1a1c, roughness:0.08, metalness:0.95 }));
+  }
+  g.add(glass);
+  for (const [m, col] of [[0.06, goldMat], [0.12, ebony]]) {      // stepped Deco frame: gold inside, ebony outside
+    const t = 0.03;
+    for (const [fw, fh, fx, fy] of [[w + m*2, m, 0, h/2 + m/2], [w + m*2, m, 0, -h/2 - m/2], [m, h, -w/2 - m/2, 0], [m, h, w/2 + m/2, 0]]) {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(fw, fh, t), col); b.position.set(fx, fy, m === 0.06 ? 0.012 : 0.004); g.add(b);
+    }
+  }
+  const crest = new THREE.Mesh(new THREE.CircleGeometry(0.11, 32, 0, Math.PI), goldMat); crest.position.set(0, h/2 + 0.12, 0.02); g.add(crest);
+  for (let i = 0; i < 7; i++) { const a = Math.PI*(i + 0.5)/7, r = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.12, 0.004), goldMat);
+    r.position.set(Math.cos(a)*0.17, h/2 + 0.12 + Math.sin(a)*0.17, 0.02); r.rotation.z = a - Math.PI/2; g.add(r); }
+  const ghostMat = new THREE.MeshBasicMaterial({ transparent:true, opacity:0, depthWrite:false });
+  const ghost = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), ghostMat); ghost.position.z = 0.006; g.add(ghost);
+  // 10/16 his ask: LIKE & SUBSCRIBE in the glass, fading in and out while you look
+  const cc = document.createElement('canvas'); cc.width = 1024; cc.height = 256; const q = cc.getContext('2d');
+  q.textAlign = 'center'; q.shadowColor = 'rgba(0,0,0,0.85)'; q.shadowBlur = 18;
+  q.fillStyle = '#e9cf8a'; q.font = '500 84px Futura, "Century Gothic", sans-serif'; q.fillText('👍  LIKE  &  SUBSCRIBE  🔔', 512, 112);
+  q.fillStyle = '#33ff66'; q.font = '400 50px Futura, "Century Gothic", sans-serif'; q.fillText('@moonologyartgallery  🌙', 512, 200);
+  const ctaT = new THREE.CanvasTexture(cc); ctaT.colorSpace = THREE.SRGBColorSpace;
+  const ctaMat = new THREE.MeshBasicMaterial({ map: ctaT, transparent:true, opacity:0, depthWrite:false, toneMapped:false });
+  const cta = new THREE.Mesh(new THREE.PlaneGeometry(w*0.9, w*0.9/4), ctaMat); cta.position.set(0, -h/2 + w*0.9/8 + 0.06, 0.009); g.add(cta);
+  const M = { g, w, h, zone, ghost, ghostMat, ctaMat, lookT: 0, inside: false, last: null, name: null };
+  M.reroll = () => {
+    let n; do { n = MIRROR_POOL[Math.floor(Math.random()*MIRROR_POOL.length)]; } while (n === M.last && MIRROR_POOL.length > 1);
+    M.last = M.name = n;
+    ghostTexture(n, ({ t, ar }) => { if (M.name !== n) return;
+      ghostMat.map = t; ghostMat.needsUpdate = true;
+      const s = Math.min((w*0.86)/ar, h*0.86); ghost.scale.set(s*ar, s, 1); });
+  };
+  mirrors.push(M); return M;
+}
+const _mn = new THREE.Vector3(), _mp = new THREE.Vector3(), _cf = new THREE.Vector3();
+function mirrorsUpdate(dt, t) {
+  camera.getWorldDirection(_cf);
+  for (const M of mirrors) {
+    const here = M.zone(camera.position.x, camera.position.z);
+    if (here && !M.inside) M.reroll();              // a new piece every time someone arrives
+    M.inside = here;
+    M.g.getWorldPosition(_mp); _mn.set(0, 0, 1).applyQuaternion(M.g.getWorldQuaternion(new THREE.Quaternion()));
+    const toM = _mp.clone().sub(camera.position), dist = toM.length(); toM.normalize();
+    const looking = here && _cf.dot(toM) > 0.82 && _mn.dot(toM) < -0.5 && dist < 3.5;
+    const target = looking && M.ghostMat.map ? 0.78 + Math.sin(t*1.3)*0.06 : 0;   // it breathes a little while you watch
+    M.ghostMat.opacity += (target - M.ghostMat.opacity)*Math.min(1, dt*(looking ? 0.9 : 2.5));
+    // the call to action breathes in and out on a 6 s cycle, starting 2 s after the piece appears
+    M.lookT = looking ? M.lookT + dt : 0;
+    const cyc = M.lookT > 2 ? 0.5 - 0.5*Math.cos((M.lookT - 2)*Math.PI*2/6) : 0;
+    M.ctaMat.opacity += (cyc*0.95 - M.ctaMat.opacity)*Math.min(1, dt*4);
+  }
+}
+// the elevator mirror: back wall of the car, above the brass rail
+mirror(cab, GX1 + CAB_D - 0.02, 1.72, BZ, -Math.PI/2, CAB_W - 0.5, 1.15, (x, z) => inCab(x, z));   // crest clears the 2.7 m ceiling
+
 const innerDoors = (() => { const L = [];
   for (const s of [-1, 1]) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.03, EH, EW/2), [LEAF[s < 0 ? 1 : 0], edge, edge, edge, edge, edge]);   // the rider faces the sunburst too
     m.position.set(GX1 + 0.1, EH/2, BZ + s*EW/4); cab.add(m); L.push({ m, s, z0: BZ + s*EW/4 }); }
@@ -1448,6 +1536,11 @@ addEventListener('pointermove', e => {
 addEventListener('keydown', e => keys[e.code] = true);
 addEventListener('keyup',   e => keys[e.code] = false);
 let touchWalk = 0;
+// 10/16 HIS ASK: a turnaround trigger — one tap (or T) swings you 180°, eased like a person turning
+let turning = null;
+function turnAround() { if (turning) return; turning = { from: yaw, to: yaw + Math.PI, p0: pitch, t: 0 }; }
+document.getElementById('turn').addEventListener('pointerdown', e => { e.stopPropagation(); turnAround(); });
+addEventListener('keydown', e => { if (e.code === 'KeyT') turnAround(); });
 document.querySelectorAll('#walk button').forEach(b => {
   const d = Number(b.dataset.d);
   b.addEventListener('pointerdown', e => { e.stopPropagation(); touchWalk = d; });
@@ -1541,6 +1634,12 @@ function step() {
   if (!okHere || blocked(cx, cz)) {
     camera.position.x = prevX; camera.position.z = prevZ;
   }
+  if (turning) {
+    turning.t = Math.min(1, turning.t + dt/0.6);
+    const e = turning.t*turning.t*(3 - 2*turning.t);
+    yaw = turning.from + (turning.to - turning.from)*e; pitch = turning.p0*(1 - e);
+    if (turning.t >= 1) { yaw = Math.atan2(Math.sin(yaw), Math.cos(yaw)); turning = null; }
+  }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
   } else tourCamera(t);
 
@@ -1555,6 +1654,7 @@ function step() {
   spot.intensity = 60 + Math.sin(t * 0.4) * 2;   // a barely-there breathing of the gallery light
 
   elevUpdate(dt, t);
+  mirrorsUpdate(dt, t);
   lunar.rotation.y = t * 0.05;
   for (const tc of torches) {   // flame flicker
     const f = 0.85 + 0.15*Math.sin(t*9 + tc.seed) + 0.08*Math.sin(t*23 + tc.seed*2);
@@ -1588,7 +1688,7 @@ if (TOUR) {
 
 // ?elevtest — a scripted ride for checking the elevator headless: call, step in, choose B, ride, arrive
 if (QS.has('elevtest')) {
-  window.__m = { elev, camera, cab, innerDoors, outerDoors, keys, doAct };
+  window.__m = { elev, camera, cab, innerDoors, outerDoors, keys, doAct, mirrors };
   camera.position.set(GX1 - 1.6, 1.62, BZ); yaw = -Math.PI/2;
   setTimeout(() => doAct(), 300);
   setTimeout(() => { camera.position.set(GX1 + 1.0, 1.62, BZ); yaw = Math.PI/2; }, 2600);
@@ -1597,7 +1697,7 @@ if (QS.has('elevtest')) {
 }
 document.getElementById('enter').addEventListener('click', e => { e.currentTarget.remove(); audio(); });
 if (QS.has('skip') || TOUR) document.getElementById('enter').remove();
-if (TOUR) for (const id of ['hud', 'walk', 'label']) document.getElementById(id).style.display = 'none';  // for screenshots / direct links
+if (TOUR) for (const id of ['hud', 'walk', 'label', 'turn', 'act']) document.getElementById(id).style.display = 'none';  // for screenshots / direct links
 addEventListener('resize', () => {
   camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight);
