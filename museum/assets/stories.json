@@ -1,259 +1,412 @@
 [
-  {
-    "key": "shabti",
-    "title": "Shabti of Amenhotep III",
-    "story": "This carved figure is a shabti. The Getty art dictionary says shabtis went into tombs to serve the dead. The name is often read as \"answerer.\" The Met record says this one was made for King Amenhotep III. That was about 1386 to 1347 BCE. It probably came from his tomb in the West Valley of the Kings. It is ebony, 40 cm tall, with glass eyes. 🏺",
-    "sources": [
-      "https://collectionapi.metmuseum.org/public/collection/v1/objects/544492",
-      "https://vocab.getty.edu/page/aat/300184956",
-      "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300184956"
-    ],
-    "readMore": [
-      {
-        "label": "The Met: Shabti of Amenhotep III (15.2.10)",
-        "url": "https://www.metmuseum.org/art/collection/search/544492",
-        "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
-      },
-      {
-        "label": "Getty Art & Architecture Thesaurus: ushabti (shabti)",
-        "url": "https://vocab.getty.edu/page/aat/300184956",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "thoth_ibis_inlay",
-    "title": "Inlay depicting Thoth as the ibis with a Maat feather",
-    "story": "The Met titles this piece an inlay of Thoth as the ibis with a Maat feather. Its record dates it to 360 to 343 BCE. That falls in Dynasty 30, probably under King Nectanebo II. The Met says it is said to come from Hermopolis in Middle Egypt. The inlay is about 15.6 cm long. It is faience. The Getty calls that ground quartz with a glassy glaze. 🪶",
-    "sources": [
-      "https://collectionapi.metmuseum.org/public/collection/v1/objects/544093",
-      "https://vocab.getty.edu/page/aat/300265177",
-      "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300265177"
-    ],
-    "readMore": [
-      {
-        "label": "The Met: Inlay depicting Thoth as the ibis (26.7.992)",
-        "url": "https://www.metmuseum.org/art/collection/search/544093",
-        "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
-      },
-      {
-        "label": "Getty Art & Architecture Thesaurus: faience",
-        "url": "https://vocab.getty.edu/page/aat/300265177",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "maat_figure",
-    "title": "Figure of the goddess Maat",
-    "story": "The Met calls this small carving a figure of the goddess Maat. Its record places it in Dynasty 22. That is about 945 to 721 BCE, in the Third Intermediate Period. The find place is given as Egypt. The figure stands just 6.6 cm high. That is about the length of a finger. It is cut from feldspar. The Getty lists that stone as a gem stone. 💚",
-    "sources": [
-      "https://collectionapi.metmuseum.org/public/collection/v1/objects/552741",
-      "https://vocab.getty.edu/page/aat/300210989",
-      "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300210989"
-    ],
-    "readMore": [
-      {
-        "label": "The Met: Figure of the goddess Maat (59.26.1)",
-        "url": "https://www.metmuseum.org/art/collection/search/552741",
-        "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
-      },
-      {
-        "label": "Getty Art & Architecture Thesaurus: feldspar",
-        "url": "https://vocab.getty.edu/page/aat/300210989",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "ibis_feather",
-    "title": "Ibis with maat feather",
-    "story": "The Met lists this small faience piece as an amulet. Its title is \"Ibis with maat feather.\" The Getty says amulets were worn as charms. People wore them to keep harm away or to bring good luck. The Met record dates this one from 664 to 30 BCE. That span runs from the Late Period into the Ptolemaic Period. The find place is given as Egypt. It is 1.9 cm long. ✨",
-    "sources": [
-      "https://collectionapi.metmuseum.org/public/collection/v1/objects/570351",
-      "https://vocab.getty.edu/page/aat/300266585",
-      "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300266585"
-    ],
-    "readMore": [
-      {
-        "label": "The Met: Ibis with maat feather (26.7.873)",
-        "url": "https://www.metmuseum.org/art/collection/search/570351",
-        "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
-      },
-      {
-        "label": "Getty Art & Architecture Thesaurus: amulets",
-        "url": "https://vocab.getty.edu/page/aat/300266585",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "ostracon_ramesses",
-    "title": "Ostracon depicting Ramesses IX offering Maat",
-    "story": "An ostracon is a piece of pottery or stone with writing on it. That is how the Getty puts it. This one is limestone and ink, 15 cm tall. The Met record dates it to the reign of Ramesses IX. That is about 1137 to 1118 BCE. It came from the Valley of the Kings, dug up in 1913. The Met attributes the drawing to a chief draftsman named Amenhotep. ✍️",
-    "sources": [
-      "https://collectionapi.metmuseum.org/public/collection/v1/objects/544716",
-      "https://vocab.getty.edu/page/aat/300185396",
-      "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300185396"
-    ],
-    "readMore": [
-      {
-        "label": "The Met: Ostracon depicting Ramesses IX offering Maat (14.6.215)",
-        "url": "https://www.metmuseum.org/art/collection/search/544716",
-        "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
-      },
-      {
-        "label": "Getty Art & Architecture Thesaurus: ostraca",
-        "url": "https://vocab.getty.edu/page/aat/300185396",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "luna",
-    "title": "Luna · Earth's Moon",
-    "story": "The Moon is Earth's only moon. NASA says it sits about 238,855 miles away. That is 384,400 km. NASA says Earth and the Moon are tidally locked. We only ever see one side of it. NASA adds that no one saw the far side until 1959. A Soviet spacecraft flew past it. This globe uses NASA's CGI Moon Kit colour map. It was made from Lunar Reconnaissance Orbiter data. 🌙",
-    "sources": [
-      "https://science.nasa.gov/moon/facts/",
-      "https://svs.gsfc.nasa.gov/4720/"
-    ],
-    "readMore": [
-      {
-        "label": "NASA: Moon Facts",
-        "url": "https://science.nasa.gov/moon/facts/",
-        "status": "HTTP 200 verified 2026-10-12"
-      },
-      {
-        "label": "NASA Scientific Visualization Studio: CGI Moon Kit (SVS 4720)",
-        "url": "https://svs.gsfc.nasa.gov/4720/",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "europa",
-    "title": "Europa · Jupiter's icy moon",
-    "story": "Europa is the fourth largest moon of Jupiter. NASA says many scientists think a salty ocean lies under its icy shell. They believe it holds twice as much water as Earth's ocean. NASA sent the Europa Clipper spacecraft there in October 2024. This view came from the Galileo spacecraft. It flew by in 1995 and 1998. NASA says the bluer, whiter spots hold purer water ice. 🧊",
-    "sources": [
-      "https://science.nasa.gov/jupiter/jupiter-moons/europa/",
-      "https://science.nasa.gov/photojournal/europas-stunning-surface-2/"
-    ],
-    "readMore": [
-      {
-        "label": "NASA Photojournal: Europa's Stunning Surface (PIA19048)",
-        "url": "https://science.nasa.gov/photojournal/europas-stunning-surface-2/",
-        "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA19048 redirects here)"
-      },
-      {
-        "label": "NASA: Europa",
-        "url": "https://science.nasa.gov/jupiter/jupiter-moons/europa/",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "mimas",
-    "title": "Mimas · Saturn's smallest major moon",
-    "story": "NASA says Mimas is the smallest of Saturn's main moons. It is about 245 miles across, or 394 km. William Herschel found it in 1789. Like our Moon, it keeps one face toward its planet. The big crater on the right is named Herschel. NASA says it is 130 km wide. That is a third of the whole moon. NASA says it makes Mimas look like the Death Star. 🪐",
-    "sources": [
-      "https://science.nasa.gov/saturn/moons/mimas/",
-      "https://science.nasa.gov/photojournal/flying-by-the-death-star-moon/"
-    ],
-    "readMore": [
-      {
-        "label": "NASA Photojournal: Flying by the \"Death Star\" Moon (PIA12570)",
-        "url": "https://science.nasa.gov/photojournal/flying-by-the-death-star-moon/",
-        "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA12570 redirects here)"
-      },
-      {
-        "label": "NASA: Mimas",
-        "url": "https://science.nasa.gov/saturn/moons/mimas/",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "enceladus",
-    "title": "Enceladus · the moon that sprays its ocean",
-    "story": "NASA says Enceladus is a small, icy moon. Jets on it throw water and ice into space. So spacecraft can sample its ocean from outside. NASA says those samples hold most of the chemicals life needs. This map was built from Cassini pictures. It is one of the first colour maps of the whole moon. NASA says the colours are stretched past what eyes can see. 🌊",
-    "sources": [
-      "https://science.nasa.gov/saturn/moons/enceladus/",
-      "https://science.nasa.gov/photojournal/color-maps-of-enceladus-2014/"
-    ],
-    "readMore": [
-      {
-        "label": "NASA Photojournal: Color Maps of Enceladus – 2014 (PIA18435)",
-        "url": "https://science.nasa.gov/photojournal/color-maps-of-enceladus-2014/",
-        "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA18435 redirects here)"
-      },
-      {
-        "label": "NASA: Enceladus",
-        "url": "https://science.nasa.gov/saturn/moons/enceladus/",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "titan",
-    "title": "Titan · Saturn's largest moon",
-    "story": "NASA says Titan is Saturn's largest moon. It is the only moon known to have a thick air layer. NASA says it is also the only place but Earth with liquid on the ground. It has clouds, rain, rivers, lakes and seas. They are made of methane and ethane, not water. Haze hides the ground. So NASA built this map from 9,873 Cassini pictures. 🟠",
-    "sources": [
-      "https://science.nasa.gov/saturn/moons/titan/",
-      "https://science.nasa.gov/photojournal/titan-mosaic-the-surface-under-the-haze/"
-    ],
-    "readMore": [
-      {
-        "label": "NASA Photojournal: Titan Mosaic – The Surface Under the Haze (PIA22770)",
-        "url": "https://science.nasa.gov/photojournal/titan-mosaic-the-surface-under-the-haze/",
-        "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA22770 redirects here)"
-      },
-      {
-        "label": "NASA: Titan",
-        "url": "https://science.nasa.gov/saturn/moons/titan/",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "io",
-    "title": "Io · the most volcanic world we know",
-    "story": "NASA calls Io the most volcanic world in the solar system. It has hundreds of volcanoes and lakes of melted rock. NASA says Io is caught in a tug of war. Jupiter pulls on it, and so do two other moons. Those are Europa and Ganymede. NASA says Io is just a bit larger than our Moon. The Galileo spacecraft took this view on 3 July 1999. 🌋",
-    "sources": [
-      "https://science.nasa.gov/jupiter/jupiter-moons/io/",
-      "https://science.nasa.gov/photojournal/global-image-of-io-true-color/"
-    ],
-    "readMore": [
-      {
-        "label": "NASA Photojournal: Global image of Io, true colour (PIA02308)",
-        "url": "https://science.nasa.gov/photojournal/global-image-of-io-true-color/",
-        "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA02308 redirects here)"
-      },
-      {
-        "label": "NASA: Io",
-        "url": "https://science.nasa.gov/jupiter/jupiter-moons/io/",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  },
-  {
-    "key": "ganymede",
-    "title": "Ganymede · the biggest moon of all",
-    "story": "NASA says Ganymede is the largest moon in the solar system. It is bigger than the planet Mercury. It is the only moon known to have its own magnetic field. NASA says that field lights up auroras near its poles. NASA adds there is strong proof of a salty ocean under the ice. The USGS built this map from Galileo and Voyager pictures. 🧭",
-    "sources": [
-      "https://science.nasa.gov/jupiter/jupiter-moons/ganymede/",
-      "https://astrogeology.usgs.gov/search/map/ganymede_voyager_galileo_ssi_global_mosaic_1km"
-    ],
-    "readMore": [
-      {
-        "label": "USGS Astrogeology: Ganymede Voyager – Galileo SSI Global Mosaic 1km",
-        "url": "https://astrogeology.usgs.gov/search/map/ganymede_voyager_galileo_ssi_global_mosaic_1km",
-        "status": "HTTP 200 verified 2026-10-12 (page content confirmed, not a soft 404)"
-      },
-      {
-        "label": "NASA: Ganymede",
-        "url": "https://science.nasa.gov/jupiter/jupiter-moons/ganymede/",
-        "status": "HTTP 200 verified 2026-10-12"
-      }
-    ]
-  }
+ {
+  "key": "shabti",
+  "title": "Shabti of Amenhotep III",
+  "story": "This carved figure is a shabti. The Getty art dictionary says shabtis went into tombs to serve the dead. The name is often read as \"answerer.\" The Met record says this one was made for King Amenhotep III. That was about 1386 to 1347 BCE. It probably came from his tomb in the West Valley of the Kings. It is ebony, 40 cm tall, with glass eyes. 🏺",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/544492",
+   "https://vocab.getty.edu/page/aat/300184956",
+   "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300184956"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Shabti of Amenhotep III (15.2.10)",
+    "url": "https://www.metmuseum.org/art/collection/search/544492",
+    "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
+   },
+   {
+    "label": "Getty Art & Architecture Thesaurus: ushabti (shabti)",
+    "url": "https://vocab.getty.edu/page/aat/300184956",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "thoth_ibis_inlay",
+  "title": "Inlay depicting Thoth as the ibis with a Maat feather",
+  "story": "The Met titles this piece an inlay of Thoth as the ibis with a Maat feather. Its record dates it to 360 to 343 BCE. That falls in Dynasty 30, probably under King Nectanebo II. The Met says it is said to come from Hermopolis in Middle Egypt. The inlay is about 15.6 cm long. It is faience. The Getty calls that ground quartz with a glassy glaze. 🪶",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/544093",
+   "https://vocab.getty.edu/page/aat/300265177",
+   "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300265177"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Inlay depicting Thoth as the ibis (26.7.992)",
+    "url": "https://www.metmuseum.org/art/collection/search/544093",
+    "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
+   },
+   {
+    "label": "Getty Art & Architecture Thesaurus: faience",
+    "url": "https://vocab.getty.edu/page/aat/300265177",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "maat_figure",
+  "title": "Figure of the goddess Maat",
+  "story": "The Met calls this small carving a figure of the goddess Maat. Its record places it in Dynasty 22. That is about 945 to 721 BCE, in the Third Intermediate Period. The find place is given as Egypt. The figure stands just 6.6 cm high. That is about the length of a finger. It is cut from feldspar. The Getty lists that stone as a gem stone. 💚",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/552741",
+   "https://vocab.getty.edu/page/aat/300210989",
+   "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300210989"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Figure of the goddess Maat (59.26.1)",
+    "url": "https://www.metmuseum.org/art/collection/search/552741",
+    "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
+   },
+   {
+    "label": "Getty Art & Architecture Thesaurus: feldspar",
+    "url": "https://vocab.getty.edu/page/aat/300210989",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "ibis_feather",
+  "title": "Ibis with maat feather",
+  "story": "The Met lists this small faience piece as an amulet. Its title is \"Ibis with maat feather.\" The Getty says amulets were worn as charms. People wore them to keep harm away or to bring good luck. The Met record dates this one from 664 to 30 BCE. That span runs from the Late Period into the Ptolemaic Period. The find place is given as Egypt. It is 1.9 cm long. ✨",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/570351",
+   "https://vocab.getty.edu/page/aat/300266585",
+   "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300266585"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Ibis with maat feather (26.7.873)",
+    "url": "https://www.metmuseum.org/art/collection/search/570351",
+    "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
+   },
+   {
+    "label": "Getty Art & Architecture Thesaurus: amulets",
+    "url": "https://vocab.getty.edu/page/aat/300266585",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "ostracon_ramesses",
+  "title": "Ostracon depicting Ramesses IX offering Maat",
+  "story": "An ostracon is a piece of pottery or stone with writing on it. That is how the Getty puts it. This one is limestone and ink, 15 cm tall. The Met record dates it to the reign of Ramesses IX. That is about 1137 to 1118 BCE. It came from the Valley of the Kings, dug up in 1913. The Met attributes the drawing to a chief draftsman named Amenhotep. ✍️",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/544716",
+   "https://vocab.getty.edu/page/aat/300185396",
+   "http://vocabsservices.getty.edu/AATService.asmx/AATGetSubject?subjectID=300185396"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Ostracon depicting Ramesses IX offering Maat (14.6.215)",
+    "url": "https://www.metmuseum.org/art/collection/search/544716",
+    "status": "URL taken from the Met's own record; the record itself verified HTTP 200 at collectionapi.metmuseum.org on 2026-10-12. The public page returns 429 to curl (Met blocks automated requests), so it was not load-checked."
+   },
+   {
+    "label": "Getty Art & Architecture Thesaurus: ostraca",
+    "url": "https://vocab.getty.edu/page/aat/300185396",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "luna",
+  "title": "Luna · Earth's Moon",
+  "story": "The Moon is Earth's only moon. NASA says it sits about 238,855 miles away. That is 384,400 km. NASA says Earth and the Moon are tidally locked. We only ever see one side of it. NASA adds that no one saw the far side until 1959. A Soviet spacecraft flew past it. This globe uses NASA's CGI Moon Kit colour map. It was made from Lunar Reconnaissance Orbiter data. 🌙",
+  "sources": [
+   "https://science.nasa.gov/moon/facts/",
+   "https://svs.gsfc.nasa.gov/4720/"
+  ],
+  "readMore": [
+   {
+    "label": "NASA: Moon Facts",
+    "url": "https://science.nasa.gov/moon/facts/",
+    "status": "HTTP 200 verified 2026-10-12"
+   },
+   {
+    "label": "NASA Scientific Visualization Studio: CGI Moon Kit (SVS 4720)",
+    "url": "https://svs.gsfc.nasa.gov/4720/",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "europa",
+  "title": "Europa · Jupiter's icy moon",
+  "story": "Europa is the fourth largest moon of Jupiter. NASA says many scientists think a salty ocean lies under its icy shell. They believe it holds twice as much water as Earth's ocean. NASA sent the Europa Clipper spacecraft there in October 2024. This view came from the Galileo spacecraft. It flew by in 1995 and 1998. NASA says the bluer, whiter spots hold purer water ice. 🧊",
+  "sources": [
+   "https://science.nasa.gov/jupiter/jupiter-moons/europa/",
+   "https://science.nasa.gov/photojournal/europas-stunning-surface-2/"
+  ],
+  "readMore": [
+   {
+    "label": "NASA Photojournal: Europa's Stunning Surface (PIA19048)",
+    "url": "https://science.nasa.gov/photojournal/europas-stunning-surface-2/",
+    "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA19048 redirects here)"
+   },
+   {
+    "label": "NASA: Europa",
+    "url": "https://science.nasa.gov/jupiter/jupiter-moons/europa/",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "mimas",
+  "title": "Mimas · Saturn's smallest major moon",
+  "story": "NASA says Mimas is the smallest of Saturn's main moons. It is about 245 miles across, or 394 km. William Herschel found it in 1789. Like our Moon, it keeps one face toward its planet. The big crater on the right is named Herschel. NASA says it is 130 km wide. That is a third of the whole moon. NASA says it makes Mimas look like the Death Star. 🪐",
+  "sources": [
+   "https://science.nasa.gov/saturn/moons/mimas/",
+   "https://science.nasa.gov/photojournal/flying-by-the-death-star-moon/"
+  ],
+  "readMore": [
+   {
+    "label": "NASA Photojournal: Flying by the \"Death Star\" Moon (PIA12570)",
+    "url": "https://science.nasa.gov/photojournal/flying-by-the-death-star-moon/",
+    "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA12570 redirects here)"
+   },
+   {
+    "label": "NASA: Mimas",
+    "url": "https://science.nasa.gov/saturn/moons/mimas/",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "enceladus",
+  "title": "Enceladus · the moon that sprays its ocean",
+  "story": "NASA says Enceladus is a small, icy moon. Jets on it throw water and ice into space. So spacecraft can sample its ocean from outside. NASA says those samples hold most of the chemicals life needs. This map was built from Cassini pictures. It is one of the first colour maps of the whole moon. NASA says the colours are stretched past what eyes can see. 🌊",
+  "sources": [
+   "https://science.nasa.gov/saturn/moons/enceladus/",
+   "https://science.nasa.gov/photojournal/color-maps-of-enceladus-2014/"
+  ],
+  "readMore": [
+   {
+    "label": "NASA Photojournal: Color Maps of Enceladus – 2014 (PIA18435)",
+    "url": "https://science.nasa.gov/photojournal/color-maps-of-enceladus-2014/",
+    "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA18435 redirects here)"
+   },
+   {
+    "label": "NASA: Enceladus",
+    "url": "https://science.nasa.gov/saturn/moons/enceladus/",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "titan",
+  "title": "Titan · Saturn's largest moon",
+  "story": "NASA says Titan is Saturn's largest moon. It is the only moon known to have a thick air layer. NASA says it is also the only place but Earth with liquid on the ground. It has clouds, rain, rivers, lakes and seas. They are made of methane and ethane, not water. Haze hides the ground. So NASA built this map from 9,873 Cassini pictures. 🟠",
+  "sources": [
+   "https://science.nasa.gov/saturn/moons/titan/",
+   "https://science.nasa.gov/photojournal/titan-mosaic-the-surface-under-the-haze/"
+  ],
+  "readMore": [
+   {
+    "label": "NASA Photojournal: Titan Mosaic – The Surface Under the Haze (PIA22770)",
+    "url": "https://science.nasa.gov/photojournal/titan-mosaic-the-surface-under-the-haze/",
+    "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA22770 redirects here)"
+   },
+   {
+    "label": "NASA: Titan",
+    "url": "https://science.nasa.gov/saturn/moons/titan/",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "io",
+  "title": "Io · the most volcanic world we know",
+  "story": "NASA calls Io the most volcanic world in the solar system. It has hundreds of volcanoes and lakes of melted rock. NASA says Io is caught in a tug of war. Jupiter pulls on it, and so do two other moons. Those are Europa and Ganymede. NASA says Io is just a bit larger than our Moon. The Galileo spacecraft took this view on 3 July 1999. 🌋",
+  "sources": [
+   "https://science.nasa.gov/jupiter/jupiter-moons/io/",
+   "https://science.nasa.gov/photojournal/global-image-of-io-true-color/"
+  ],
+  "readMore": [
+   {
+    "label": "NASA Photojournal: Global image of Io, true colour (PIA02308)",
+    "url": "https://science.nasa.gov/photojournal/global-image-of-io-true-color/",
+    "status": "HTTP 200 verified 2026-10-12 (photojournal.jpl.nasa.gov/catalog/PIA02308 redirects here)"
+   },
+   {
+    "label": "NASA: Io",
+    "url": "https://science.nasa.gov/jupiter/jupiter-moons/io/",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "ganymede",
+  "title": "Ganymede · the biggest moon of all",
+  "story": "NASA says Ganymede is the largest moon in the solar system. It is bigger than the planet Mercury. It is the only moon known to have its own magnetic field. NASA says that field lights up auroras near its poles. NASA adds there is strong proof of a salty ocean under the ice. The USGS built this map from Galileo and Voyager pictures. 🧭",
+  "sources": [
+   "https://science.nasa.gov/jupiter/jupiter-moons/ganymede/",
+   "https://astrogeology.usgs.gov/search/map/ganymede_voyager_galileo_ssi_global_mosaic_1km"
+  ],
+  "readMore": [
+   {
+    "label": "USGS Astrogeology: Ganymede Voyager – Galileo SSI Global Mosaic 1km",
+    "url": "https://astrogeology.usgs.gov/search/map/ganymede_voyager_galileo_ssi_global_mosaic_1km",
+    "status": "HTTP 200 verified 2026-10-12 (page content confirmed, not a soft 404)"
+   },
+   {
+    "label": "NASA: Ganymede",
+    "url": "https://science.nasa.gov/jupiter/jupiter-moons/ganymede/",
+    "status": "HTTP 200 verified 2026-10-12"
+   }
+  ]
+ },
+ {
+  "key": "r3_ani",
+  "title": "Papyrus of Ani: the weighing of the heart",
+  "story": "This is a copy of a page from the Papyrus of Ani. The British Museum says the scene is the Hall of Judgment. A balance holds Ani's heart on one pan. A feather for Maat sits on the other. Anubis steadies the plumb bob. Thoth, with the head of an ibis, writes down the result. A monster waits to eat the heart if Ani fails. The original dates to about 1250 BCE. 📜",
+  "sources": [
+   "https://www.britishmuseum.org/collection/object/Y_EA10470-3"
+  ],
+  "readMore": [
+   {
+    "label": "British Museum: Papyrus of Ani, sheet 3 (EA10470,3)",
+    "url": "https://www.britishmuseum.org/collection/object/Y_EA10470-3",
+    "status": "Read in Chrome 2026-10-16 (the site blocks automated fetches)."
+   }
+  ]
+ },
+ {
+  "key": "r3_nakhtamun",
+  "title": "Anubis Weighing the Heart, Tomb of Nakhtamun",
+  "story": "This is not the tomb wall itself. It is a painted copy, made full size by the artist Nina de Garis Davies. The Met record says the original is in the Tomb of Nakhtamun at Thebes. The tomb dates to the reign of Ramesses II, about 1290 to 1224 BCE. The scene shows Anubis at the scales. The copy is tempera on paper, 65.5 cm tall. 🎨",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/557830"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Anubis Weighing the Heart, Tomb of Nakhtamun (33.8.21)",
+    "url": "https://www.metmuseum.org/art/collection/search/557830",
+    "status": "Met collection API record read 2026-10-16 (public page 429s to curl)."
+   }
+  ]
+ },
+ {
+  "key": "r3_hunefer",
+  "title": "Papyrus of Hunefer: the judgment scene",
+  "story": "This page comes from the Book of the Dead of Hunefer. The British Museum says it shows scenes from his judgment. Its notes list five gods in the pictures. They are Anubis, Thoth, Ammit, Horus and Osiris. Hunefer was a scribe of the king. The museum says he may have written this papyrus himself. The page also has Spell 30B, the words spoken to the heart. 📜",
+  "sources": [
+   "https://www.britishmuseum.org/collection/object/Y_EA9901-3",
+   "https://www.britishmuseum.org/collection/object/Y_EA10470-3"
+  ],
+  "readMore": [
+   {
+    "label": "British Museum: Book of the Dead of Hunefer, sheet 3 (EA9901,3)",
+    "url": "https://www.britishmuseum.org/collection/object/Y_EA9901-3",
+    "status": "Read in Chrome 2026-10-16 (the site blocks automated fetches)."
+   }
+  ]
+ },
+ {
+  "key": "r3_ring",
+  "title": "Ring Inscribed with the Hieroglyphs Nefer Maat",
+  "story": "This ring is only 2.5 cm across. The Met record says it is faience. It carries two hieroglyphs: nefer and maat. It was found at the palace of Amenhotep III at Malqata, in Thebes. The Met's own team dug it up in 1910 to 1911. It dates to about 1386 to 1347 BCE. 💍",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/551455"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Ring Inscribed with the Hieroglyphs Nefer Maat (11.215.97)",
+    "url": "https://www.metmuseum.org/art/collection/search/551455",
+    "status": "Met collection API record read 2026-10-16 (public page 429s to curl)."
+   }
+  ]
+ },
+ {
+  "key": "r3_maat",
+  "title": "Maat",
+  "story": "This tiny figure of Maat is only 3.2 cm tall. The Met record says it is made of bright blue faience. It dates from 664 to 30 BCE. The British Museum calls Maat the goddess of truth and order. In the weighing scenes in this room, a feather for Maat sits on the scale. 🪶",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/551794",
+   "https://www.britishmuseum.org/collection/object/Y_EA10470-3"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Maat (21.6.51)",
+    "url": "https://www.metmuseum.org/art/collection/search/551794",
+    "status": "Met collection API record read 2026-10-16 (public page 429s to curl)."
+   }
+  ]
+ },
+ {
+  "key": "r3_scarab",
+  "title": "Heart Scarab inscribed for Gautsoshen",
+  "story": "This is a heart scarab, carved from slate. It is 5.7 cm long. The Met record says it came from the burial of Gautsoshen, in a tomb at Deir el-Bahri, Thebes. The Met's own team dug it up in 1923 to 1924. It dates to about 1080 to 945 BCE. The top is a beetle. The flat underside is cut with lines of hieroglyphs. 🪲",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/548252"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Heart Scarab inscribed for Gautsoshen (25.3.163)",
+    "url": "https://www.metmuseum.org/art/collection/search/548252",
+    "status": "Met collection API record read 2026-10-16 (public page 429s to curl)."
+   }
+  ]
+ },
+ {
+  "key": "r3_painedjem",
+  "title": "Heart amulet of Painedjem I",
+  "story": "This heart-shaped amulet belonged to Painedjem I. The Met record calls him a High Priest. It dates to about 1080 to 1042 BCE. It is carved from serpentinite and stands 4.3 cm tall. The Met tags a crane in its carving. In the weighing scenes in this room, the heart is what goes on the scale. 🏺",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/554823"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Heart amulet of Painedjem I (22.2.24)",
+    "url": "https://www.metmuseum.org/art/collection/search/554823",
+    "status": "Met collection API record read 2026-10-16 (public page 429s to curl)."
+   }
+  ]
+ },
+ {
+  "key": "r3_thoth",
+  "title": "Amulet of the God Thoth",
+  "story": "This small amulet shows the god Thoth with the head of an ibis. The Art Institute of Chicago dates it to the Late Period, 664 to 332 BCE. It is faience and 4.8 cm tall. In the weighing scenes in this room, the British Museum says Thoth is the one who writes down the result. 🪶",
+  "sources": [
+   "https://api.artic.edu/api/v1/artworks/140921",
+   "https://www.britishmuseum.org/collection/object/Y_EA10470-3"
+  ],
+  "readMore": [
+   {
+    "label": "Art Institute of Chicago: Amulet of the God Thoth (1894.190)",
+    "url": "https://www.artic.edu/artworks/140921",
+    "status": "Record read at api.artic.edu 2026-10-16."
+   }
+  ]
+ },
+ {
+  "key": "r3_anubis",
+  "title": "Statue of Anubis as a recumbent canid",
+  "story": "This Anubis lies down like a resting dog. The Met calls it a recumbent canid. It is limestone, and it was once painted black. It is 64 cm long and weighs 20 kg. It was found in a temple deposit at the Sacred Animal Necropolis, North Saqqara. Diggers found it in 1966 to 1967. It dates from 343 to 30 BCE. 🏺",
+  "sources": [
+   "https://collectionapi.metmuseum.org/public/collection/v1/objects/544075"
+  ],
+  "readMore": [
+   {
+    "label": "The Met: Statue of Anubis as a recumbent canid (69.105)",
+    "url": "https://www.metmuseum.org/art/collection/search/544075",
+    "status": "Met collection API record read 2026-10-16 (public page 429s to curl)."
+   }
+  ]
+ },
+ {
+  "key": "balance",
+  "title": "The Balance",
+  "story": "This is not an ancient object. We made The Balance for this room. It follows the weighing scenes on these walls. The British Museum describes the Ani scene. A heart sits on one pan. A feather for Maat sits on the other. Anubis steadies the plumb bob. Walk around it. Then find the same scale in the papyri. ⚖️",
+  "sources": [
+   "https://www.britishmuseum.org/collection/object/Y_EA10470-3"
+  ],
+  "readMore": [
+   {
+    "label": "British Museum: the Ani judgment scene (EA10470,3)",
+    "url": "https://www.britishmuseum.org/collection/object/Y_EA10470-3",
+    "status": "Read in Chrome 2026-10-16 (the site blocks automated fetches)."
+   }
+  ]
+ }
 ]

@@ -1528,7 +1528,12 @@ fetch('assets/stories.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : [
 const KEY_BY_TITLE = { 'Shabti of Amenhotep III':'shabti', 'Inlay depicting Thoth as the ibis with a Maat feather':'thoth_ibis_inlay',
   'Figure of the goddess Maat':'maat_figure', 'Ibis with maat feather':'ibis_feather',
   'Ostracon depicting Ramesses IX offering Maat, attributed to the chief draftsman Amenhotep':'ostracon_ramesses',
-  'Luna':'luna', 'Europa':'europa', 'Mimas':'mimas', 'Enceladus':'enceladus', 'Titan':'titan', 'Io':'io', 'Ganymede':'ganymede' };
+  'Luna':'luna', 'Europa':'europa', 'Mimas':'mimas', 'Enceladus':'enceladus', 'Titan':'titan', 'Io':'io', 'Ganymede':'ganymede',
+  // Room 03 (10/16)
+  'Papyrus of Ani: the weighing of the heart':'r3_ani', 'Anubis Weighing the Heart, Tomb of Nakhtamun':'r3_nakhtamun',
+  'Papyrus of Hunefer: the judgment scene':'r3_hunefer', 'Ring Inscribed with the Hieroglyphs Nefer Maat':'r3_ring', 'Maat':'r3_maat',
+  'Heart Scarab inscribed for Gautsoshen':'r3_scarab', 'Heart amulet of Painedjem I':'r3_painedjem', 'Amulet of the God Thoth':'r3_thoth',
+  'Statue of Anubis as a recumbent canid':'r3_anubis', 'The Balance':'balance' };
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 // 10/16 HIS PHONE TEST: "card stays in the way while walking" → near a piece you get a one-line TAG;
 // tap/click it for the full card (× closes it). Walking on folds it back. Clicking a piece opens it directly.
